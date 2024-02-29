@@ -3,15 +3,16 @@ minSdk = "21"
 compileSdk = "34"
 
 kotlin = "1.9.22"
+agp = "8.2.2"
+vanniktech-maven-publish = "0.27.0"
+dokka = "1.6.0"
+
 compose-compiler = "1.5.8"
 compose-ui = "1.6.2"
 compose-material3 = "1.2.0"
-agp = "8.2.2"
 androidx-core-ktx = "1.12.0"
 androidx-annotation = "1.7.1"
 google-accompanist-permissions = "0.34.0"
-nexus = "1.1.0"
-dokka = "1.6.0"
 
 [libraries]
 compose-ui = { module = "androidx.compose.ui:ui", version.ref = "compose-ui" }
@@ -25,5 +26,5 @@ google-accompanist-permissions = { module = "com.google.accompanist:accompanist-
 [plugins]
 android-library = { id = "com.android.library", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
-nexus-publish = { id = "io.github.gradle-nexus.publish-plugin", version.ref = "nexus" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
+vanniktech-maven-publish = { id = "com.vanniktech.maven.publish", version.ref = "vanniktech-maven-publish" }
