@@ -18,3 +18,4 @@ dependencyResolutionManagement {
 }
 
 include(":composeutils")
+include(":composeutils-permissions")
