@@ -6,6 +6,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.collectLatest
 
+/**
+ * Collect from [flow] and emit values into [collector], whilst relaunching the collection upon [flow], [key1] or [key2] changing.
+ */
 @Composable
 fun <T> CollectFromFlow(
     flow: Flow<T>,
@@ -18,6 +21,10 @@ fun <T> CollectFromFlow(
     }
 }
 
+/**
+ * Collect latest from [flow] with given [action], whilst relaunching the collection upon [flow], [key1] or [key2] changing.
+ * @see Flow.collectLatest
+ */
 @Composable
 fun <T> CollectLatestFromFlow(
     flow: Flow<T>,

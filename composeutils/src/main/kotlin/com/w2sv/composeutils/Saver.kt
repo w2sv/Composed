@@ -7,9 +7,15 @@ import androidx.compose.runtime.saveable.mapSaver
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 
+/**
+ * @return rememberSavable state saver for [Color].
+ */
 fun colorSaver() =
     Saver<Color, Int>(save = { it.toArgb() }, restore = { Color(it) })
 
+/**
+ * @return rememberSavable state saver for an optional [Color].
+ */
 fun nullableColorSaver() =
     nullableListSaver<Color, Float>(
         saveNonNull = {
@@ -20,6 +26,9 @@ fun nullableColorSaver() =
         }
     )
 
+/**
+ * [listSaver] for an optional object of type [Original], that enables you to omit the handling of the case in which the state value == null. Only the saving and restoring of the non-null instance needs to be handled.
+ */
 fun <Original, Saveable> nullableListSaver(
     saveNonNull: SaverScope.(value: Original) -> List<Saveable>,
     restoreNonNull: (list: List<Saveable>) -> Original?
@@ -37,6 +46,9 @@ fun <Original, Saveable> nullableListSaver(
         }
     )
 
+/**
+ * [mapSaver] for an optional object of type [T], that enables you to omit the handling of the case in which the state value == null. Only the saving and restoring of the non-null instance needs to be handled.
+ */
 fun <T> nullableMapSaver(
     saveNonNull: SaverScope.(value: T) -> Map<String, Any?>,
     restoreNonNull: (Map<String, Any?>) -> T

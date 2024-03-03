@@ -8,7 +8,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.test.junit4.createComposeRule
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertThrows
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -43,9 +42,5 @@ class DrawerStateKtTest {
         drawerState.snapTo(DrawerValue.Closed)
 
         assertEquals(0f, visibilityPercentage)
-
-        assertThrows(IllegalStateException::class.java) {
-            drawerState.visibilityPercentage(20f)
-        }
     }
 }

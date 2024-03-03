@@ -1,4 +1,4 @@
-package com.w2sv.composeutils.permissions
+package com.w2sv.composeutils.permissions.extensions
 
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.MultiplePermissionsState
@@ -10,11 +10,11 @@ fun PermissionState.isLaunchingSuppressed(launchedBefore: Boolean): Boolean =
     !status.shouldShowRationale && launchedBefore
 
 @OptIn(ExperimentalPermissionsApi::class)
-fun PermissionState.launchPermissionRequest(launchedBefore: Boolean, onBlocked: () -> Unit) {
+fun PermissionState.launchPermissionRequest(launchedBefore: Boolean, onSuppressed: () -> Unit) {
     if (!isLaunchingSuppressed(launchedBefore))
         launchPermissionRequest()
     else
-        onBlocked()
+        onSuppressed()
 }
 
 @OptIn(ExperimentalPermissionsApi::class)
@@ -22,9 +22,12 @@ fun MultiplePermissionsState.isLaunchingSuppressed(launchedBefore: Boolean): Boo
     !shouldShowRationale && launchedBefore
 
 @OptIn(ExperimentalPermissionsApi::class)
-fun MultiplePermissionsState.launchMultiplePermissionRequest(launchedBefore: Boolean, onBlocked: () -> Unit) {
+fun MultiplePermissionsState.launchMultiplePermissionRequest(
+    launchedBefore: Boolean,
+    onSuppressed: () -> Unit
+) {
     if (!isLaunchingSuppressed(launchedBefore))
         launchMultiplePermissionRequest()
     else
-        onBlocked()
+        onSuppressed()
 }
