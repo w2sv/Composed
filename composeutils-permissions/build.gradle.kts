@@ -30,6 +30,19 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+    @Suppress("UnstableApiUsage")
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
+        }
+    }
+    buildFeatures {
+        compose = true
+        buildConfig = false
+    }
+    composeOptions {
+        kotlinCompilerExtensionVersion = libs.versions.compose.compiler.get()
+    }
 }
 
 dependencies {
