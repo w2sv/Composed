@@ -20,8 +20,4 @@ inline fun Modifier.thenIf(
     condition: Boolean,
     onTrue: Modifier.() -> Modifier,
 ): Modifier =
-    this.apply {
-        if (condition) {
-            onTrue()
-        }
-    }
+    thenIf(condition = condition, onFalse = { this }, onTrue = onTrue)

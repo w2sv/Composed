@@ -25,8 +25,15 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
+    @Suppress("UnstableApiUsage")
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
+        }
+    }
     buildFeatures {
         compose = true
+        buildConfig = false
     }
     composeOptions {
         kotlinCompilerExtensionVersion = libs.versions.compose.compiler.get()
@@ -44,4 +51,8 @@ dependencies {
     api(libs.compose.material3)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.annotation)
+    implementation(libs.androidx.ui.test.junit4.android)
+    lintChecks(libs.compose.lint.checks)
+    testImplementation(libs.junit)
+    testImplementation(libs.roboelectric)
 }

@@ -34,4 +34,5 @@ android {
 
 dependencies {
     api(libs.google.accompanist.permissions)
+    lintChecks(libs.compose.lint.checks)
 }
