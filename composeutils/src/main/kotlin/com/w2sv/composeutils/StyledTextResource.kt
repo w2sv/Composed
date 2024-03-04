@@ -7,6 +7,7 @@ package com.w2sv.composeutils
 import android.content.res.Resources
 import android.graphics.Typeface
 import android.text.Spanned
+import android.text.SpannedString
 import android.text.style.AbsoluteSizeSpan
 import android.text.style.ForegroundColorSpan
 import android.text.style.RelativeSizeSpan
@@ -18,11 +19,10 @@ import android.text.style.TypefaceSpan
 import android.text.style.UnderlineSpan
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -36,43 +36,49 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.core.text.HtmlCompat
 
-//@Composable
-//fun styledTextResource(@StringRes id: Int, vararg formatArgs: Any): AnnotatedString {
-//    val resources = resources()
-//    val density = LocalDensity.current
-//    return remember(id, formatArgs) {
-//        val text = resources.getHtmlText(id, *formatArgs)
-//        spannableStringToAnnotatedString(text, density)
-//    }
-//}
-
 @Composable
-fun styledTextResource(@StringRes id: Int): AnnotatedString {
-    return spannableStringToAnnotatedString(
-        spanned = HtmlCompat.fromHtml(
-            stringResource(id = id),
-            HtmlCompat.FROM_HTML_MODE_COMPACT
+fun rememberStyledTextResource(@StringRes id: Int, vararg formatArgs: Any): AnnotatedString {
+    val resources = LocalContext.current.resources
+    val density = LocalDensity.current
+    return remember(id, *formatArgs) {
+        spannableStringToAnnotatedString(
+            text = resources.getHtmlText(id, *formatArgs),
+            density = density
+        )
+    }
+}
+
+internal fun Resources.getHtmlText(@StringRes id: Int, vararg args: Any): Spanned {
+    return HtmlCompat.fromHtml(
+        String.format(
+            SpannedString(getText(id)).toHtmlWithoutParagraphs(),
+            *args
+                .map {
+                    if (it is Spanned) it.toHtmlWithoutParagraphs() else it
+                }
+                .toTypedArray()
         ),
-        density = LocalDensity.current
+        HtmlCompat.FROM_HTML_MODE_LEGACY
     )
 }
 
-//@Composable
-//@ReadOnlyComposable
-//private fun resources(): Resources {
-//    return LocalContext.current.resources
-//}
+private fun Spanned.toHtmlWithoutParagraphs(): String {
+    return HtmlCompat
+        .toHtml(this, HtmlCompat.TO_HTML_PARAGRAPH_LINES_CONSECUTIVE)
+        .substringAfter("<p dir=\"ltr\">")
+        .substringBeforeLast("</p>")
+}
 
 internal fun spannableStringToAnnotatedString(
-    spanned: Spanned,
+    text: Spanned,
     density: Density
 ): AnnotatedString {
     return buildAnnotatedString {
-        append(spanned.toString())
-        spanned.getSpans(0, spanned.length, Any::class.java)
+        append(text)
+        text.getSpans(0, text.length, Any::class.java)
             .forEach { span ->
-                val start = spanned.getSpanStart(span)
-                val end = spanned.getSpanEnd(span)
+                val start = text.getSpanStart(span)
+                val end = text.getSpanEnd(span)
                 when (span) {
                     is StyleSpan -> when (span.style) {
                         Typeface.NORMAL -> addStyle(

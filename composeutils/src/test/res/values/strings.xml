@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="bold_text"><![CDATA[Sample text with <b>bold styling</b> to test.]]></string>
-    <string name="italic_text"><![CDATA[Sample text with <i>bold styling</i> to test.]]></string>
+    <string name="bold_text">Sample text with <b>bold styling</b> to test.</string>
+    <string name="italic_text">Sample text with <i>italic styling</i> to test.</string>
 </resources>

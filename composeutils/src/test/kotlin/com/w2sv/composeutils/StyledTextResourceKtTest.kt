@@ -16,10 +16,10 @@ class StyledTextResourceKtTest {
     @Test
     fun conversion() {
         composeTestRule.setContent {
-            val boldText = styledTextResource(id = R.string.bold_text)
+            val boldText = rememberStyledTextResource(id = R.string.bold_text)
             boldText.examine()
 
-            val italicText = styledTextResource(id = R.string.bold_text)
+            val italicText = rememberStyledTextResource(id = R.string.italic_text)
             italicText.examine()
         }
     }
