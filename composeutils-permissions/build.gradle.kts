@@ -9,7 +9,7 @@ kotlin {
 }
 
 android {
-    namespace = "com.w2sv.composeutils"
+    namespace = "com.w2sv.composeutils.permissions"
     compileSdk = libs.versions.compileSdk.get().toInt()
 
     defaultConfig {

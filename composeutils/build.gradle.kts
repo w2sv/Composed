@@ -29,6 +29,7 @@ android {
     testOptions {
         unitTests {
             isIncludeAndroidResources = true
+            isReturnDefaultValues = true
         }
     }
     buildFeatures {
@@ -45,10 +46,14 @@ android {
     }
 }
 
+tasks.withType(Test::class.java) {
+    android.sourceSets.getByName("main").res.srcDir("src/test/res")
+}
+
 dependencies {
-    api(libs.compose.ui)
-    api(libs.compose.ui.tooling)
-    api(libs.compose.material3)
+    implementation(libs.compose.ui)
+    implementation(libs.compose.ui.tooling)
+    implementation(libs.compose.material3)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.annotation)
     implementation(libs.androidx.ui.test.junit4.android)
