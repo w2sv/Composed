@@ -8,11 +8,11 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 
 /**
- * Run the given [callback] inside of a [LifecycleEventObserver] launched as a [DisposableEffect], when the [lifecycleOwner] reaches the given [lifecycleEvent] and clean up the observer when [lifecycleOwner], [key1] or [key2] changes or if [DoOnLifecycleEvent] leaves the composition.
+ * Run the given [callback] inside of a [LifecycleEventObserver] launched as a [DisposableEffect], when the [lifecycleOwner] reaches the given [lifecycleEvent] and clean up the observer when [lifecycleOwner], [key1] or [key2] changes or if [OnLifecycleEvent] leaves the composition.
  * @see DisposableEffect
  */
 @Composable
-fun DoOnLifecycleEvent(
+fun OnLifecycleEvent(
     callback: () -> Unit,
     lifecycleEvent: Lifecycle.Event,
     lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
