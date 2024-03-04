@@ -7,11 +7,9 @@ package com.w2sv.composeutils
 import android.content.res.Resources
 import android.graphics.Typeface
 import android.text.Spanned
-import android.text.SpannedString
 import android.text.style.AbsoluteSizeSpan
 import android.text.style.ForegroundColorSpan
 import android.text.style.RelativeSizeSpan
-import android.text.style.StrikethroughSpan
 import android.text.style.StyleSpan
 import android.text.style.SubscriptSpan
 import android.text.style.SuperscriptSpan
@@ -35,6 +33,7 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.core.text.HtmlCompat
+import androidx.core.text.toSpanned
 
 @Composable
 fun rememberStyledTextResource(@StringRes id: Int, vararg formatArgs: Any): AnnotatedString {
@@ -51,14 +50,14 @@ fun rememberStyledTextResource(@StringRes id: Int, vararg formatArgs: Any): Anno
 internal fun Resources.getHtmlText(@StringRes id: Int, vararg args: Any): Spanned {
     return HtmlCompat.fromHtml(
         String.format(
-            SpannedString(getText(id)).toHtmlWithoutParagraphs(),
+            getText(id).toSpanned().toHtmlWithoutParagraphs(),
             *args
                 .map {
                     if (it is Spanned) it.toHtmlWithoutParagraphs() else it
                 }
                 .toTypedArray()
         ),
-        HtmlCompat.FROM_HTML_MODE_LEGACY
+        HtmlCompat.FROM_HTML_MODE_COMPACT
     )
 }
 
@@ -77,107 +76,52 @@ internal fun spannableStringToAnnotatedString(
         append(text)
         text.getSpans(0, text.length, Any::class.java)
             .forEach { span ->
-                val start = text.getSpanStart(span)
-                val end = text.getSpanEnd(span)
-                when (span) {
-                    is StyleSpan -> when (span.style) {
-                        Typeface.NORMAL -> addStyle(
-                            SpanStyle(
+                addStyle(
+                    when (span) {
+                        is StyleSpan -> when (span.style) {
+                            Typeface.NORMAL -> SpanStyle(
                                 fontWeight = FontWeight.Normal,
                                 fontStyle = FontStyle.Normal
-                            ),
-                            start,
-                            end
-                        )
+                            )
 
-                        Typeface.BOLD -> addStyle(
-                            SpanStyle(
+                            Typeface.BOLD -> SpanStyle(
                                 fontWeight = FontWeight.Bold,
                                 fontStyle = FontStyle.Normal
-                            ),
-                            start,
-                            end
-                        )
+                            )
 
-                        Typeface.ITALIC -> addStyle(
-                            SpanStyle(
+                            Typeface.ITALIC -> SpanStyle(
                                 fontWeight = FontWeight.Normal,
                                 fontStyle = FontStyle.Italic
-                            ),
-                            start,
-                            end
-                        )
+                            )
 
-                        Typeface.BOLD_ITALIC -> addStyle(
-                            SpanStyle(
-                                fontWeight = FontWeight.Bold,
-                                fontStyle = FontStyle.Italic
-                            ),
-                            start,
-                            end
-                        )
-                    }
+                            else -> SpanStyle()
+                        }
 
-                    is TypefaceSpan -> addStyle(
-                        SpanStyle(
+                        is TypefaceSpan -> SpanStyle(
                             fontFamily = when (span.family) {
-                                FontFamily.SansSerif.name -> FontFamily.SansSerif
-                                FontFamily.Serif.name -> FontFamily.Serif
+                                // FontFamily.SansSerif.name -> FontFamily.SansSerif
+                                // FontFamily.Serif.name -> FontFamily.Serif
                                 FontFamily.Monospace.name -> FontFamily.Monospace
-                                FontFamily.Cursive.name -> FontFamily.Cursive
+                                // FontFamily.Cursive.name -> FontFamily.Cursive
                                 else -> FontFamily.Default
                             }
-                        ),
-                        start,
-                        end
-                    )
-
-                    is AbsoluteSizeSpan -> with(density) {
-                        addStyle(
-                            SpanStyle(fontSize = if (span.dip) span.size.dp.toSp() else span.size.toSp()),
-                            start,
-                            end
                         )
-                    }
 
-                    is RelativeSizeSpan -> addStyle(
-                        SpanStyle(fontSize = span.sizeChange.em),
-                        start,
-                        end
-                    )
+                        is AbsoluteSizeSpan -> density.run {
+                            SpanStyle(fontSize = if (span.dip) span.size.dp.toSp() else span.size.toSp())
+                        }
 
-                    is StrikethroughSpan -> addStyle(
-                        SpanStyle(textDecoration = TextDecoration.LineThrough),
-                        start,
-                        end
-                    )
-
-                    is UnderlineSpan -> addStyle(
-                        SpanStyle(textDecoration = TextDecoration.Underline),
-                        start,
-                        end
-                    )
-
-                    is SuperscriptSpan -> addStyle(
-                        SpanStyle(baselineShift = BaselineShift.Superscript),
-                        start,
-                        end
-                    )
-
-                    is SubscriptSpan -> addStyle(
-                        SpanStyle(baselineShift = BaselineShift.Subscript),
-                        start,
-                        end
-                    )
-
-                    is ForegroundColorSpan -> addStyle(
-                        SpanStyle(color = Color(span.foregroundColor)),
-                        start,
-                        end
-                    )
-
-                    else -> addStyle(SpanStyle(), start, end)
-                }
+                        is RelativeSizeSpan -> SpanStyle(fontSize = span.sizeChange.em)
+                        // is StrikethroughSpan -> SpanStyle(textDecoration = TextDecoration.LineThrough)
+                        is UnderlineSpan -> SpanStyle(textDecoration = TextDecoration.Underline)
+                        is SuperscriptSpan -> SpanStyle(baselineShift = BaselineShift.Superscript)
+                        is SubscriptSpan -> SpanStyle(baselineShift = BaselineShift.Subscript)
+                        is ForegroundColorSpan -> SpanStyle(color = Color(span.foregroundColor))
+                        else -> SpanStyle()
+                    },
+                    text.getSpanStart(span),
+                    text.getSpanEnd(span)
+                )
             }
     }
 }

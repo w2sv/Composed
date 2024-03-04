@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="bold_text">Sample text with <b>bold styling</b> to test.</string>
-    <string name="italic_text">Sample text with <i>italic styling</i> to test.</string>
+    <string name="bold">Sample text with <b>bold styling</b> to test.</string>
+    <string name="italic">Sample text with <i>italic styling</i> to test.</string>
+    <string name="bold_italic_consecutive">Sample text with <b>bold styling</b> and <i>italic styling</i> to test.</string>
+    <string name="bold_italic_nested">Sample text with <b>bold <i>italic</i> styling</b> to test.</string>
+    <string name="subscript">Sample text with <sub>subscript</sub> to test.</string>
+    <string name="superscript">Sample text with <sup>subscript</sup> to test.</string>
+    <string name="strikethrough">Sample text with <s>strikethrough</s> to test.</string>
+    <string name="underline">Sample text with <u>underline</u> to test.</string>
+    <string name="colored">Sample text with <font color="#9900FF">colored</font> to test.</string>
+    <string name="monospace">Sample text with <font face="monospace">monospace</font> to test.</string>
 </resources>
