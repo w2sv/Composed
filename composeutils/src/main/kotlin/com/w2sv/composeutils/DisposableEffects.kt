@@ -32,3 +32,12 @@ fun DoOnLifecycleEvent(
         }
     }
 }
+
+@Composable
+fun OnRemoveFromComposition(callback: () -> Unit) {
+    DisposableEffect(Unit) {
+        onDispose {
+            callback()
+        }
+    }
+}
