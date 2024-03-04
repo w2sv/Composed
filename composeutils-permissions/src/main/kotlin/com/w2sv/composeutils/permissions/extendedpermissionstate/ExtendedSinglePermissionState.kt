@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalPermissionsApi::class)
+
 package com.w2sv.composeutils.permissions.extendedpermissionstate
 
 import androidx.compose.runtime.Composable
@@ -16,7 +18,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 @Stable
-@OptIn(ExperimentalPermissionsApi::class)
 open class ExtendedSinglePermissionState(
     private val requestLaunchedBefore: StateFlow<Boolean>,
     permissionState: PermissionState,
@@ -35,13 +36,13 @@ open class ExtendedSinglePermissionState(
     }
 }
 
-@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun rememberExtendedPermissionState(
     permission: String,
     requestLaunchedBefore: StateFlow<Boolean>,
     saveRequestLaunched: () -> Unit,
     onPermissionResult: (Boolean) -> Unit = {},
+    onLaunchingSuppressed: () -> Unit = {},
     scope: CoroutineScope = rememberCoroutineScope()
 ): ExtendedSinglePermissionState {
 
@@ -66,7 +67,8 @@ fun rememberExtendedPermissionState(
         ExtendedSinglePermissionState(
             requestLaunchedBefore = requestLaunchedBefore,
             permissionState = permissionState,
-            grantedFromRequest = grantedFromRequest
+            grantedFromRequest = grantedFromRequest,
+            onLaunchingSuppressed = onLaunchingSuppressed
         )
     }
 }

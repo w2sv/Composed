@@ -1,5 +1,5 @@
 /**
- * Entire file content taken from https://stackoverflow.com/a/70162451/12083276.
+ * Functions adopted from https://stackoverflow.com/a/70162451/12083276.
  */
 
 package com.w2sv.composeutils
@@ -21,6 +21,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -35,6 +36,18 @@ import androidx.compose.ui.unit.em
 import androidx.core.text.HtmlCompat
 import androidx.core.text.toSpanned
 
+/**
+ * @return A remembered html-styled resource text converted to an [AnnotatedString], keyed by [id] and [formatArgs].
+ * #
+ * Tested with:
+ * - bold: &lt;b&gt;
+ * - italic: &lt;i&gt;
+ * - underline: &lt;u&gt;
+ * - subscript: &lt;sub&gt;
+ * - superscript: &lt;sup&gt;
+ * - foreground color: &lt;font color="#9900FF"&gt;
+ * - monospace font family: &lt;font face="monospace"&gt;
+ */
 @Composable
 fun rememberStyledTextResource(@StringRes id: Int, vararg formatArgs: Any): AnnotatedString {
     val resources = LocalContext.current.resources
@@ -47,7 +60,7 @@ fun rememberStyledTextResource(@StringRes id: Int, vararg formatArgs: Any): Anno
     }
 }
 
-internal fun Resources.getHtmlText(@StringRes id: Int, vararg args: Any): Spanned {
+private fun Resources.getHtmlText(@StringRes id: Int, vararg args: Any): Spanned {
     return HtmlCompat.fromHtml(
         String.format(
             getText(id).toSpanned().toHtmlWithoutParagraphs(),
@@ -68,7 +81,7 @@ private fun Spanned.toHtmlWithoutParagraphs(): String {
         .substringBeforeLast("</p>")
 }
 
-internal fun spannableStringToAnnotatedString(
+private fun spannableStringToAnnotatedString(
     text: Spanned,
     density: Density
 ): AnnotatedString {

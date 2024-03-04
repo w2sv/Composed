@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalPermissionsApi::class)
+
 package com.w2sv.composeutils.permissions.extendedpermissionstate
 
 import android.annotation.SuppressLint
@@ -16,7 +18,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 @Stable
-@OptIn(ExperimentalPermissionsApi::class)
 open class ExtendedMultiplePermissionsState(
     private val requestLaunchedBefore: StateFlow<Boolean>,
     multiplePermissionsState: MultiplePermissionsState,
@@ -35,7 +36,6 @@ open class ExtendedMultiplePermissionsState(
     }
 }
 
-@OptIn(ExperimentalPermissionsApi::class)
 @SuppressLint("ComposeUnstableCollections")
 @Composable
 fun rememberExtendedMultiplePermissionsState(
@@ -43,6 +43,7 @@ fun rememberExtendedMultiplePermissionsState(
     requestLaunchedBefore: StateFlow<Boolean>,
     saveRequestLaunched: () -> Unit,
     onPermissionResult: (Map<String, Boolean>) -> Unit = {},
+    onLaunchingSuppressed: () -> Unit = {},
     scope: CoroutineScope = rememberCoroutineScope()
 ): ExtendedMultiplePermissionsState {
 
@@ -67,7 +68,8 @@ fun rememberExtendedMultiplePermissionsState(
         ExtendedMultiplePermissionsState(
             requestLaunchedBefore = requestLaunchedBefore,
             multiplePermissionsState = permissionState,
-            grantedFromRequest = grantedFromRequest
+            grantedFromRequest = grantedFromRequest,
+            onLaunchingSuppressed = onLaunchingSuppressed
         )
     }
 }
