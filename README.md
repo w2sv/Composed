@@ -305,7 +305,6 @@ open class ExtendedMultiplePermissionsState(
 ) : MultiplePermissionsState by multiplePermissionsState,
     ExtendedPermissionState
 
-@SuppressLint("ComposeUnstableCollections")
 @Composable
 fun rememberExtendedMultiplePermissionsState(
     permissions: List<String>,
