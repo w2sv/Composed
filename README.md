@@ -41,9 +41,9 @@ Then add the dependencies you lust for to your `build.gradle.kts` files:
 ```kotlin
 dependencies {
     // Core utils
-    implementation 'com.w2sv.Composed:composed:<latest-version>'
+    implementation "com.github.w2sv.Composed:composed:<version>"
     // Permission utils
-    implementation 'com.w2sv.Composed:permissions:<latest-version>'
+    implementation "com.github.w2sv.Composed:permissions:<version>"
 }
 ```
 
