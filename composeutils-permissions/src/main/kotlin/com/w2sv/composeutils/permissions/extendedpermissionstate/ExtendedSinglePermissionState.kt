@@ -17,12 +17,19 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
+/**
+ * Permission state which, as opposed to the accompanist [PermissionState], which it extends
+ * - exposes a [grantedFromRequest] shared flow to allow for distributed subscription and callback invocation, instead of only being able to pass a onPermissionResult callback upon instantiation, which needs to cover all granting reactions, possibly impacting various components
+ * - allows for callbacks upon permission requesting being suppressed
+ *
+ * Discerning whether launching is indeed suppressed requires a persisted boolean value, representing whether the permission request has already been launched at least once, which is to be passed as StateFlow under [requestLaunchedBefore].
+ */
 @Stable
 open class ExtendedSinglePermissionState(
     private val requestLaunchedBefore: StateFlow<Boolean>,
     permissionState: PermissionState,
     override val grantedFromRequest: SharedFlow<Boolean>,
-    private val onLaunchingSuppressed: () -> Unit = {}
+    private val defaultOnLaunchingSuppressed: () -> Unit = {}
 ) : PermissionState by permissionState,
     ExtendedPermissionState {
 
@@ -31,7 +38,7 @@ open class ExtendedSinglePermissionState(
     override fun launchRequest(onSuppressed: (() -> Unit)?) {
         launchPermissionRequest(
             launchedBefore = requestLaunchedBefore.value,
-            onSuppressed = onSuppressed ?: this.onLaunchingSuppressed
+            onSuppressed = onSuppressed ?: defaultOnLaunchingSuppressed
         )
     }
 }
@@ -41,8 +48,8 @@ fun rememberExtendedPermissionState(
     permission: String,
     requestLaunchedBefore: StateFlow<Boolean>,
     saveRequestLaunched: () -> Unit,
-    onPermissionResult: (Boolean) -> Unit = {},
-    onLaunchingSuppressed: () -> Unit = {},
+    defaultOnPermissionResult: (Boolean) -> Unit = {},
+    defaultOnLaunchingSuppressed: () -> Unit = {},
     scope: CoroutineScope = rememberCoroutineScope()
 ): ExtendedSinglePermissionState {
 
@@ -57,7 +64,7 @@ fun rememberExtendedPermissionState(
                 if (!requestLaunchedBefore.value) {
                     saveRequestLaunched()
                 }
-                onPermissionResult(it)
+                defaultOnPermissionResult(it)
                 scope.launch { grantedFromRequest.emit(it) }
             }
         }
@@ -68,7 +75,7 @@ fun rememberExtendedPermissionState(
             requestLaunchedBefore = requestLaunchedBefore,
             permissionState = permissionState,
             grantedFromRequest = grantedFromRequest,
-            onLaunchingSuppressed = onLaunchingSuppressed
+            defaultOnLaunchingSuppressed = defaultOnLaunchingSuppressed
         )
     }
 }

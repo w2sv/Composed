@@ -9,6 +9,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.MultiplePermissionsState
+import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.w2sv.composeutils.permissions.extensions.launchMultiplePermissionRequest
 import kotlinx.coroutines.CoroutineScope
@@ -17,12 +18,19 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
+/**
+ * Permission state which, as opposed to the accompanist [MultiplePermissionsState], which it extends
+ * - exposes a [grantedFromRequest] shared flow to allow for distributed subscription and callback invocation, instead of only being able to pass a onPermissionResult callback upon instantiation, which needs to cover all granting reactions, possibly impacting various components
+ * - allows for callbacks upon permission requesting being suppressed
+ *
+ * Discerning whether launching is indeed suppressed requires a persisted boolean value, representing whether the permission request has already been launched at least once, which is to be passed as StateFlow under [requestLaunchedBefore].
+ */
 @Stable
 open class ExtendedMultiplePermissionsState(
     private val requestLaunchedBefore: StateFlow<Boolean>,
     multiplePermissionsState: MultiplePermissionsState,
     override val grantedFromRequest: SharedFlow<Boolean>,
-    private val onLaunchingSuppressed: () -> Unit = {}
+    private val defaultOnLaunchingSuppressed: () -> Unit = {}
 ) : MultiplePermissionsState by multiplePermissionsState,
     ExtendedPermissionState {
 
@@ -31,7 +39,7 @@ open class ExtendedMultiplePermissionsState(
     override fun launchRequest(onSuppressed: (() -> Unit)?) {
         launchMultiplePermissionRequest(
             launchedBefore = requestLaunchedBefore.value,
-            onSuppressed = onSuppressed ?: this.onLaunchingSuppressed
+            onSuppressed = onSuppressed ?: defaultOnLaunchingSuppressed
         )
     }
 }
@@ -42,8 +50,8 @@ fun rememberExtendedMultiplePermissionsState(
     permissions: List<String>,
     requestLaunchedBefore: StateFlow<Boolean>,
     saveRequestLaunched: () -> Unit,
-    onPermissionResult: (Map<String, Boolean>) -> Unit = {},
-    onLaunchingSuppressed: () -> Unit = {},
+    defaultOnPermissionResult: (Map<String, Boolean>) -> Unit = {},
+    defaultOnLaunchingSuppressed: () -> Unit = {},
     scope: CoroutineScope = rememberCoroutineScope()
 ): ExtendedMultiplePermissionsState {
 
@@ -58,7 +66,7 @@ fun rememberExtendedMultiplePermissionsState(
                 if (!requestLaunchedBefore.value) {
                     saveRequestLaunched()
                 }
-                onPermissionResult(map)
+                defaultOnPermissionResult(map)
                 scope.launch { grantedFromRequest.emit(map.values.all { it }) }
             }
         }
@@ -69,7 +77,7 @@ fun rememberExtendedMultiplePermissionsState(
             requestLaunchedBefore = requestLaunchedBefore,
             multiplePermissionsState = permissionState,
             grantedFromRequest = grantedFromRequest,
-            onLaunchingSuppressed = onLaunchingSuppressed
+            defaultOnLaunchingSuppressed = defaultOnLaunchingSuppressed
         )
     }
 }
