@@ -4,10 +4,15 @@
     <a href="https://android-arsenal.com/api?level=21">
     <img src="https://img.shields.io/badge/API-21%2B-brightgreen.svg?style=flat" alt="API">
 </a>
-<img src="https://img.shields.io/github/v/release/w2sv/Compose-Utils?include_prereleases" alt="GitHub release (latest by date including pre-releases)">
+    
+<a href="https://jitpack.io/#w2sv/Composed">
+  <img src="https://jitpack.io/v/w2sv/Composed.svg" alt="JitPack">
+</a>
+
 <a href="https://github.com/w2sv/Compose-Utils/actions/workflows/workflow.yaml">
     <img src="https://github.com/w2sv/Compose-Utils/actions/workflows/workflow.yaml/badge.svg" alt="Build">
 </a>
+
 <img src="https://img.shields.io/github/license/w2sv/Compose-Utils" alt="GitHub License">
 </p>
 
@@ -19,7 +24,30 @@
 
 ------
 
-## Contents
+# Installation
+
+Make sure you have jitpack added to your dependency resolution repositories by adding the following to your `settings.gradle.kts`:
+
+```kotlin
+dependencyResolutionManagement {
+  repositories {
+    maven("https://jitpack.io")
+  }
+}
+```
+
+Then add the dependencies you lust for to your `build.gradle.kts` files:
+
+```kotlin
+dependencies {
+    // Core utils
+    implementation 'com.w2sv.Composed:composed:<latest-version>'
+    // Permission utils
+    implementation 'com.w2sv.Composed:permissions:<latest-version>'
+}
+```
+
+# Contents
 
 - [State Savers](#state-savers)
 - [Styled Text](#styled-text)
@@ -262,3 +290,19 @@ fun rememberExtendedMultiplePermissionsState(
 ): ExtendedMultiplePermissionsState
 ```
 
+# License
+```xml
+Designed and developed by 2024 w2sv (Janek Zangenberg)
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+```
