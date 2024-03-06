@@ -4,7 +4,6 @@ compileSdk = "34"
 
 kotlin = "1.9.22"
 agp = "8.3.0"
-vanniktech-maven-publish = "0.27.0"
 
 compose-compiler = "1.5.8"
 compose-ui = "1.6.2"
@@ -34,4 +33,3 @@ roboelectric = { module = "org.robolectric:robolectric", version.ref = "robolect
 [plugins]
 android-library = { id = "com.android.library", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
-vanniktech-maven-publish = { id = "com.vanniktech.maven.publish", version.ref = "vanniktech-maven-publish" }
