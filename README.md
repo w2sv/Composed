@@ -4,11 +4,11 @@
     <a href="https://android-arsenal.com/api?level=21">
     <img src="https://img.shields.io/badge/API-21%2B-brightgreen.svg?style=flat" alt="API">
 </a>
-<img src="https://img.shields.io/github/v/release/w2sv/Composed?include_prereleases" alt="GitHub release (latest by date including pre-releases)">
-<a href="https://github.com/w2sv/Composed/actions/workflows/workflow.yaml">
-    <img src="https://github.com/w2sv/Composed/actions/workflows/workflow.yaml/badge.svg" alt="Build">
+<img src="https://img.shields.io/github/v/release/w2sv/Compose-Utils?include_prereleases" alt="GitHub release (latest by date including pre-releases)">
+<a href="https://github.com/w2sv/Compose-Utils/actions/workflows/workflow.yaml">
+    <img src="https://github.com/w2sv/Compose-Utils/actions/workflows/workflow.yaml/badge.svg" alt="Build">
 </a>
-<img src="https://img.shields.io/github/license/w2sv/Composed" alt="GitHub License">
+<img src="https://img.shields.io/github/license/w2sv/Compose-Utils" alt="GitHub License">
 </p>
 
 ------
@@ -35,38 +35,28 @@
 
 ## State Savers
 
-### `colorSaver()`
-
-Returns a `rememberSavable` state saver for `Color`.
-
 ```kotlin
+/**
+ * Returns a rememberSavable state saver for Color.
+ */
 fun colorSaver(): Saver<Color, Int>
-```
 
-### `nullableColorSaver()`
-
-Returns a `rememberSavable` state saver for an optional `Color`.
-
-```kotlin
+/**
+ * Returns a rememberSavable state saver for an optional Color.
+ */
 fun nullableColorSaver(): Saver<Color?, Float>
-```
 
-### `nullableListSaver()`
-
-`listSaver` for an optional object, enabling handling of non-null instances only.
-
-```kotlin
+/**
+ * listSaver for an optional object, enabling handling of non-null instances only.
+ */
 fun <Original, Saveable> nullableListSaver(
     saveNonNull: SaverScope.(value: Original) -> List<Saveable>,
     restoreNonNull: (list: List<Saveable>) -> Original?
 ): Saver<Original?, Any>
-```
 
-### `nullableMapSaver()`
-
-`mapSaver` for an optional object, enabling handling of non-null instances only.
-
-```kotlin
+/**
+ * mapSaver for an optional object, enabling handling of non-null instances only.
+ */
 fun <T> nullableMapSaver(
     saveNonNull: SaverScope.(value: T) -> Map<String, Any?>,
     restoreNonNull: (Map<String, Any?>) -> T
@@ -75,22 +65,20 @@ fun <T> nullableMapSaver(
 
 ## Styled Text
 
-### `rememberStyledTextResource()`
-
-Convert a HTML-styled string resource text to an `AnnotatedString` and remember it.
-
 ```kotlin
+/**
+ * Converts a HTML-styled string resource text to a remembered AnnotatedString.
+ */
 @Composable
 fun rememberStyledTextResource(@StringRes id: Int, vararg formatArgs: Any): AnnotatedString
 ```
 
 ## Modifiers
 
-### `Modifier.thenIf()`
-
-Applies modifiers depending on a condition.
-
 ```kotlin
+/**
+ * Applies modifiers depending on a condition.
+ */
 inline fun Modifier.thenIf(
     condition: Boolean,
     onFalse: Modifier.() -> Modifier = { this },
@@ -100,11 +88,10 @@ inline fun Modifier.thenIf(
 
 ## Flow Collectors
 
-### `CollectFromFlow()`
-
-Collects from a flow and emits values into a collector.
-
 ```kotlin
+/**
+ * Collects from a flow and emits values into a collector.
+ */
 @Composable
 fun <T> CollectFromFlow(
     flow: Flow<T>,
@@ -112,13 +99,10 @@ fun <T> CollectFromFlow(
     key1: Any? = null,
     key2: Any? = null
 )
-```
 
-### `CollectLatestFromFlow()`
-
-Collects latest from a flow with given action.
-
-```kotlin
+/**
+ * Collects latest from a flow with given action.
+ */
 @Composable
 fun <T> CollectLatestFromFlow(
     flow: Flow<T>,
@@ -130,11 +114,10 @@ fun <T> CollectLatestFromFlow(
 
 ## Lifecycle Observers
 
-### `OnLifecycleEvent()`
-
-Runs a callback whenever the lifecycleOwner reaches the given lifecycleEvent.
-
 ```kotlin
+/**
+ * Runs a callback whenever the lifecycleOwner reaches the given lifecycleEvent.
+ */
 @Composable
 fun OnLifecycleEvent(
     callback: () -> Unit,
@@ -143,64 +126,48 @@ fun OnLifecycleEvent(
     key1: Any? = null,
     key2: Any? = null
 )
-```
 
-### `OnRemoveFromComposition()`
-
-Runs a callback when removed from composition.
-
-```kotlin
+/**
+ * Runs a callback when removed from composition.
+ */
 @Composable
 fun OnRemoveFromComposition(callback: () -> Unit)
 ```
 
 ## Orientation
 
-### `isLandscapeModeActive`
-
 ```kotlin
+/**
+ * Returns true if the landscape mode is active, false otherwise.
+ */
 val isLandscapeModeActive: Boolean
-    @Composable
-    @ReadOnlyComposable
-    get() = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
-```
 
-### `isPortraitModeActive`
-
-```kotlin
+/**
+ * Returns true if the portrait mode is active, false otherwise.
+ */
 val isPortraitModeActive: Boolean
-    @Composable
-    @ReadOnlyComposable
-    get() = LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT
 ```
 
 ## Dimension Conversion
 
-### `toPx()`
-
-Converts `Dp` to pixels.
-
 ```kotlin
+/**
+ * Converts Dp to pixels.
+ */
 @Composable
 @ReadOnlyComposable
 fun Dp.toPx(): Float
-```
 
-### `toDp()`
-
-Converts pixels to `Dp`.
-
-```kotlin
+/**
+ * Converts pixels to Dp.
+ */
 @Composable
 @ReadOnlyComposable
 fun Int.toDp(): Dp
-```
 
-### `toDp()`
-
-Converts pixels to `Dp`.
-
-```kotlin
+/**
+ * Converts pixels to Dp.
+ */
 @Composable
 @ReadOnlyComposable
 fun Float.toDp(): Dp
@@ -208,40 +175,38 @@ fun Float.toDp(): Dp
 
 ## Color Conversion
 
-### `toComposeColor()`
-
-Converts a hex color string to `Color`.
-
 ```kotlin
+/**
+ * Converts a hex color string to Color.
+ */
 fun String.toComposeColor(): Color
 ```
 
 ## Map Conversion
 
 ```kotlin
+/**
+ * Converts a regular Map to a SnapshotStateMap.
+ */
 fun <K, V> Map<K, V>.toMutableStateMap(): SnapshotStateMap<K, V>
 ```
 
 ## Drawer State
 
-### `DrawerState.visibilityPercentage()`
-
-Returns a `State<Float>` whose value ranges from 0.0 (drawer closed) to 1.0 (drawer fully open).
-
 ```kotlin
+/**
+ * Returns a State<Float> whose value ranges from 0.0 (drawer closed) to 1.0 (drawer fully open).
+ */
 fun DrawerState.visibilityPercentage(@FloatRange(from = 0.0) maxWidthPx: Float): State<Float>
-```
 
-### `DrawerState.rememberVisibilityPercentage()`
-
-```kotlin
+/**
+ * Remembers a visibility percentage for the drawer.
+ */
 @Composable
-fun DrawerState.rememberVisibilityPercentage(@FloatRange(from = 0.0) maxWidthPx: Float = DrawerDefaults.MaximumDrawerWidth.toPx()): State<Float> =
+fun DrawerState.rememberVisibilityPercentage(@FloatRange(from = 0.0) maxWidthPx: Float = DrawerDefaults.MaximumDrawerWidth.toPx()): State<Float>
 ```
 
 ## Permission States
-
-### `ExtendedPermissionState`
 
 ```kotlin
 /**
@@ -249,36 +214,22 @@ fun DrawerState.rememberVisibilityPercentage(@FloatRange(from = 0.0) maxWidthPx:
  * - exposes a [grantedFromRequest] shared flow to allow for distributed subscription and callback invocation, instead of only being able to pass a onPermissionResult callback upon instantiation, which needs to cover all granting reactions, possibly impacting various components
  * - allows for callbacks upon permission requesting being suppressed
  */
-
 @Stable
 interface ExtendedPermissionState {
     val granted: Boolean
-
-    /**
-     * The result of a launched permission request.
-     */
     val grantedFromRequest: SharedFlow<Boolean>
-
-    /**
-     * Launches the permission request if launching is not suppressed, otherwise invokes [onSuppressed].
-     */
     fun launchRequest(onSuppressed: (() -> Unit)? = null)
 }
-```
 
-with the implementations
+// With the implementations:
 
-#### `ExtendedSinglePermissionState`
-
-```kotlin
 @Stable
 open class ExtendedSinglePermissionState(
     private val requestLaunchedBefore: StateFlow<Boolean>,
     permissionState: PermissionState,
     override val grantedFromRequest: SharedFlow<Boolean>,
     private val defaultOnLaunchingSuppressed: () -> Unit = {}
-) : PermissionState by permissionState,
-    ExtendedPermissionState
+) : PermissionState by permissionState, ExtendedPermissionState
 
 @Composable
 fun rememberExtendedSinglePermissionState(
@@ -289,21 +240,16 @@ fun rememberExtendedSinglePermissionState(
     defaultOnLaunchingSuppressed: () -> Unit = {},
     scope: CoroutineScope = rememberCoroutineScope()
 ): ExtendedSinglePermissionState
-```
 
-and
+// And
 
-#### `ExtendedMultiplePermissionsState`
-
-```kotlin
 @Stable
 open class ExtendedMultiplePermissionsState(
     private val requestLaunchedBefore: StateFlow<Boolean>,
     multiplePermissionsState: MultiplePermissionsState,
     override val grantedFromRequest: SharedFlow<Boolean>,
     private val defaultOnLaunchingSuppressed: () -> Unit = {}
-) : MultiplePermissionsState by multiplePermissionsState,
-    ExtendedPermissionState
+) : MultiplePermissionsState by multiplePermissionsState, ExtendedPermissionState
 
 @Composable
 fun rememberExtendedMultiplePermissionsState(
