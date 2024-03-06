@@ -4,11 +4,11 @@
     <a href="https://android-arsenal.com/api?level=21">
     <img src="https://img.shields.io/badge/API-21%2B-brightgreen.svg?style=flat" alt="API">
 </a>
-<img src="https://img.shields.io/github/v/release/w2sv/Compose-Utils?include_prereleases" alt="GitHub release (latest by date including pre-releases)">
-<a href="https://github.com/w2sv/Compose-Utils/actions/workflows/workflow.yaml">
-    <img src="https://github.com/w2sv/Compose-Utils/actions/workflows/workflow.yaml/badge.svg" alt="Build">
+<img src="https://img.shields.io/github/v/release/w2sv/Composed?include_prereleases" alt="GitHub release (latest by date including pre-releases)">
+<a href="https://github.com/w2sv/Composed/actions/workflows/workflow.yaml">
+    <img src="https://github.com/w2sv/Composed/actions/workflows/workflow.yaml/badge.svg" alt="Build">
 </a>
-<img src="https://img.shields.io/github/license/w2sv/Compose-Utils" alt="GitHub License">
+<img src="https://img.shields.io/github/license/w2sv/Composed" alt="GitHub License">
 </p>
 
 ------

@@ -15,5 +15,5 @@ dependencyResolutionManagement {
     }
 }
 
-include(":composeutils")
-include(":composeutils-permissions")
+include(":composed")
+include(":composed-permissions")
