@@ -91,8 +91,8 @@ dependencies {
     implementation(libs.compose.material3)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.annotation)
-    implementation(libs.androidx.ui.test.junit4.android)
     lintChecks(libs.compose.lint.checks)
     testImplementation(libs.junit)
     testImplementation(libs.roboelectric)
+    testImplementation(libs.androidx.ui.test.junit4.android)
 }
