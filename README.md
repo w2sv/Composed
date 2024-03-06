@@ -26,10 +26,12 @@
 - [Modifiers](#modifiers)
 - [Flow Collectors](#flow-collectors)
 - [Lifecycle Observers](#lifecycle-observers)
-- [Orientation Utilities](#orientation-utilities)
+- [Orientation](#orientation)
 - [Dimension Conversion](#dimension-conversion)
 - [Color Conversion](#color-conversion)
+- [Map Conversion](#map-conversion)
 - [Drawer State](#drawer-state)
+- [Permission States](#permission-states)
 
 ## State Savers
 
@@ -152,7 +154,7 @@ Runs a callback when removed from composition.
 fun OnRemoveFromComposition(callback: () -> Unit)
 ```
 
-## Orientation Utilities
+## Orientation
 
 ### `isLandscapeModeActive`
 
@@ -214,6 +216,12 @@ Converts a hex color string to `Color`.
 fun String.toComposeColor(): Color
 ```
 
+## Map Conversion
+
+```kotlin
+fun <K, V> Map<K, V>.toMutableStateMap(): SnapshotStateMap<K, V>
+```
+
 ## Drawer State
 
 ### `DrawerState.visibilityPercentage()`
@@ -230,3 +238,82 @@ fun DrawerState.visibilityPercentage(@FloatRange(from = 0.0) maxWidthPx: Float):
 @Composable
 fun DrawerState.rememberVisibilityPercentage(@FloatRange(from = 0.0) maxWidthPx: Float = DrawerDefaults.MaximumDrawerWidth.toPx()): State<Float> =
 ```
+
+## Permission States
+
+### `ExtendedPermissionState`
+
+```kotlin
+/**
+ * Permission state which, as opposed to the accompanist ones,
+ * - exposes a [grantedFromRequest] shared flow to allow for distributed subscription and callback invocation, instead of only being able to pass a onPermissionResult callback upon instantiation, which needs to cover all granting reactions, possibly impacting various components
+ * - allows for callbacks upon permission requesting being suppressed
+ */
+
+@Stable
+interface ExtendedPermissionState {
+    val granted: Boolean
+
+    /**
+     * The result of a launched permission request.
+     */
+    val grantedFromRequest: SharedFlow<Boolean>
+
+    /**
+     * Launches the permission request if launching is not suppressed, otherwise invokes [onSuppressed].
+     */
+    fun launchRequest(onSuppressed: (() -> Unit)? = null)
+}
+```
+
+with the implementations
+
+#### `ExtendedSinglePermissionState`
+
+```kotlin
+@Stable
+open class ExtendedSinglePermissionState(
+    private val requestLaunchedBefore: StateFlow<Boolean>,
+    permissionState: PermissionState,
+    override val grantedFromRequest: SharedFlow<Boolean>,
+    private val defaultOnLaunchingSuppressed: () -> Unit = {}
+) : PermissionState by permissionState,
+    ExtendedPermissionState
+
+@Composable
+fun rememberExtendedSinglePermissionState(
+    permission: String,
+    requestLaunchedBefore: StateFlow<Boolean>,
+    saveRequestLaunched: () -> Unit,
+    defaultOnPermissionResult: (Boolean) -> Unit = {},
+    defaultOnLaunchingSuppressed: () -> Unit = {},
+    scope: CoroutineScope = rememberCoroutineScope()
+): ExtendedSinglePermissionState
+```
+
+and
+
+#### `ExtendedMultiplePermissionsState`
+
+```kotlin
+@Stable
+open class ExtendedMultiplePermissionsState(
+    private val requestLaunchedBefore: StateFlow<Boolean>,
+    multiplePermissionsState: MultiplePermissionsState,
+    override val grantedFromRequest: SharedFlow<Boolean>,
+    private val defaultOnLaunchingSuppressed: () -> Unit = {}
+) : MultiplePermissionsState by multiplePermissionsState,
+    ExtendedPermissionState
+
+@SuppressLint("ComposeUnstableCollections")
+@Composable
+fun rememberExtendedMultiplePermissionsState(
+    permissions: List<String>,
+    requestLaunchedBefore: StateFlow<Boolean>,
+    saveRequestLaunched: () -> Unit,
+    defaultOnPermissionResult: (Map<String, Boolean>) -> Unit = {},
+    defaultOnLaunchingSuppressed: () -> Unit = {},
+    scope: CoroutineScope = rememberCoroutineScope()
+): ExtendedMultiplePermissionsState
+```
+

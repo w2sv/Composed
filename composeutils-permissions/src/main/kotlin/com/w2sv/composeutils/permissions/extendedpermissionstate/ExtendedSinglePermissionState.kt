@@ -44,7 +44,7 @@ open class ExtendedSinglePermissionState(
 }
 
 @Composable
-fun rememberExtendedPermissionState(
+fun rememberExtendedSinglePermissionState(
     permission: String,
     requestLaunchedBefore: StateFlow<Boolean>,
     saveRequestLaunched: () -> Unit,

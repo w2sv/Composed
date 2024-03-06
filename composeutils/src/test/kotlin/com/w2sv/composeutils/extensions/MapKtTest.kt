@@ -3,7 +3,7 @@ package com.w2sv.composeutils.extensions
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
-class CollectionKtTest {
+class MapKtTest {
 
     @Test
     fun toMutableStateMap() {
