@@ -1,4 +1,4 @@
-package com.w2sv.composed
+package com.w2sv.composed.extensions
 
 import androidx.compose.ui.Modifier
 
