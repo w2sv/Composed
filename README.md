@@ -58,7 +58,9 @@ dependencies {
 - [Dimension Conversion](#dimension-conversion)
 - [Color Conversion](#color-conversion)
 - [Map Conversion](#map-conversion)
-- [Drawer State](#drawer-state)
+- [Drawer State](#drawerstate)
+- [SnackbarHostState](#snackbarhoststate)
+- [Easing](#easing)
 - [Permission States](#permission-states)
 
 ## State Savers
@@ -219,7 +221,7 @@ fun String.toComposeColor(): Color
 fun <K, V> Map<K, V>.toMutableStateMap(): SnapshotStateMap<K, V>
 ```
 
-## Drawer State
+## DrawerState
 
 ```kotlin
 /**
@@ -232,6 +234,31 @@ fun DrawerState.visibilityPercentage(@FloatRange(from = 0.0) maxWidthPx: Float):
  */
 @Composable
 fun DrawerState.rememberVisibilityPercentage(@FloatRange(from = 0.0) maxWidthPx: Float = DrawerDefaults.MaximumDrawerWidth.toPx()): State<Float>
+```
+
+## SnackbarHostState
+
+```kotlin
+/**
+ * Dismisses the currently showing snackbar if there is one and shows a new one with the given [snackbarVisuals].
+ */
+suspend fun SnackbarHostState.dismissCurrentSnackbarAndShow(snackbarVisuals: SnackbarVisuals)
+
+/**
+ * Dismisses the currently showing snackbar if there is one and shows a new one with the given parameters.
+ */
+suspend fun SnackbarHostState.dismissCurrentSnackbarAndShow(
+    message: String,
+    actionLabel: String? = null,
+    withDismissAction: Boolean = false,
+    duration: SnackbarDuration = if (actionLabel == null) SnackbarDuration.Short else SnackbarDuration.Indefinite
+)
+```
+
+## Easing
+
+```kotlin
+fun TimeInterpolator.toEasing() = Easing
 ```
 
 ## Permission States
