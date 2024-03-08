@@ -5,6 +5,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.test.junit4.createComposeRule
+import kotlinx.coroutines.delay
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
@@ -72,10 +73,13 @@ class DisposableEffectsKtTest {
                     changedCallbackTriggerCount += 1
                 }
                 println("Changed callback")
+                delay(100)
                 removeFromComposition = true
                 println("Removed from composition")
             }
         }
+
+        composeTestRule.mainClock.advanceTimeBy(100)
 
         assertEquals(0, originalCallbackTriggerCount)
         assertEquals(1, changedCallbackTriggerCount)
