@@ -2,6 +2,8 @@ package com.w2sv.composed
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -19,10 +21,12 @@ fun OnLifecycleEvent(
     key1: Any? = null,
     key2: Any? = null
 ) {
+    val currentCallback by rememberUpdatedState(newValue = callback)
+
     DisposableEffect(lifecycleOwner, key1, key2) {
         val observer = LifecycleEventObserver { _, event ->
             if (event == lifecycleEvent) {
-                callback()
+                currentCallback()
             }
         }
 
@@ -35,9 +39,11 @@ fun OnLifecycleEvent(
 
 @Composable
 fun OnRemoveFromComposition(callback: () -> Unit) {
+    val currentCallback by rememberUpdatedState(newValue = callback)
+
     DisposableEffect(Unit) {
         onDispose {
-            callback()
+            currentCallback()
         }
     }
 }
