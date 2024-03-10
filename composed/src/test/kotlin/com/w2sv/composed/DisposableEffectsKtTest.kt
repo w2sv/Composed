@@ -5,7 +5,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.test.junit4.createComposeRule
-import kotlinx.coroutines.delay
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
@@ -48,19 +47,26 @@ class DisposableEffectsKtTest {
         var originalCallbackTriggerCount = 0
         var changedCallbackTriggerCount = 0
 
+        val originalCallback = {
+            println("Original callback triggered")
+            originalCallbackTriggerCount += 1
+        }
+        val changedCallback = {
+            println("Changed callback triggered")
+            changedCallbackTriggerCount += 1
+        }
+
         var removeFromComposition by mutableStateOf(false)
-        var callback by mutableStateOf(
-            {
-                println("Original callback triggered")
-                originalCallbackTriggerCount += 1
-            }
-        )
+        var callback by mutableStateOf(originalCallback)
 
         composeTestRule.setContent {
             println("Composing")
 
-            LaunchedEffect(callback.hashCode()) {
-                println(callback.hashCode())
+            LaunchedEffect(callback) {
+                if (callback.hashCode() == changedCallback.hashCode()) {
+                    removeFromComposition = true
+                    println("Set removeFromComposition=true")
+                }
             }
 
             if (!removeFromComposition) {
@@ -68,18 +74,10 @@ class DisposableEffectsKtTest {
             }
 
             LaunchedEffect(Unit) {
-                callback = {
-                    println("Changed callback triggered")
-                    changedCallbackTriggerCount += 1
-                }
+                callback = changedCallback
                 println("Changed callback")
-                delay(100)
-                removeFromComposition = true
-                println("Removed from composition")
             }
         }
-
-        composeTestRule.mainClock.advanceTimeBy(100)
 
         assertEquals(0, originalCallbackTriggerCount)
         assertEquals(1, changedCallbackTriggerCount)
