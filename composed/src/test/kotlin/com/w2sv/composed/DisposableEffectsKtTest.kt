@@ -1,10 +1,13 @@
 package com.w2sv.composed
 
+import androidx.activity.ComponentActivity
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.lifecycle.Lifecycle
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
@@ -15,10 +18,10 @@ import org.robolectric.RobolectricTestRunner
 class DisposableEffectsKtTest {
 
     @get:Rule
-    val composeTestRule = createComposeRule()
+    val composeTestRule = createAndroidComposeRule<ComponentActivity>()
 
     @Test
-    fun onRemoveFromComposition() {
+    fun `OnRemoveFromComposition basic functionality`() {
         var callbackTriggerCount = 0
         var removeFromComposition by mutableStateOf(false)
 
@@ -81,5 +84,40 @@ class DisposableEffectsKtTest {
 
         assertEquals(0, originalCallbackTriggerCount)
         assertEquals(1, changedCallbackTriggerCount)
+    }
+
+    @Test
+    fun `onLifecycleEvent basic functionality`() {
+        var triggerCount = 0
+
+        composeTestRule.setContent {
+            OnLifecycleEvent(
+                callback = { triggerCount += 1 },
+                lifecycleEvent = Lifecycle.Event.ON_DESTROY
+            )
+        }
+        composeTestRule.activityRule.scenario.moveToState(Lifecycle.State.DESTROYED)
+        assertEquals(1, triggerCount)
+    }
+
+    @Test
+    fun `onLifecycleEvent updates event`() {
+        var receivedTriggerState: String? = null
+        var triggerEvent by mutableStateOf(Lifecycle.Event.ON_START)
+
+        composeTestRule.setContent {
+            val lifecycleOwner = LocalLifecycleOwner.current
+            OnLifecycleEvent(
+                callback = {
+                    receivedTriggerState = lifecycleOwner.lifecycle.currentState.toString()
+                },
+                lifecycleEvent = triggerEvent
+            )
+            LaunchedEffect(Unit) {
+                triggerEvent = Lifecycle.Event.ON_DESTROY
+            }
+        }
+        composeTestRule.activityRule.scenario.moveToState(Lifecycle.State.DESTROYED)
+        assertEquals("DESTROYED", receivedTriggerState)
     }
 }

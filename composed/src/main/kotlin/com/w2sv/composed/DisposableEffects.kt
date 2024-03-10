@@ -22,10 +22,11 @@ fun OnLifecycleEvent(
     key2: Any? = null
 ) {
     val currentCallback by rememberUpdatedState(newValue = callback)
+    val currentLifecycleEvent by rememberUpdatedState(newValue = lifecycleEvent)
 
     DisposableEffect(lifecycleOwner, key1, key2) {
         val observer = LifecycleEventObserver { _, event ->
-            if (event == lifecycleEvent) {
+            if (event == currentLifecycleEvent) {
                 currentCallback()
             }
         }
