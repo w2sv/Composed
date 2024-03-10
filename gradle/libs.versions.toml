@@ -4,6 +4,7 @@ compileSdk = "34"
 
 kotlin = "1.9.22"
 agp = "8.3.0"
+kover = "0.7.6"
 
 compose-compiler = "1.5.8"
 compose-ui = "1.6.3"
@@ -33,3 +34,4 @@ roboelectric = { module = "org.robolectric:robolectric", version.ref = "robolect
 [plugins]
 android-library = { id = "com.android.library", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kover" }
