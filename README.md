@@ -124,7 +124,7 @@ inline fun Modifier.thenIf(
  * [Column] whose [elements], rendered through [makeElement], will be divided by [makeDivider]. [makeDivider] will be invoked only in between elements, that is, neither before the first, nor after the last element.
  */
 @Composable
-fun <T> ElementDividedColumn(
+fun <T> InterElementDividedColumn(
     elements: List<T>,
     makeElement: @Composable ColumnScope.(T) -> Unit,
     modifier: Modifier = Modifier,
@@ -137,8 +137,8 @@ fun <T> ElementDividedColumn(
  * [Row] whose [elements], rendered through [makeElement], will be divided by [makeDivider]. [makeDivider] will be invoked only in between elements, that is, neither before the first, nor after the last element.
  */
 @Composable
-fun <T> ElementDividedRow(
-    @SuppressLint("ComposeUnstableCollections") elements: List<T>,
+fun <T> InterElementDividedRow(
+    elements: List<T>,
     makeElement: @Composable RowScope.(T) -> Unit,
     modifier: Modifier = Modifier,
     makeDivider: @Composable RowScope.() -> Unit = { VerticalDivider() },
