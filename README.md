@@ -52,6 +52,7 @@ dependencies {
 - [State Savers](#state-savers)
 - [Styled Text](#styled-text)
 - [Modifiers](#modifiers)
+- [Layout](#layout)
 - [Flow Collectors](#flow-collectors)
 - [Lifecycle Observers](#lifecycle-observers)
 - [Orientation](#orientation)
@@ -114,6 +115,36 @@ inline fun Modifier.thenIf(
     onFalse: Modifier.() -> Modifier = { this },
     onTrue: Modifier.() -> Modifier = { this },
 ): Modifier
+```
+
+## Layout
+
+```kotlin
+/**
+ * [Column] whose [elements], rendered through [makeElement], will be divided by [makeDivider]. [makeDivider] will be invoked only in between elements, that is, neither before the first, nor after the last element.
+ */
+@Composable
+fun <T> ElementDividedColumn(
+    elements: List<T>,
+    makeElement: @Composable ColumnScope.(T) -> Unit,
+    modifier: Modifier = Modifier,
+    makeDivider: @Composable ColumnScope.() -> Unit = { HorizontalDivider() },
+    verticalArrangement: Arrangement.Vertical = Arrangement.Top,
+    horizontalAlignment: Alignment.Horizontal = Alignment.Start,
+)
+
+/**
+ * [Row] whose [elements], rendered through [makeElement], will be divided by [makeDivider]. [makeDivider] will be invoked only in between elements, that is, neither before the first, nor after the last element.
+ */
+@Composable
+fun <T> ElementDividedRow(
+    @SuppressLint("ComposeUnstableCollections") elements: List<T>,
+    makeElement: @Composable RowScope.(T) -> Unit,
+    modifier: Modifier = Modifier,
+    makeDivider: @Composable RowScope.() -> Unit = { VerticalDivider() },
+    horizontalArrangement: Arrangement.Horizontal = Arrangement.Start,
+    verticalAlignment: Alignment.Vertical = Alignment.Top,
+)
 ```
 
 ## Flow Collectors
