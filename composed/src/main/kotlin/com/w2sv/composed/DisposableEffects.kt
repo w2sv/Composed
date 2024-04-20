@@ -15,11 +15,11 @@ import androidx.lifecycle.LifecycleOwner
  */
 @Composable
 fun OnLifecycleEvent(
-    callback: () -> Unit,
     lifecycleEvent: Lifecycle.Event,
     lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
     key1: Any? = null,
-    key2: Any? = null
+    key2: Any? = null,
+    callback: () -> Unit
 ) {
     val currentCallback by rememberUpdatedState(newValue = callback)
     val currentLifecycleEvent by rememberUpdatedState(newValue = lifecycleEvent)
@@ -39,7 +39,7 @@ fun OnLifecycleEvent(
 }
 
 @Composable
-fun OnRemoveFromComposition(callback: () -> Unit) {
+fun OnDispose(callback: () -> Unit) {
     val currentCallback by rememberUpdatedState(newValue = callback)
 
     DisposableEffect(Unit) {

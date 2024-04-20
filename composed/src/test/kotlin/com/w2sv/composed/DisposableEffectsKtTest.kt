@@ -29,7 +29,7 @@ class DisposableEffectsKtTest {
             println("Composing")
 
             if (!removeFromComposition) {
-                OnRemoveFromComposition {
+                OnDispose {
                     println("Running callback")
                     callbackTriggerCount += 1
                 }
@@ -73,7 +73,7 @@ class DisposableEffectsKtTest {
             }
 
             if (!removeFromComposition) {
-                OnRemoveFromComposition(callback = callback)
+                OnDispose(callback = callback)
             }
 
             LaunchedEffect(Unit) {
