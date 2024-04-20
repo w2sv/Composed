@@ -2,19 +2,19 @@
 minSdk = "21"
 compileSdk = "34"
 
-kotlin = "1.9.22"
-agp = "8.3.0"
+kotlin = "1.9.23"
+agp = "8.3.2"
 kover = "0.7.6"
 
 compose-compiler = "1.5.10"
-compose-ui = "1.6.3"
+compose-ui = "1.6.6"
 compose-material3 = "1.2.1"
-androidx-core-ktx = "1.12.0"
+androidx-core-ktx = "1.13.0"
 androidx-annotation = "1.7.1"
 google-accompanist-permissions = "0.34.0"
 compose-lint-checks = "1.3.1"
 junit = "4.13.2"
-uiTestJunit4Android = "1.6.3"
+uiTestJunit4Android = "1.6.6"
 robolectric = "4.11.1"
 
 [libraries]
