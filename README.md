@@ -156,9 +156,9 @@ fun <T> InterElementDividedRow(
 @Composable
 fun <T> CollectFromFlow(
     flow: Flow<T>,
-    collector: FlowCollector<T>,
     key1: Any? = null,
-    key2: Any? = null
+    key2: Any? = null,
+    collector: FlowCollector<T>
 )
 
 /**
@@ -167,9 +167,9 @@ fun <T> CollectFromFlow(
 @Composable
 fun <T> CollectLatestFromFlow(
     flow: Flow<T>,
-    action: suspend (value: T) -> Unit,
     key1: Any? = null,
-    key2: Any? = null
+    key2: Any? = null,
+    action: suspend (value: T) -> Unit
 )
 ```
 
@@ -181,18 +181,18 @@ fun <T> CollectLatestFromFlow(
  */
 @Composable
 fun OnLifecycleEvent(
-    callback: () -> Unit,
     lifecycleEvent: Lifecycle.Event,
     lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
     key1: Any? = null,
-    key2: Any? = null
+    key2: Any? = null,
+    callback: () -> Unit
 )
 
 /**
  * Runs a callback when removed from composition.
  */
 @Composable
-fun OnRemoveFromComposition(callback: () -> Unit)
+fun OnDispose(callback: () -> Unit)
 ```
 
 ## Orientation
