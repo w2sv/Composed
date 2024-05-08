@@ -26,3 +26,12 @@ inline fun Modifier.thenIf(
     onTrue: Modifier.() -> Modifier,
 ): Modifier =
     thenIf(condition = condition, onFalse = { this }, onTrue = onTrue)
+
+/**
+ * A convenience function that invokes the Modifier receiver function [onNotNull] which depends on an optional [instance], if that [instance] is not null.
+ */
+inline fun <T> Modifier.thenIfNotNull(
+    instance: T?,
+    onNotNull: Modifier.(T) -> Modifier,
+): Modifier =
+    instance?.let { onNotNull(it) } ?: this

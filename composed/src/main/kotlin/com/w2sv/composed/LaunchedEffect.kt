@@ -3,6 +3,8 @@ package com.w2sv.composed
 import android.annotation.SuppressLint
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberUpdatedState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.collectLatest
@@ -36,5 +38,19 @@ fun <T> CollectLatestFromFlow(
 ) {
     LaunchedEffect(flow, key1, key2) {
         flow.collectLatest(action)
+    }
+}
+
+@Composable
+fun <T> OnChange(
+    value: T,
+    key1: Any? = null,
+    key2: Any? = null,
+    callback: suspend (T) -> Unit
+) {
+    val updatedCallback by rememberUpdatedState(newValue = callback)
+
+    LaunchedEffect(value, key1, key2) {
+        updatedCallback(value)
     }
 }
