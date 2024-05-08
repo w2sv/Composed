@@ -20,7 +20,7 @@ fun <T> CollectFromFlow(
     key2: Any? = null,
     collector: FlowCollector<T>
 ) {
-    LaunchedEffect(flow, key1, key2) {
+    LaunchedEffect(flow, collector, key1, key2) {
         flow.collect(collector)
     }
 }
@@ -36,7 +36,7 @@ fun <T> CollectLatestFromFlow(
     key2: Any? = null,
     action: suspend (value: T) -> Unit
 ) {
-    LaunchedEffect(flow, key1, key2) {
+    LaunchedEffect(flow, action, key1, key2) {
         flow.collectLatest(action)
     }
 }
