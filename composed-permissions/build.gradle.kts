@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.android.library)
+    alias(libs.plugins.kotlin.compose.compiler)
     `maven-publish`
 }
 
@@ -39,9 +40,6 @@ android {
     buildFeatures {
         compose = true
         buildConfig = false
-    }
-    composeOptions {
-        kotlinCompilerExtensionVersion = libs.versions.compose.compiler.get()
     }
     publishing {
         singleVariant("release") {
