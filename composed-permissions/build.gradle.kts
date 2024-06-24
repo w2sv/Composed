@@ -41,11 +41,6 @@ android {
         compose = true
         buildConfig = false
     }
-    publishing {
-        singleVariant("release") {
-            withSourcesJar()
-        }
-    }
 }
 
 publishing {
