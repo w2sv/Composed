@@ -102,3 +102,4 @@ app/credentials.json
 /app/prod/release/
 
 secret.properties
+/.kotlin/

@@ -64,9 +64,7 @@ private fun Resources.getHtmlText(@StringRes id: Int, vararg args: Any): Spanned
         String.format(
             getText(id).toSpanned().toHtmlWithoutParagraphs(),
             *args
-                .map {
-                    if (it is Spanned) it.toHtmlWithoutParagraphs() else it
-                }
+                .map { if (it is Spanned) it.toHtmlWithoutParagraphs() else it }
                 .toTypedArray()
         ),
         HtmlCompat.FROM_HTML_MODE_COMPACT
