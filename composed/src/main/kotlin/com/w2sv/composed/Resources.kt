@@ -52,12 +52,31 @@ fun rememberStyledTextResource(@StringRes id: Int, vararg formatArgs: Any): Anno
     val resources = LocalContext.current.resources
     val density = LocalDensity.current
     return remember(id, *formatArgs) {
-        spannableStringToAnnotatedString(
-            text = resources.getHtmlText(id, *formatArgs),
-            density = density
-        )
+        resources.getAnnotatedString(id, density, *formatArgs)
     }
 }
+
+/**
+ * Converts a html-styled resource text to an [AnnotatedString].
+ * #
+ * Tested with:
+ * - bold: &lt;b&gt;
+ * - italic: &lt;i&gt;
+ * - underline: &lt;u&gt;
+ * - subscript: &lt;sub&gt;
+ * - superscript: &lt;sup&gt;
+ * - foreground color: &lt;font color="#9900FF"&gt;
+ * - monospace font family: &lt;font face="monospace"&gt;
+ */
+fun Resources.getAnnotatedString(
+    @StringRes id: Int,
+    density: Density? = null,
+    vararg formatArgs: Any
+): AnnotatedString =
+    spannableStringToAnnotatedString(
+        text = getHtmlText(id, *formatArgs),
+        density = density
+    )
 
 private fun Resources.getHtmlText(@StringRes id: Int, vararg args: Any): Spanned {
     return HtmlCompat.fromHtml(
@@ -80,7 +99,7 @@ private fun Spanned.toHtmlWithoutParagraphs(): String {
 
 private fun spannableStringToAnnotatedString(
     text: Spanned,
-    density: Density
+    density: Density?
 ): AnnotatedString {
     return buildAnnotatedString {
         append(text)
@@ -117,8 +136,10 @@ private fun spannableStringToAnnotatedString(
                             }
                         )
 
-                        is AbsoluteSizeSpan -> density.run {
-                            SpanStyle(fontSize = if (span.dip) span.size.dp.toSp() else span.size.toSp())
+                        is AbsoluteSizeSpan -> {
+                            density
+                                ?.run { SpanStyle(fontSize = if (span.dip) span.size.dp.toSp() else span.size.toSp()) }
+                                ?: throw IllegalArgumentException("Found AbsoluteSizeSpan but passed density null. Pass a Density to convert.")
                         }
 
                         is RelativeSizeSpan -> SpanStyle(fontSize = span.sizeChange.em)
