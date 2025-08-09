@@ -49,10 +49,7 @@ fun <Original, Saveable> nullableListSaver(
 /**
  * [mapSaver] for an optional object of type [T], that enables you to omit the handling of the case in which the state value == null. Only the saving and restoring of the non-null instance needs to be handled.
  */
-fun <T> nullableMapSaver(
-    saveNonNull: SaverScope.(value: T) -> Map<String, Any?>,
-    restoreNonNull: (Map<String, Any?>) -> T
-): Saver<T, Any> =
+fun <T> nullableMapSaver(saveNonNull: SaverScope.(value: T) -> Map<String, Any?>, restoreNonNull: (Map<String, Any?>) -> T): Saver<T, Any> =
     mapSaver(
         save = { original ->
             original?.let { saveNonNull(it) } ?: emptyMap()

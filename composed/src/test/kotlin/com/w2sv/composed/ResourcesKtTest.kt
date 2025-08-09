@@ -28,19 +28,23 @@ class ResourcesKtTest {
     @Test
     fun conversion() {
         composeTestRule.setContent {
-            testStyledText(id = R.string.bold,
+            testStyledText(
+                id = R.string.bold,
                 expectedSpanStyleCount = 1,
                 checkFirstSpanStyle = { it.fontWeight == FontWeight(weight = 700) }
             )
-            testStyledText(id = R.string.italic,
+            testStyledText(
+                id = R.string.italic,
                 expectedSpanStyleCount = 1,
                 checkFirstSpanStyle = { it.fontStyle == FontStyle.Italic }
             )
-            testStyledText(id = R.string.bold_italic_consecutive,
+            testStyledText(
+                id = R.string.bold_italic_consecutive,
                 expectedSpanStyleCount = 2,
                 checkFirstSpanStyle = { it.fontWeight == FontWeight(weight = 700) }
             )
-            testStyledText(id = R.string.bold_italic_nested,
+            testStyledText(
+                id = R.string.bold_italic_nested,
                 expectedSpanStyleCount = 4,
                 checkFirstSpanStyle = { it.fontWeight == FontWeight(weight = 700) }
             )
@@ -60,11 +64,13 @@ class ResourcesKtTest {
                 expectedSpanStyleCount = 1,
                 checkFirstSpanStyle = { it.textDecoration == TextDecoration.Underline }
             )
-            testStyledText(id = R.string.colored,
+            testStyledText(
+                id = R.string.colored,
                 expectedSpanStyleCount = 1,
                 checkFirstSpanStyle = { it.color == Color(0.6f, 0.0f, 1.0f, 1.0f) }
             )
-            testStyledText(id = R.string.monospace,
+            testStyledText(
+                id = R.string.monospace,
                 expectedSpanStyleCount = 1,
                 checkFirstSpanStyle = { it.fontFamily == FontFamily.Monospace }
             )

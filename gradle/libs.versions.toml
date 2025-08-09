@@ -2,7 +2,7 @@
 # @keep
 minSdk = "21"
 # @keep
-compileSdk = "35"
+compileSdk = "36"
 versionCatalogUpdate = "1.0.0"
 kotlin = "2.0.21"
 agp = "8.7.2"

@@ -7,12 +7,15 @@ import androidx.compose.ui.unit.Dp
 
 @Composable
 @ReadOnlyComposable
-fun Dp.toPx() = with(LocalDensity.current) { this@toPx.toPx() }
+fun Dp.toPx() =
+    with(LocalDensity.current) { this@toPx.toPx() }
 
 @Composable
 @ReadOnlyComposable
-fun Int.toDp() = with(LocalDensity.current) { this@toDp.toDp() }
+fun Int.toDp() =
+    with(LocalDensity.current) { this@toDp.toDp() }
 
 @Composable
 @ReadOnlyComposable
-fun Float.toDp() = with(LocalDensity.current) { this@toDp.toDp() }
+fun Float.toDp() =
+    with(LocalDensity.current) { this@toDp.toDp() }

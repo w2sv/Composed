@@ -22,7 +22,7 @@ fun <T> InterElementDividedColumn(
     modifier: Modifier = Modifier,
     makeDivider: @Composable ColumnScope.() -> Unit = { HorizontalDivider() },
     verticalArrangement: Arrangement.Vertical = Arrangement.Top,
-    horizontalAlignment: Alignment.Horizontal = Alignment.Start,
+    horizontalAlignment: Alignment.Horizontal = Alignment.Start
 ) {
     Column(
         modifier = modifier,
@@ -48,7 +48,7 @@ fun <T> InterElementDividedRow(
     modifier: Modifier = Modifier,
     makeDivider: @Composable RowScope.() -> Unit = { VerticalDivider() },
     horizontalArrangement: Arrangement.Horizontal = Arrangement.Start,
-    verticalAlignment: Alignment.Vertical = Alignment.Top,
+    verticalAlignment: Alignment.Vertical = Alignment.Top
 ) {
     Row(
         modifier = modifier,

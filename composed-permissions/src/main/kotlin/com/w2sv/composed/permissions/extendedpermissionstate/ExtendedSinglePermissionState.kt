@@ -52,7 +52,6 @@ fun rememberExtendedSinglePermissionState(
     defaultOnLaunchingSuppressed: () -> Unit = {},
     scope: CoroutineScope = rememberCoroutineScope()
 ): ExtendedSinglePermissionState {
-
     val grantedFromRequest = remember {
         MutableSharedFlow<Boolean>()
     }

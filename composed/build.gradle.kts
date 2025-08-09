@@ -1,8 +1,9 @@
 plugins {
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.android.library)
-    alias(libs.plugins.kover)
+    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose.compiler)
+    alias(libs.plugins.kover)
+    alias(libs.plugins.ktlint)
     `maven-publish`
 }
 

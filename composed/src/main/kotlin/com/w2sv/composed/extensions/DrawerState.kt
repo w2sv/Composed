@@ -13,14 +13,16 @@ import androidx.compose.runtime.remember
  * @param maxWidthPx The with in pixels upon the drawer being fully expanded. If unmodified, this will equal [DrawerDefaults.MaximumDrawerWidth].
  */
 fun DrawerState.visibilityPercentage(@FloatRange(from = 0.0) maxWidthPx: Float): State<Float> {
-    return derivedStateOf { currentOffset / maxWidthPx + 1 }  // currentOffset = -MAX when completely hidden, 0 when completely visible
+    return derivedStateOf { currentOffset / maxWidthPx + 1 } // currentOffset = -MAX when completely hidden, 0 when completely visible
 }
 
 /**
  * @see visibilityPercentage
  */
 @Composable
-fun DrawerState.rememberVisibilityPercentage(@FloatRange(from = 0.0) maxWidthPx: Float = DrawerDefaults.MaximumDrawerWidth.toPx()): State<Float> =
+fun DrawerState.rememberVisibilityPercentage(
+    @FloatRange(from = 0.0) maxWidthPx: Float = DrawerDefaults.MaximumDrawerWidth.toPx()
+): State<Float> =
     remember {
         visibilityPercentage(maxWidthPx)
     }

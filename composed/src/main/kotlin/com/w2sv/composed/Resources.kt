@@ -78,8 +78,8 @@ fun Resources.getAnnotatedString(
         density = density
     )
 
-private fun Resources.getHtmlText(@StringRes id: Int, vararg args: Any): Spanned {
-    return HtmlCompat.fromHtml(
+private fun Resources.getHtmlText(@StringRes id: Int, vararg args: Any): Spanned =
+    HtmlCompat.fromHtml(
         String.format(
             getText(id).toSpanned().toHtmlWithoutParagraphs(),
             *args
@@ -88,20 +88,15 @@ private fun Resources.getHtmlText(@StringRes id: Int, vararg args: Any): Spanned
         ),
         HtmlCompat.FROM_HTML_MODE_COMPACT
     )
-}
 
-private fun Spanned.toHtmlWithoutParagraphs(): String {
-    return HtmlCompat
+private fun Spanned.toHtmlWithoutParagraphs(): String =
+    HtmlCompat
         .toHtml(this, HtmlCompat.TO_HTML_PARAGRAPH_LINES_CONSECUTIVE)
         .substringAfter("<p dir=\"ltr\">")
         .substringBeforeLast("</p>")
-}
 
-private fun spannableStringToAnnotatedString(
-    text: Spanned,
-    density: Density?
-): AnnotatedString {
-    return buildAnnotatedString {
+private fun spannableStringToAnnotatedString(text: Spanned, density: Density?): AnnotatedString =
+    buildAnnotatedString {
         append(text)
         text.getSpans(0, text.length, Any::class.java)
             .forEach { span ->
@@ -139,7 +134,9 @@ private fun spannableStringToAnnotatedString(
                         is AbsoluteSizeSpan -> {
                             density
                                 ?.run { SpanStyle(fontSize = if (span.dip) span.size.dp.toSp() else span.size.toSp()) }
-                                ?: throw IllegalArgumentException("Found AbsoluteSizeSpan but passed density null. Pass a Density to convert.")
+                                ?: throw IllegalArgumentException(
+                                    "Found AbsoluteSizeSpan but passed density null. Pass a Density to convert."
+                                )
                         }
 
                         is RelativeSizeSpan -> SpanStyle(fontSize = span.sizeChange.em)
@@ -155,4 +152,3 @@ private fun spannableStringToAnnotatedString(
                 )
             }
     }
-}

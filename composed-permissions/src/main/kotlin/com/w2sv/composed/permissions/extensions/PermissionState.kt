@@ -10,25 +10,21 @@ import com.google.accompanist.permissions.shouldShowRationale
 fun PermissionState.isLaunchingSuppressed(launchedBefore: Boolean): Boolean =
     !status.shouldShowRationale && launchedBefore
 
-inline fun PermissionState.launchPermissionRequest(
-    launchedBefore: Boolean,
-    onSuppressed: () -> Unit
-) {
-    if (!isLaunchingSuppressed(launchedBefore))
+inline fun PermissionState.launchPermissionRequest(launchedBefore: Boolean, onSuppressed: () -> Unit) {
+    if (!isLaunchingSuppressed(launchedBefore)) {
         launchPermissionRequest()
-    else
+    } else {
         onSuppressed()
+    }
 }
 
 fun MultiplePermissionsState.isLaunchingSuppressed(launchedBefore: Boolean): Boolean =
     !shouldShowRationale && launchedBefore
 
-inline fun MultiplePermissionsState.launchMultiplePermissionRequest(
-    launchedBefore: Boolean,
-    onSuppressed: () -> Unit
-) {
-    if (!isLaunchingSuppressed(launchedBefore))
+inline fun MultiplePermissionsState.launchMultiplePermissionRequest(launchedBefore: Boolean, onSuppressed: () -> Unit) {
+    if (!isLaunchingSuppressed(launchedBefore)) {
         launchMultiplePermissionRequest()
-    else
+    } else {
         onSuppressed()
+    }
 }
