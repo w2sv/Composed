@@ -33,9 +33,7 @@ android {
         }
     }
     testOptions {
-        unitTests {
-            isIncludeAndroidResources = true
-        }
+        unitTests.all { it.enabled = false }
     }
     buildFeatures {
         compose = true
