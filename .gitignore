@@ -103,3 +103,6 @@ app/credentials.json
 
 secret.properties
 /.kotlin/
+
+version.txt
+release-notes.txt
