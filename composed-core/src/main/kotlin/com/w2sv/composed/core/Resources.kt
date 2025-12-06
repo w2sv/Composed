@@ -19,8 +19,8 @@ import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.core.text.HtmlCompat
+import androidx.core.text.toHtml
 import androidx.core.text.toSpanned
 
 /**
@@ -49,7 +50,7 @@ import androidx.core.text.toSpanned
  */
 @Composable
 fun rememberStyledTextResource(@StringRes id: Int, vararg formatArgs: Any): AnnotatedString {
-    val resources = LocalContext.current.resources
+    val resources = LocalResources.current
     val density = LocalDensity.current
     return remember(id, *formatArgs) {
         resources.getAnnotatedString(id, density, *formatArgs)
@@ -90,8 +91,8 @@ private fun Resources.getHtmlText(@StringRes id: Int, vararg args: Any): Spanned
     )
 
 private fun Spanned.toHtmlWithoutParagraphs(): String =
-    HtmlCompat
-        .toHtml(this, HtmlCompat.TO_HTML_PARAGRAPH_LINES_CONSECUTIVE)
+    this
+        .toHtml()
         .substringAfter("<p dir=\"ltr\">")
         .substringBeforeLast("</p>")
 
