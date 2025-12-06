@@ -1,12 +1,6 @@
 plugins {
     id("w2sv.android-library")
-    alias(libs.plugins.kotlin.compose.compiler)
-}
-
-android {
-    buildFeatures {
-        compose = true
-    }
+    id("w2sv.compose-module")
 }
 
 publishing {
@@ -42,5 +36,4 @@ publishing {
 dependencies {
     api(libs.google.accompanist.permissions)
     implementation(libs.compose.ui.tooling)
-    lintChecks(libs.compose.lint.checks)
 }

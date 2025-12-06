@@ -1,21 +1,7 @@
 plugins {
     id("w2sv.android-library")
-    alias(libs.plugins.kotlin.compose.compiler)
+    id("w2sv.compose-module")
     alias(libs.plugins.kover)
-}
-
-android {
-    buildFeatures {
-        compose = true
-    }
-    // androidx.compose.ui:ui-test-junit4-android:1.10.0 needs minSdk=23
-    sourceSets {
-        getByName("test") {
-            defaultConfig {
-                minSdk = 23
-            }
-        }
-    }
 }
 
 tasks.withType(Test::class.java) {
@@ -58,7 +44,6 @@ dependencies {
     implementation(libs.compose.material3)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.annotation)
-    lintChecks(libs.compose.lint.checks)
     testImplementation(libs.junit)
     testImplementation(libs.roboelectric)
     testImplementation(libs.androidx.ui.test.junit4.android)
