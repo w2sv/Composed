@@ -15,7 +15,7 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 
 @RunWith(RobolectricTestRunner::class)
-class FlowCollectionKtTest {
+class LaunchedEffectKtTest {
 
     @get:Rule
     val composeTestRule = createAndroidComposeRule<ComponentActivity>()

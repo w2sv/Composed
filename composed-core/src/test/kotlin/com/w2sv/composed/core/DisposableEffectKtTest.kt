@@ -26,19 +26,14 @@ class DisposableEffectKtTest {
         var removeFromComposition by mutableStateOf(false)
 
         composeTestRule.setContent {
-            println("Composing")
-
             if (!removeFromComposition) {
                 OnDispose {
-                    println("Running callback")
                     callbackTriggerCount += 1
                 }
             }
 
             LaunchedEffect(Unit) {
-                println("Removing")
                 removeFromComposition = true
-                println("Removed")
             }
         }
 
@@ -51,11 +46,9 @@ class DisposableEffectKtTest {
         var changedCallbackTriggerCount = 0
 
         val originalCallback = {
-            println("Original callback triggered")
             originalCallbackTriggerCount += 1
         }
         val changedCallback = {
-            println("Changed callback triggered")
             changedCallbackTriggerCount += 1
         }
 
@@ -63,12 +56,9 @@ class DisposableEffectKtTest {
         var callback by mutableStateOf(originalCallback)
 
         composeTestRule.setContent {
-            println("Composing")
-
             LaunchedEffect(callback) {
                 if (callback.hashCode() == changedCallback.hashCode()) {
                     removeFromComposition = true
-                    println("Set removeFromComposition=true")
                 }
             }
 
@@ -78,7 +68,6 @@ class DisposableEffectKtTest {
 
             LaunchedEffect(Unit) {
                 callback = changedCallback
-                println("Changed callback")
             }
         }
 
