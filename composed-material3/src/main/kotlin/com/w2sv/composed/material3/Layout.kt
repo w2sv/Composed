@@ -16,7 +16,7 @@ import androidx.compose.ui.Modifier
  * [Column] whose [elements], rendered through [makeElement], will be divided by [makeDivider]. [makeDivider] will be invoked only in between elements, that is, neither before the first, nor after the last element.
  */
 @Composable
-fun <T> InterElementDividedColumn(
+fun <T> ColumnWithDividers(
     @SuppressLint("ComposeUnstableCollections") elements: List<T>,
     makeElement: @Composable ColumnScope.(T) -> Unit,
     modifier: Modifier = Modifier,
@@ -42,7 +42,7 @@ fun <T> InterElementDividedColumn(
  * [Row] whose [elements], rendered through [makeElement], will be divided by [makeDivider]. [makeDivider] will be invoked only in between elements, that is, neither before the first, nor after the last element.
  */
 @Composable
-fun <T> InterElementDividedRow(
+fun <T> RowWithDividers(
     @SuppressLint("ComposeUnstableCollections") elements: List<T>,
     makeElement: @Composable RowScope.(T) -> Unit,
     modifier: Modifier = Modifier,
