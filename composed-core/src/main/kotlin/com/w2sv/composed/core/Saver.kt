@@ -29,9 +29,9 @@ fun nullableColorSaver() =
 /**
  * [listSaver] for an optional object of type [Original], that enables you to omit the handling of the case in which the state value == null. Only the saving and restoring of the non-null instance needs to be handled.
  */
-fun <Original, Saveable> nullableListSaver(
-    saveNonNull: SaverScope.(value: Original) -> List<Saveable>,
-    restoreNonNull: (list: List<Saveable>) -> Original?
+fun <Original, Savable> nullableListSaver(
+    saveNonNull: SaverScope.(value: Original) -> List<Savable>,
+    restoreNonNull: (list: List<Savable>) -> Original?
 ): Saver<Original?, Any> =
     listSaver(
         save = { original ->

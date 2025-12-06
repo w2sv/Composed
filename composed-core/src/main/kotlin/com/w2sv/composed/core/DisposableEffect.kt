@@ -10,7 +10,10 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.compose.LocalLifecycleOwner
 
 /**
- * Run the given [callback] inside of a [LifecycleEventObserver] launched as a [DisposableEffect], when the [lifecycleOwner] reaches the given [lifecycleEvent] and clean up the observer when [lifecycleOwner], [key1] or [key2] changes or if [OnLifecycleEvent] leaves the composition.
+ * Run the given [callback] inside of a [LifecycleEventObserver] launched as a [DisposableEffect], when the [lifecycleOwner] reaches the
+ * given [lifecycleEvent] and clean up the observer when [lifecycleOwner], [key1] or [key2] changes or if [OnLifecycleEvent] leaves the
+ * composition.
+ *
  * @see DisposableEffect
  */
 @Composable
@@ -38,6 +41,12 @@ fun OnLifecycleEvent(
     }
 }
 
+/**
+ * Executes [callback] when the current composition leaves the composition.
+ *
+ * This is a convenience wrapper around `DisposableEffect(Unit)` that ensures
+ * the latest provided [callback] is invoked during disposal.
+ */
 @Composable
 fun OnDispose(callback: () -> Unit) {
     val currentCallback by rememberUpdatedState(newValue = callback)

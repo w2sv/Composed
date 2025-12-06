@@ -41,6 +41,12 @@ fun <T> CollectLatestFromFlow(
     }
 }
 
+/**
+ * Runs [callback] whenever [value] or one of the optional keys changes.
+ *
+ * This behaves like a [LaunchedEffect] tied to [value], ensuring the latest
+ * [callback] is invoked with the updated value.
+ */
 @Composable
 fun <T> OnChange(
     value: T,
