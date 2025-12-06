@@ -1,6 +1,6 @@
 plugins {
     id("w2sv.android-library")
-    id("w2sv.compose-module")
+    id("w2sv.compose-conventions")
 }
 
 publishing {

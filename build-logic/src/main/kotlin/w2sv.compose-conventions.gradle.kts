@@ -1,4 +1,3 @@
-import gradle.kotlin.dsl.plugins._2035c710eaf7e06d9cfab030694b8afb.compose
 import org.gradle.accessors.dm.LibrariesForLibs
 
 plugins {
