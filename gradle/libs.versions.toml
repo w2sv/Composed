@@ -2,8 +2,6 @@
 agp = "8.13.1"
 androidx-annotation = "1.9.1"
 androidx-core-ktx = "1.17.0"
-# @keep
-compileSdk = "36"
 compose-lint-checks = "1.4.2"
 compose-material3 = "1.4.0"
 compose-ui = "1.10.0"
@@ -12,8 +10,6 @@ junit = "4.13.2"
 kotlin = "2.2.21"
 kover = "0.9.3"
 ktlint = "14.0.1"
-# @keep
-minSdk = "21"
 robolectric = "4.16"
 uiTestJunit4Android = "1.10.0"
 versionCatalogUpdate = "1.0.1"

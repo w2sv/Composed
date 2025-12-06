@@ -6,6 +6,7 @@ pluginManagement {
         gradlePluginPortal()
         mavenCentral()
     }
+    includeBuild("build-logic")
 }
 
 dependencyResolutionManagement {
@@ -15,5 +16,7 @@ dependencyResolutionManagement {
     }
 }
 
-include(":composed")
+rootProject.name = "composed"
+
+include(":composed-core")
 include(":composed-permissions")

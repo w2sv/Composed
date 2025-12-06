@@ -1,10 +1,10 @@
 <h1 align="center">Composed</h1>
 
-<p align="center">    
+<p align="center">
     <a href="https://android-arsenal.com/api?level=21">
     <img src="https://img.shields.io/badge/API-21%2B-brightgreen.svg?style=flat" alt="API">
 </a>
-    
+
 <a href="https://jitpack.io/#w2sv/Composed">
   <img src="https://jitpack.io/v/w2sv/Composed.svg" alt="JitPack">
 </a>
@@ -41,7 +41,7 @@ Then add the dependencies you lust for to your `build.gradle.kts` files:
 ```kotlin
 dependencies {
     // Core utils
-    implementation "com.github.w2sv.Composed:composed:<version>"
+    implementation "com.github.w2sv.Composed:core:<version>"
     // Permission utils
     implementation "com.github.w2sv.Composed:permissions:<version>"
 }
