@@ -4,15 +4,11 @@ plugins {
     alias(libs.plugins.kover)
 }
 
-tasks.withType(Test::class.java) {
-    android.sourceSets.getByName("main").res.srcDir("src/test/res")
-}
-
 publishing {
     publications {
         register<MavenPublication>("release") {
             groupId = "com.w2sv.composed"
-            artifactId = "core"
+            artifactId = "material3"
             version = version.toString()
             pom {
                 developers {
@@ -21,7 +17,7 @@ publishing {
                         name.set("Janek Zangenberg")
                     }
                 }
-                description.set("Generic utils for development with Jetpack Compose.")
+                description.set("Material3 utils for development with Jetpack Compose.")
                 url.set("https://github.com/w2sv/Composed")
                 licenses {
                     license {
@@ -39,15 +35,15 @@ publishing {
 }
 
 dependencies {
-    implementation(libs.compose.foundation)
+    implementation(projects.composed.composedCore)
+
     implementation(libs.compose.ui)
     implementation(libs.compose.ui.tooling)
+    implementation(libs.compose.material3)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.annotation)
-    implementation(libs.androidx.compose.animation.core)
 
     testImplementation(libs.junit)
     testImplementation(libs.roboelectric)
     testImplementation(libs.androidx.ui.test.junit4.android)
-    testImplementation(libs.compose.material3)
 }

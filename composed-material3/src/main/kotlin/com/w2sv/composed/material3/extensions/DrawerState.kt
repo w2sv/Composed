@@ -1,4 +1,4 @@
-package com.w2sv.composed.core.extensions
+package com.w2sv.composed.material3.extensions
 
 import androidx.annotation.FloatRange
 import androidx.compose.material3.DrawerDefaults
@@ -7,6 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.remember
+import com.w2sv.composed.core.extensions.toPx
 
 /**
  * @return Float [State] whose value ranges from 0.0 (drawer fully closed) to 1.0 (drawer fully open).

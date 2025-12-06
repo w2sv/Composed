@@ -1,4 +1,4 @@
-package com.w2sv.composed.core
+package com.w2sv.composed.material3
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement

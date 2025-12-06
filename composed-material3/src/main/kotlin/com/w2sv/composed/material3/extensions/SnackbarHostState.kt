@@ -1,4 +1,4 @@
-package com.w2sv.composed.core.extensions
+package com.w2sv.composed.material3.extensions
 
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState

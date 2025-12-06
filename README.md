@@ -44,6 +44,8 @@ dependencies {
     implementation "com.github.w2sv.Composed:core:<version>"
     // Permission utils
     implementation "com.github.w2sv.Composed:permissions:<version>"
+    // Material3 utils
+    implementation "com.github.w2sv.Composed:material3:<version>"
 }
 ```
 

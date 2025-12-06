@@ -1,11 +1,11 @@
-package com.w2sv.composed.core.extensions
+package com.w2sv.composed.material3.extensions
 
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.test.junit4.createComposeRule
-import com.w2sv.composed.core.extensions.visibilityPercentage
+import com.w2sv.composed.material3.extensions.visibilityPercentage
 import kotlin.properties.Delegates
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
