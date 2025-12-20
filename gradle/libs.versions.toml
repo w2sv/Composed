@@ -1,33 +1,33 @@
 [versions]
-agp = "8.13.1"
+agp = "8.13.2"
 androidx-annotation = "1.9.1"
 androidx-core-ktx = "1.17.0"
+androidxComposeAnimation = "1.10.0"
 compose-lint-checks = "1.4.2"
 compose-material3 = "1.4.0"
 compose-ui = "1.10.0"
 google-accompanist-permissions = "0.37.3"
 junit = "4.13.2"
-kotlin = "2.2.21"
-kover = "0.9.3"
+kotlin = "2.3.0"
+kover = "0.9.4"
 ktlint = "14.0.1"
 robolectric = "4.16"
 uiTestJunit4Android = "1.10.0"
 versionCatalogUpdate = "1.0.1"
-androidxComposeAnimation = "1.10.0"
 
 [libraries]
 androidx-annotation = { module = "androidx.annotation:annotation", version.ref = "androidx-annotation" }
+androidx-compose-animation-core = { module = "androidx.compose.animation:animation-core", version.ref = "androidxComposeAnimation" }
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "androidx-core-ktx" }
 androidx-ui-test-junit4-android = { module = "androidx.compose.ui:ui-test-junit4-android", version.ref = "uiTestJunit4Android" }
+compose-foundation = { module = "androidx.compose.foundation:foundation", version.ref = "compose-ui" }
 compose-lint-checks = { module = "com.slack.lint.compose:compose-lint-checks", version.ref = "compose-lint-checks" }
 compose-material3 = { module = "androidx.compose.material3:material3", version.ref = "compose-material3" }
-compose-foundation = { module = "androidx.compose.foundation:foundation", version.ref = "compose-ui" }
 compose-ui = { module = "androidx.compose.ui:ui", version.ref = "compose-ui" }
 compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "compose-ui" }
 google-accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "google-accompanist-permissions" }
 junit = { module = "junit:junit", version.ref = "junit" }
 roboelectric = { module = "org.robolectric:robolectric", version.ref = "robolectric" }
-androidx-compose-animation-core = { group = "androidx.compose.animation", name = "animation-core", version.ref = "androidxComposeAnimation" }
 
 [plugins]
 android-library = { id = "com.android.library", version.ref = "agp" }
