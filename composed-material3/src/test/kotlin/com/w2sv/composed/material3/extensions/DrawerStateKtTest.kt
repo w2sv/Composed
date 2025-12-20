@@ -1,15 +1,16 @@
 package com.w2sv.composed.material3.extensions
 
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.State
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.junit4.createComposeRule
-import com.w2sv.composed.material3.extensions.visibilityPercentage
-import kotlin.properties.Delegates
-import kotlinx.coroutines.test.runTest
+import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -21,29 +22,29 @@ class DrawerStateKtTest {
     @get:Rule
     val composeTestRule = createComposeRule()
 
-    private var maxWidthPx by Delegates.notNull<Float>()
-
-    @Ignore("Mysteriously not working anymore after update of compose dependencies. DrawerState.currentOffset always null.")
     @Test
-    fun visibilityPercentage() =
-        runTest {
-            val drawerState = DrawerState(initialValue = DrawerValue.Closed)
+    fun visibilityProgress() {
+        val drawerState = DrawerState(initialValue = DrawerValue.Closed)
+        lateinit var visibilityProgress: State<Float>
+        val sheetWidth = 300.dp
 
-            composeTestRule.setContent {
-                maxWidthPx = 120f
+        with(composeTestRule) {
+            setContent {
+                visibilityProgress = drawerState.rememberVisibilityProgress(sheetWidth)
+
                 ModalNavigationDrawer(
-                    drawerContent = { /*TODO*/ },
                     drawerState = drawerState,
+                    drawerContent = { ModalDrawerSheet(modifier = Modifier.width(sheetWidth)) {} },
                     content = {}
                 )
             }
 
-            val visibilityPercentage by drawerState.visibilityPercentage(maxWidthPx)
+            runOnIdle {
+                assertEquals(0f, visibilityProgress.value)
 
-            assertEquals(0f, visibilityPercentage)
-
-            drawerState.snapTo(DrawerValue.Open)
-
-            assertEquals(1f, visibilityPercentage)
+                runBlocking { drawerState.snapTo(DrawerValue.Open) }
+                assertEquals(1f, visibilityProgress.value)
+            }
         }
+    }
 }
