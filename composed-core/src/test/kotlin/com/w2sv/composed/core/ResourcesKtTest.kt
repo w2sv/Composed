@@ -26,7 +26,7 @@ class ResourcesKtTest {
     val composeTestRule = createComposeRule()
 
     @Test
-    fun conversion() {
+    fun `test rememberStyledTextResource`() {
         composeTestRule.setContent {
             testStyledText(
                 id = R.string.bold,
@@ -87,7 +87,6 @@ private fun testStyledText(
 ) {
     val styled = rememberStyledTextResource(id = id)
     assertEquals(stringResource(id = id), styled.toString())
-    println(styled.spanStyles)
     assertEquals(expectedSpanStyleCount, styled.spanStyles.size)
     assertTrue(checkFirstSpanStyle(styled.spanStyles.first().item))
 }

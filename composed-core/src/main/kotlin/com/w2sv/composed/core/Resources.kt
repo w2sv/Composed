@@ -59,7 +59,7 @@ fun rememberStyledTextResource(@StringRes id: Int, vararg formatArgs: Any): Anno
 
 /**
  * Converts a html-styled resource text to an [AnnotatedString].
- * #
+ *
  * Tested with:
  * - bold: &lt;b&gt;
  * - italic: &lt;i&gt;
@@ -103,24 +103,20 @@ private fun spannableStringToAnnotatedString(text: Spanned, density: Density?): 
             .forEach { span ->
                 addStyle(
                     when (span) {
-                        is StyleSpan -> when (span.style) {
-                            Typeface.NORMAL -> SpanStyle(
-                                fontWeight = FontWeight.Normal,
-                                fontStyle = FontStyle.Normal
-                            )
+                        is StyleSpan if span.style == Typeface.NORMAL -> SpanStyle(
+                            fontWeight = FontWeight.Normal,
+                            fontStyle = FontStyle.Normal
+                        )
 
-                            Typeface.BOLD -> SpanStyle(
-                                fontWeight = FontWeight.Bold,
-                                fontStyle = FontStyle.Normal
-                            )
+                        is StyleSpan if span.style == Typeface.BOLD -> SpanStyle(
+                            fontWeight = FontWeight.Bold,
+                            fontStyle = FontStyle.Normal
+                        )
 
-                            Typeface.ITALIC -> SpanStyle(
-                                fontWeight = FontWeight.Normal,
-                                fontStyle = FontStyle.Italic
-                            )
-
-                            else -> SpanStyle()
-                        }
+                        is StyleSpan if span.style == Typeface.ITALIC -> SpanStyle(
+                            fontWeight = FontWeight.Normal,
+                            fontStyle = FontStyle.Italic
+                        )
 
                         is TypefaceSpan -> SpanStyle(
                             fontFamily = when (span.family) {
@@ -135,9 +131,7 @@ private fun spannableStringToAnnotatedString(text: Spanned, density: Density?): 
                         is AbsoluteSizeSpan -> {
                             density
                                 ?.run { SpanStyle(fontSize = if (span.dip) span.size.dp.toSp() else span.size.toSp()) }
-                                ?: throw IllegalArgumentException(
-                                    "Found AbsoluteSizeSpan but passed density null. Pass a Density to convert."
-                                )
+                                ?: error("Found AbsoluteSizeSpan but passed density null. Pass a Density to convert.")
                         }
 
                         is RelativeSizeSpan -> SpanStyle(fontSize = span.sizeChange.em)

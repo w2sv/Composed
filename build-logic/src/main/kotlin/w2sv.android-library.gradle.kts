@@ -35,4 +35,6 @@ android {
     }
 
     publishing { singleVariant("release") { withSourcesJar() } }
+
+    kotlin.compilerOptions.freeCompilerArgs.add("-Xwhen-guards")
 }
