@@ -1,19 +1,23 @@
 plugins {
-    id("w2sv.android-library")
-    id("w2sv.compose-conventions")
+    id("w2sv.cmp-library")
     alias(libs.plugins.kover)
 }
 
-dependencies {
-    implementation(projects.composed.composedCore)
+kotlin {
+    sourceSets {
+        commonMain.dependencies {
+            implementation(projects.composed.composedCore)
+            api(libs.jetbrains.compose.foundation)
+            api(libs.jetbrains.compose.material3)
+            api(libs.jetbrains.compose.runtime)
+            api(libs.jetbrains.compose.ui)
+        }
 
-    implementation(libs.compose.ui)
-    implementation(libs.compose.ui.tooling)
-    implementation(libs.compose.material3)
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.annotation)
-
-    testImplementation(libs.junit)
-    testImplementation(libs.roboelectric)
-    testImplementation(libs.androidx.ui.test.junit4.android)
+        getByName("androidHostTest").dependencies {
+            implementation(kotlin("test"))
+            implementation(libs.jetbrains.compose.ui.test.junit4)
+            implementation(libs.junit)
+            implementation(libs.roboelectric)
+        }
+    }
 }

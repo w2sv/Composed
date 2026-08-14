@@ -20,4 +20,4 @@ rootProject.name = "composed"
 
 include(":composed-core")
 include(":composed-material3")
-include(":composed-permissions")
+include(":composed-permissions-android")

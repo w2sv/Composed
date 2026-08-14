@@ -14,343 +14,62 @@
 <img src="https://img.shields.io/github/license/w2sv/Composed" alt="GitHub License">
 </p>
 
-------
+---
 
 <p align="center">
-<b>A collection of utils to facilitate development with Jetpack Compose.</b>
+<b>A collection of utilities for Compose Multiplatform.</b>
 </p>
 
-------
+Composed provides small, focused helpers for common Compose patterns, including effects, savers, modifiers, Material 3 state handling, and Android permissions.
+It is not a UI component library, design system, or cross-platform permissions abstraction.
+Platform-specific utilities remain explicitly scoped to Android.
 
-# Installation
+---
 
-Add the dependencies you lust for to your `build.gradle.kts` files:
+## Modules
+
+| Module | Platforms | Description |
+|---|---|---|
+| `composed-core` | Android, JVM/Desktop, iOS | General-purpose Compose utilities for effects, savers, modifiers, collections, colors, and dimensions. Android resource, configuration, and View-system extensions are available on Android only. |
+| `composed-material3` | Android, JVM/Desktop, iOS | Utilities and extensions for Compose Material 3 layouts, drawers, and snackbars. |
+| `composed-permissions-android` | Android | Permission-state utilities built on Accompanist Permissions. |
+
+## Installation
+
+### Inline
 
 ```kotlin
 dependencies {
-    // Core utils
     implementation("io.github.w2sv:composed-core:<version>")
-    // Permission utils
-    implementation("io.github.w2sv:composed-permissions:<version>")
-    // Material3 utils
     implementation("io.github.w2sv:composed-material3:<version>")
+    implementation("io.github.w2sv:composed-permissions-android:<version>")
 }
 ```
 
-# Contents
+### Version Catalog (`libs.versions.toml`)
 
-- [State Savers](#state-savers)
-- [Styled Text](#styled-text)
-- [Modifiers](#modifiers)
-- [Layout](#layout)
-- [Flow Collectors](#flow-collectors)
-- [Lifecycle Observers](#lifecycle-observers)
-- [Orientation](#orientation)
-- [Dimension Conversion](#dimension-conversion)
-- [Color Conversion](#color-conversion)
-- [Map Conversion](#map-conversion)
-- [Drawer State](#drawerstate)
-- [SnackbarHostState](#snackbarhoststate)
-- [Easing](#easing)
-- [Permission States](#permission-states)
+```toml
+[versions]
+w2sv-composed = "<version>"
 
-## State Savers
-
-```kotlin
-/**
- * Returns a rememberSavable state saver for Color.
- */
-fun colorSaver(): Saver<Color, Int>
-
-/**
- * Returns a rememberSavable state saver for an optional Color.
- */
-fun nullableColorSaver(): Saver<Color?, Float>
-
-/**
- * listSaver for an optional object, enabling handling of non-null instances only.
- */
-fun <Original, Saveable> nullableListSaver(
-    saveNonNull: SaverScope.(value: Original) -> List<Saveable>,
-    restoreNonNull: (list: List<Saveable>) -> Original?
-): Saver<Original?, Any>
-
-/**
- * mapSaver for an optional object, enabling handling of non-null instances only.
- */
-fun <T> nullableMapSaver(
-    saveNonNull: SaverScope.(value: T) -> Map<String, Any?>,
-    restoreNonNull: (Map<String, Any?>) -> T
-): Saver<T, Any>
+[libraries]
+w2sv-composed-core = { module = "io.github.w2sv:composed-core", version.ref = "w2sv-composed" }
+w2sv-composed-material3 = { module = "io.github.w2sv:composed-material3", version.ref = "w2sv-composed" }
+w2sv-composed-permissions-android = { module = "io.github.w2sv:composed-permissions-android", version.ref = "w2sv-composed" }
 ```
 
-## Styled Text
+**build.gradle.kts:**
 
 ```kotlin
-/**
- * Converts a HTML-styled string resource text to a remembered AnnotatedString.
- */
-@Composable
-fun rememberStyledTextResource(@StringRes id: Int, vararg formatArgs: Any): AnnotatedString
-```
-
-## Modifiers
-
-```kotlin
-/**
- * Applies modifiers depending on a condition.
- */
-inline fun Modifier.thenIf(
-    condition: Boolean,
-    onFalse: Modifier.() -> Modifier = { this },
-    onTrue: Modifier.() -> Modifier = { this },
-): Modifier
-```
-
-## Layout
-
-```kotlin
-/**
- * [Column] whose [elements], rendered through [makeElement], will be divided by [makeDivider]. [makeDivider] will be invoked only in between elements, that is, neither before the first, nor after the last element.
- */
-@Composable
-fun <T> ColumnWithDividers(
-    elements: List<T>,
-    makeElement: @Composable ColumnScope.(T) -> Unit,
-    modifier: Modifier = Modifier,
-    makeDivider: @Composable ColumnScope.() -> Unit = { HorizontalDivider() },
-    verticalArrangement: Arrangement.Vertical = Arrangement.Top,
-    horizontalAlignment: Alignment.Horizontal = Alignment.Start,
-)
-
-/**
- * [Row] whose [elements], rendered through [makeElement], will be divided by [makeDivider]. [makeDivider] will be invoked only in between elements, that is, neither before the first, nor after the last element.
- */
-@Composable
-fun <T> RowWithDividers(
-    elements: List<T>,
-    makeElement: @Composable RowScope.(T) -> Unit,
-    modifier: Modifier = Modifier,
-    makeDivider: @Composable RowScope.() -> Unit = { VerticalDivider() },
-    horizontalArrangement: Arrangement.Horizontal = Arrangement.Start,
-    verticalAlignment: Alignment.Vertical = Alignment.Top,
-)
-```
-
-## Flow Collectors
-
-```kotlin
-/**
- * Collects from a flow and emits values into a collector.
- */
-@Composable
-fun <T> CollectFromFlow(
-    flow: Flow<T>,
-    key1: Any? = null,
-    key2: Any? = null,
-    collector: FlowCollector<T>
-)
-
-/**
- * Collects latest from a flow with given action.
- */
-@Composable
-fun <T> CollectLatestFromFlow(
-    flow: Flow<T>,
-    key1: Any? = null,
-    key2: Any? = null,
-    action: suspend (value: T) -> Unit
-)
-```
-
-## Lifecycle Observers
-
-```kotlin
-/**
- * Runs a callback whenever the lifecycleOwner reaches the given lifecycleEvent.
- */
-@Composable
-fun OnLifecycleEvent(
-    lifecycleEvent: Lifecycle.Event,
-    lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
-    key1: Any? = null,
-    key2: Any? = null,
-    callback: () -> Unit
-)
-
-/**
- * Runs a callback when removed from composition.
- */
-@Composable
-fun OnDispose(callback: () -> Unit)
-```
-
-## Orientation
-
-```kotlin
-/**
- * Returns true if the landscape mode is active, false otherwise.
- */
-val isLandscapeModeActive: Boolean
-
-/**
- * Returns true if the portrait mode is active, false otherwise.
- */
-val isPortraitModeActive: Boolean
-```
-
-## Dimension Conversion
-
-```kotlin
-/**
- * Converts Dp to pixels.
- */
-@Composable
-@ReadOnlyComposable
-fun Dp.toPx(): Float
-
-/**
- * Converts pixels to Dp.
- */
-@Composable
-@ReadOnlyComposable
-fun Int.toDp(): Dp
-
-/**
- * Converts pixels to Dp.
- */
-@Composable
-@ReadOnlyComposable
-fun Float.toDp(): Dp
-```
-
-## Color Conversion
-
-```kotlin
-/**
- * Converts a hex color string to Color.
- */
-fun String.toComposeColor(): Color
-```
-
-## Map Conversion
-
-```kotlin
-/**
- * Converts a regular Map to a SnapshotStateMap.
- */
-fun <K, V> Map<K, V>.toMutableStateMap(): SnapshotStateMap<K, V>
-```
-
-## DrawerState
-
-```kotlin
-/**
- * Returns a State<Float> whose value ranges from 0.0 (drawer closed) to 1.0 (drawer fully open).
- */
-fun DrawerState.visibilityPercentage(@FloatRange(from = 0.0) maxWidthPx: Float): State<Float>
-
-/**
- * Remembers a visibility percentage for the drawer.
- */
-@Composable
-fun DrawerState.rememberVisibilityPercentage(@FloatRange(from = 0.0) maxWidthPx: Float = DrawerDefaults.MaximumDrawerWidth.toPx()): State<Float>
-```
-
-## SnackbarHostState
-
-```kotlin
-/**
- * Dismisses the currently showing snackbar if there is one and shows a new one with the given [snackbarVisuals].
- */
-suspend fun SnackbarHostState.dismissCurrentSnackbarAndShow(snackbarVisuals: SnackbarVisuals)
-
-/**
- * Dismisses the currently showing snackbar if there is one and shows a new one with the given parameters.
- */
-suspend fun SnackbarHostState.dismissCurrentSnackbarAndShow(
-    message: String,
-    actionLabel: String? = null,
-    withDismissAction: Boolean = false,
-    duration: SnackbarDuration = if (actionLabel == null) SnackbarDuration.Short else SnackbarDuration.Indefinite
-)
-```
-
-## Easing
-
-```kotlin
-fun TimeInterpolator.toEasing() = Easing
-```
-
-## Permission States
-
-```kotlin
-/**
- * Permission state which, as opposed to the accompanist ones,
- * - exposes a [grantedFromRequest] shared flow to allow for distributed subscription and callback invocation, instead of only being able to pass a onPermissionResult callback upon instantiation, which needs to cover all granting reactions, possibly impacting various components
- * - allows for callbacks upon permission requesting being suppressed
- */
-@Stable
-interface ExtendedPermissionState {
-    val granted: Boolean
-    val grantedFromRequest: SharedFlow<Boolean>
-    fun launchRequest(onSuppressed: (() -> Unit)? = null)
+dependencies {
+    implementation(libs.w2sv.composed.core)
+    implementation(libs.w2sv.composed.material3)
+    implementation(libs.w2sv.composed.permissions.android)
 }
-
-// With the implementations:
-
-@Stable
-open class ExtendedSinglePermissionState(
-    private val requestLaunchedBefore: StateFlow<Boolean>,
-    permissionState: PermissionState,
-    override val grantedFromRequest: SharedFlow<Boolean>,
-    private val defaultOnLaunchingSuppressed: () -> Unit = {}
-) : PermissionState by permissionState, ExtendedPermissionState
-
-@Composable
-fun rememberExtendedSinglePermissionState(
-    permission: String,
-    requestLaunchedBefore: StateFlow<Boolean>,
-    saveRequestLaunched: () -> Unit,
-    defaultOnPermissionResult: (Boolean) -> Unit = {},
-    defaultOnLaunchingSuppressed: () -> Unit = {},
-    scope: CoroutineScope = rememberCoroutineScope()
-): ExtendedSinglePermissionState
-
-// And
-
-@Stable
-open class ExtendedMultiplePermissionsState(
-    private val requestLaunchedBefore: StateFlow<Boolean>,
-    multiplePermissionsState: MultiplePermissionsState,
-    override val grantedFromRequest: SharedFlow<Boolean>,
-    private val defaultOnLaunchingSuppressed: () -> Unit = {}
-) : MultiplePermissionsState by multiplePermissionsState, ExtendedPermissionState
-
-@Composable
-fun rememberExtendedMultiplePermissionsState(
-    permissions: List<String>,
-    requestLaunchedBefore: StateFlow<Boolean>,
-    saveRequestLaunched: () -> Unit,
-    defaultOnPermissionResult: (Map<String, Boolean>) -> Unit = {},
-    defaultOnLaunchingSuppressed: () -> Unit = {},
-    scope: CoroutineScope = rememberCoroutineScope()
-): ExtendedMultiplePermissionsState
 ```
 
 # License
-```xml
-Designed and developed by 2024 w2sv (Janek Zangenberg)
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
+Designed and developed by 2024 w2sv (Janek Zangenberg).
 
-   http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-```
+Licensed under the [Apache License 2.0](LICENSE).

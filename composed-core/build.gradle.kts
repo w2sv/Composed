@@ -1,23 +1,36 @@
 plugins {
-    id("w2sv.android-library")
-    id("w2sv.compose-conventions")
+    id("w2sv.cmp-library")
     alias(libs.plugins.kover)
 }
 
-tasks.withType(Test::class.java) {
-    android.sourceSets.getByName("main").res.srcDir("src/test/res")
-}
+kotlin {
+    sourceSets {
+        commonMain.dependencies {
+            api(libs.jetbrains.compose.runtime)
+            api(libs.jetbrains.compose.ui)
+            api(libs.jetbrains.androidx.lifecycle.runtime.compose)
+            api(libs.jetbrains.kotlinx.coroutines.core)
+        }
 
-dependencies {
-    implementation(libs.compose.foundation)
-    implementation(libs.compose.ui)
-    implementation(libs.compose.ui.tooling)
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.annotation)
-    implementation(libs.androidx.compose.animation.core)
+        commonTest.dependencies {
+            implementation(libs.jetbrains.compose.foundation)
+            implementation(kotlin("test"))
+        }
 
-    testImplementation(libs.junit)
-    testImplementation(libs.roboelectric)
-    testImplementation(libs.androidx.ui.test.junit4.android)
-    testImplementation(libs.compose.material3)
+        androidMain.dependencies {
+            api(libs.jetbrains.compose.animation)
+            api(libs.androidx.annotation)
+            implementation(libs.androidx.core.ktx)
+        }
+
+        getByName("androidHostTest").dependencies {
+            implementation(libs.jetbrains.compose.material3)
+            implementation(kotlin("test"))
+            implementation(libs.androidx.activity.compose)
+            implementation(libs.jetbrains.compose.ui.test.junit4)
+            implementation(libs.jetbrains.kotlinx.coroutines.test)
+            implementation(libs.junit)
+            implementation(libs.roboelectric)
+        }
+    }
 }

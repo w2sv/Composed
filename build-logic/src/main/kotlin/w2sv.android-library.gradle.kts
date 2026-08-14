@@ -1,15 +1,22 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     id("com.android.library")
-    id("org.jetbrains.kotlin.android")
     id("org.jlleitschuh.gradle.ktlint")
     id("com.vanniktech.maven.publish")
 }
 
-kotlin { jvmToolchain(11) }
+kotlin {
+    target {
+        compilerOptions {
+            jvmTarget = JvmTarget.JVM_11
+        }
+    }
+}
 
 android {
-    namespace = "com.w2sv.${path.removePrefix(":").replace(':', '.').replace('-', '.')}"
-    compileSdk = 36
+    namespace = "com.w2sv.${path.removePrefix(":").replace(':', '.').replace('-', '.').removeSuffix(".android")}"
+    compileSdk = 37
 
     defaultConfig {
         minSdk = 21
@@ -33,8 +40,6 @@ android {
             all { test -> test.failOnNoDiscoveredTests = false }
         }
     }
-
-    kotlin.compilerOptions.freeCompilerArgs.add("-Xwhen-guards")
 }
 
 mavenPublishing {

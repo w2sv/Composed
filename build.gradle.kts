@@ -1,8 +1,10 @@
 import nl.littlerobots.vcu.plugin.resolver.VersionSelectors
 
 plugins {
-    alias(libs.plugins.kotlin.android) apply false
     alias(libs.plugins.android.library) apply false
+    alias(libs.plugins.android.kmp.library) apply false
+    alias(libs.plugins.jetbrains.compose) apply false
+    alias(libs.plugins.jetbrains.kotlin.multiplatform) apply false
     alias(libs.plugins.kotlin.compose.compiler) apply false
     alias(libs.plugins.kover) apply false
     alias(libs.plugins.ktlint)
