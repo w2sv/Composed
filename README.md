@@ -5,15 +5,13 @@
     <img src="https://img.shields.io/badge/API-21%2B-brightgreen.svg?style=flat" alt="API">
 </a>
 
-<a href="https://jitpack.io/#w2sv/Composed">
-  <img src="https://jitpack.io/v/w2sv/Composed.svg" alt="JitPack">
+<img src="https://img.shields.io/maven-central/v/io.github.w2sv/composed-core" alt="Maven Central Version">
+
+<a href="https://github.com/w2sv/Composed/actions/workflows/workflow.yaml">
+    <img src="https://github.com/w2sv/Composed/actions/workflows/workflow.yaml/badge.svg" alt="Build">
 </a>
 
-<a href="https://github.com/w2sv/Compose-Utils/actions/workflows/workflow.yaml">
-    <img src="https://github.com/w2sv/Compose-Utils/actions/workflows/workflow.yaml/badge.svg" alt="Build">
-</a>
-
-<img src="https://img.shields.io/github/license/w2sv/Compose-Utils" alt="GitHub License">
+<img src="https://img.shields.io/github/license/w2sv/Composed" alt="GitHub License">
 </p>
 
 ------
@@ -26,26 +24,16 @@
 
 # Installation
 
-Make sure you have jitpack added to your dependency resolution repositories by adding the following to your `settings.gradle.kts`:
-
-```kotlin
-dependencyResolutionManagement {
-  repositories {
-    maven("https://jitpack.io")
-  }
-}
-```
-
-Then add the dependencies you lust for to your `build.gradle.kts` files:
+Add the dependencies you lust for to your `build.gradle.kts` files:
 
 ```kotlin
 dependencies {
     // Core utils
-    implementation "com.github.w2sv.Composed:core:<version>"
+    implementation("io.github.w2sv:composed-core:<version>")
     // Permission utils
-    implementation "com.github.w2sv.Composed:permissions:<version>"
+    implementation("io.github.w2sv:composed-permissions:<version>")
     // Material3 utils
-    implementation "com.github.w2sv.Composed:material3:<version>"
+    implementation("io.github.w2sv:composed-material3:<version>")
 }
 ```
 

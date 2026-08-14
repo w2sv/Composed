@@ -14,8 +14,8 @@ versionCatalogUpdate {
 }
 
 // Set version from $ROOT/version.txt, which is created or updated when running the make publish routine
-rootProject.layout.projectDirectory.file("version.txt").asFile.let { versionFile ->
-    if (versionFile.exists()) {
-        version = versionFile.readText().trim()
-    }
-}
+rootProject.file("version.txt")
+    .takeIf { it.exists() }
+    ?.readText()
+    ?.trim()
+    ?.let { version = it }

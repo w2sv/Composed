@@ -14,6 +14,7 @@ ktlint = "14.0.1"
 robolectric = "4.16"
 uiTestJunit4Android = "1.10.0"
 versionCatalogUpdate = "1.0.1"
+vanniktech-maven-publish = "0.36.0"
 
 [libraries]
 androidx-annotation = { module = "androidx.annotation:annotation", version.ref = "androidx-annotation" }
@@ -35,4 +36,5 @@ kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kover" }
 ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlint" }
+vanniktech-maven-publish = { id = "com.vanniktech.maven.publish", version.ref = "vanniktech-maven-publish" }
 versionCatalogUpdate = { id = "nl.littlerobots.version-catalog-update", version.ref = "versionCatalogUpdate" }

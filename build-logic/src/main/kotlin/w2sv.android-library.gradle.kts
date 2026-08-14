@@ -2,7 +2,7 @@ plugins {
     id("com.android.library")
     id("org.jetbrains.kotlin.android")
     id("org.jlleitschuh.gradle.ktlint")
-    `maven-publish`
+    id("com.vanniktech.maven.publish")
 }
 
 kotlin { jvmToolchain(11) }
@@ -34,7 +34,13 @@ android {
         }
     }
 
-    publishing { singleVariant("release") { withSourcesJar() } }
-
     kotlin.compilerOptions.freeCompilerArgs.add("-Xwhen-guards")
+}
+
+mavenPublishing {
+    // Use the module name as artifactId.
+    coordinates(
+        artifactId = project.name,
+        version = rootProject.version.toString(),
+    )
 }

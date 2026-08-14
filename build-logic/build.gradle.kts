@@ -14,6 +14,7 @@ dependencies {
     implementation(plugin(libs.plugins.kotlin.android))
     implementation(plugin(libs.plugins.kotlin.compose.compiler))
     implementation(plugin(libs.plugins.ktlint))
+    implementation(plugin(libs.plugins.vanniktech.maven.publish))
 }
 
 private fun plugin(dependency: Provider<PluginDependency>): Provider<String> =
