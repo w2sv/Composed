@@ -23,4 +23,3 @@ fun <P> rememberMovableContentOf(content: @Composable (P) -> Unit): @Composable 
     val currentContent by rememberUpdatedState(content)
     return remember { movableContentOf { parameter: P -> currentContent(parameter) } }
 }
-

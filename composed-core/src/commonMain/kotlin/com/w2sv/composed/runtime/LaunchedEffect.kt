@@ -18,8 +18,10 @@ fun <T> CollectFromFlow(
     key2: Any? = null,
     collector: FlowCollector<T>
 ) {
-    LaunchedEffect(flow, collector, key1, key2) {
-        flow.collect(collector)
+    val currentCollector by rememberUpdatedState(collector)
+
+    LaunchedEffect(flow, key1, key2) {
+        flow.collect { value -> currentCollector.emit(value) }
     }
 }
 
@@ -32,10 +34,14 @@ fun <T> CollectLatestFromFlow(
     flow: Flow<T>,
     key1: Any? = null,
     key2: Any? = null,
-    action: suspend (value: T) -> Unit
+    action: suspend (T) -> Unit
 ) {
-    LaunchedEffect(flow, action, key1, key2) {
-        flow.collectLatest(action)
+    val currentAction by rememberUpdatedState(action)
+
+    LaunchedEffect(flow, key1, key2) {
+        flow.collectLatest { value ->
+            currentAction(value)
+        }
     }
 }
 
@@ -52,9 +58,9 @@ fun <T> OnChange(
     key2: Any? = null,
     callback: suspend (T) -> Unit
 ) {
-    val updatedCallback by rememberUpdatedState(newValue = callback)
+    val currentCallback by rememberUpdatedState(newValue = callback)
 
     LaunchedEffect(value, key1, key2) {
-        updatedCallback(value)
+        currentCallback(value)
     }
 }

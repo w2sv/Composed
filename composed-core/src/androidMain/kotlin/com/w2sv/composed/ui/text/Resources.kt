@@ -37,7 +37,8 @@ import androidx.core.text.toHtml
 import androidx.core.text.toSpanned
 
 /**
- * @return A remembered html-styled resource text converted to an [AnnotatedString], keyed by [id] and [formatArgs].
+ * @return A remembered html-styled resource text converted to an [AnnotatedString], keyed by [id], [LocalResources], [LocalDensity] and
+ * [formatArgs].
  * #
  * Tested with:
  * - bold: &lt;b&gt;
@@ -52,7 +53,8 @@ import androidx.core.text.toSpanned
 fun rememberStyledTextResource(@StringRes id: Int, vararg formatArgs: Any): AnnotatedString {
     val resources = LocalResources.current
     val density = LocalDensity.current
-    return remember(id, *formatArgs) {
+
+    return remember(id, resources, density, *formatArgs) {
         resources.getAnnotatedString(id, density, *formatArgs)
     }
 }
