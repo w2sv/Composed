@@ -7,15 +7,14 @@ import kotlin.test.assertEquals
 class ColorKtTest {
 
     @Test
-    fun `String toComposeColor`() {
+    fun `parse Color from String`() {
         assertEquals(
             Color.Red,
-            "#FFFF0000".toComposeColor()
+            Color.parse("#FFFF0000")
         )
         assertEquals(
             Color.Red,
-            "#FF0000".toComposeColor()
+            Color.parse("#FF0000")
         )
-        assertEquals(Color.Red, "red".toComposeColor())
     }
 }

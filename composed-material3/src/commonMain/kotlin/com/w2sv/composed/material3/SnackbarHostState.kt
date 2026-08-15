@@ -5,13 +5,15 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.SnackbarVisuals
 
+/**
+ * Shortcut for `currentSnackbarData?.dismiss()`.
+ */
 fun SnackbarHostState.dismissCurrentSnackbar() {
     currentSnackbarData?.dismiss()
 }
 
 /**
  * Dismisses the currently showing snackbar if there is one and shows a new one with the given [snackbarVisuals].
- *
  * @see SnackbarHostState.showSnackbar
  */
 suspend fun SnackbarHostState.dismissCurrentSnackbarAndShow(snackbarVisuals: SnackbarVisuals): SnackbarResult {
@@ -21,7 +23,6 @@ suspend fun SnackbarHostState.dismissCurrentSnackbarAndShow(snackbarVisuals: Sna
 
 /**
  * Dismisses the currently showing snackbar if there is one and shows a new one with the given parameters.
- *
  * @see SnackbarHostState.showSnackbar
  */
 suspend fun SnackbarHostState.dismissCurrentSnackbarAndShow(
