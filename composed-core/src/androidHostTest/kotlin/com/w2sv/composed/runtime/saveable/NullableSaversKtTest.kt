@@ -12,7 +12,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.hasTextExactly
 import androidx.compose.ui.test.junit4.StateRestorationTester
-import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import org.junit.Rule
 import org.junit.Test
@@ -22,7 +22,7 @@ import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [36])
-class SaverKtTest {
+class NullableSaversKtTest {
 
     @get:Rule
     val composeTestRule = createComposeRule()
@@ -36,42 +36,6 @@ class SaverKtTest {
     }
 
     @Test
-    fun `colorSaver should correctly save and restore colors`() {
-        setContentAndEmulateSavedInstanceStateRestore {
-            val red by rememberSaveable(stateSaver = colorSaver()) {
-                mutableStateOf(Color.Red)
-            }
-            Text(text = red.toString(), modifier = Modifier.testTag("colorText"))
-        }
-        composeTestRule
-            .onNodeWithTag("colorText")
-            .assert(hasTextExactly(Color.Red.toString()))
-    }
-
-    @Test
-    fun `nullableColorSaver should correctly save and restore colors`() {
-        setContentAndEmulateSavedInstanceStateRestore {
-            val red by rememberSaveable(stateSaver = nullableColorSaver()) {
-                mutableStateOf(Color.Red)
-            }
-            val nullColor by rememberSaveable(stateSaver = nullableColorSaver()) {
-                mutableStateOf(null)
-            }
-            Text(text = red.toString(), modifier = Modifier.testTag("colorText"))
-            Text(
-                text = nullColor.toString(),
-                modifier = Modifier.testTag("nullColorText")
-            )
-        }
-        composeTestRule
-            .onNodeWithTag("colorText")
-            .assert(hasTextExactly(Color.Red.toString()))
-        composeTestRule
-            .onNodeWithTag("nullColorText")
-            .assert(hasTextExactly("null"))
-    }
-
-    @Test
     fun `nullableListSaver should correctly save and restore colors`() {
         val nullableColorListSaver = nullableListSaver(
             saveNonNull = {
@@ -82,9 +46,7 @@ class SaverKtTest {
             }
         )
         setContentAndEmulateSavedInstanceStateRestore {
-            val red by rememberSaveable(
-                stateSaver = nullableColorListSaver
-            ) {
+            val red by rememberSaveable(stateSaver = nullableColorListSaver) {
                 mutableStateOf(Color.Red)
             }
             Text(text = red.toString(), modifier = Modifier.testTag("colorText"))

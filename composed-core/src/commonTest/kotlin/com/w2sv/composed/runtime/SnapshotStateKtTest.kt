@@ -3,7 +3,7 @@ package com.w2sv.composed.runtime
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-class MapKtTest {
+class SnapshotStateKtTest {
 
     @Test
     fun toMutableStateMap() {
