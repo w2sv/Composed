@@ -87,12 +87,13 @@ class ScopedSnackbarController internal constructor(private val controller: Snac
 @Composable
 fun rememberScopedSnackbarController(
     snackbarHostState: SnackbarHostState,
-    controller: SnackbarController = rememberSnackbarController(snackbarHostState),
     scope: CoroutineScope = rememberCoroutineScope()
-): ScopedSnackbarController =
-    remember(snackbarHostState, controller, scope) {
+): ScopedSnackbarController {
+    val controller = rememberSnackbarController(snackbarHostState)
+    return remember(controller, scope) {
         ScopedSnackbarController(
             controller = controller,
             scope = scope
         )
     }
+}
