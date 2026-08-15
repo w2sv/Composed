@@ -1,0 +1,44 @@
+name: Deploy API Docs
+on:
+  push:
+    tags:
+      - '*'
+
+env:
+  JAVA_VERSION: 17
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  publish:
+    name: Publish
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Generate Dokka HTML
+        run: ./gradlew dokkaGeneratePublicationHtml
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: build/dokka/html
+
+      - name: Deploy Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

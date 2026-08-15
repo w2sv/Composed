@@ -4,8 +4,12 @@ plugins {
     id("com.android.kotlin.multiplatform.library")
     id("org.jetbrains.kotlin.multiplatform")
     id("org.jlleitschuh.gradle.ktlint")
+    id("org.jetbrains.dokka")
     id("com.vanniktech.maven.publish")
 }
+
+// Include every module applying this convention plugin in the root Dokka site.
+rootProject.dependencies.add("dokka", project)
 
 kotlin {
     android {

@@ -39,7 +39,7 @@ import androidx.core.text.toSpanned
 /**
  * @return A remembered html-styled resource text converted to an [AnnotatedString], keyed by [id], [LocalResources], [LocalDensity] and
  * [formatArgs].
- * #
+ *
  * Tested with:
  * - bold: &lt;b&gt;
  * - italic: &lt;i&gt;

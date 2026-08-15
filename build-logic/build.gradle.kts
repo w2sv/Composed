@@ -15,6 +15,7 @@ dependencies {
     implementation(plugin(libs.plugins.jetbrains.kotlin.multiplatform))
     implementation(plugin(libs.plugins.kotlin.compose.compiler))
     implementation(plugin(libs.plugins.ktlint))
+    implementation(plugin(libs.plugins.org.jetbrains.dokka))
     implementation(plugin(libs.plugins.vanniktech.maven.publish))
 }
 

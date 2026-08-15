@@ -7,6 +7,10 @@
 
 <img src="https://img.shields.io/maven-central/v/io.github.w2sv/composed-core" alt="Maven Central Version">
 
+<a href="https://w2sv.github.io/Composed/">
+    <img src="https://img.shields.io/badge/docs-API_reference-blue" alt="API Reference">
+</a>
+
 <a href="https://github.com/w2sv/Composed/actions/workflows/workflow.yaml">
     <img src="https://github.com/w2sv/Composed/actions/workflows/workflow.yaml/badge.svg" alt="Build">
 </a>
@@ -26,7 +30,7 @@ Platform-specific utilities remain explicitly scoped to Android.
 
 ---
 
-## Modules
+## 📦 Modules
 
 | Module | Platforms | Description |
 |---|---|---|
@@ -35,7 +39,7 @@ Platform-specific utilities remain explicitly scoped to Android.
 
 Android permission-state utilities are available separately from [TrackedPermissions](https://github.com/w2sv/TrackedPermissions).
 
-## Installation
+## 🚀 Installation
 
 ### Inline
 
@@ -66,7 +70,7 @@ dependencies {
 }
 ```
 
-# License
+## 📄 License
 
 Designed and developed by 2024 w2sv (Janek Zangenberg).
 
