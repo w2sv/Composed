@@ -20,8 +20,8 @@
 <b>A collection of utilities for Compose Multiplatform.</b>
 </p>
 
-Composed provides small, focused helpers for common Compose patterns, including effects, savers, modifiers, Material 3 state handling, and Android permissions.
-It is not a UI component library, design system, or cross-platform permissions abstraction.
+Composed provides small, focused helpers for common Compose patterns, including effects, savers, modifiers, and Material 3 state handling.
+It is not a UI component library or design system.
 Platform-specific utilities remain explicitly scoped to Android.
 
 ---
@@ -32,7 +32,8 @@ Platform-specific utilities remain explicitly scoped to Android.
 |---|---|---|
 | `composed-core` | Android, JVM/Desktop, iOS | General-purpose Compose utilities for effects, savers, modifiers, collections, colors, and dimensions. Android resource, configuration, and View-system extensions are available on Android only. |
 | `composed-material3` | Android, JVM/Desktop, iOS | Utilities and extensions for Compose Material 3 layouts, drawers, and snackbars. |
-| `composed-permissions-android` | Android | Permission-state utilities built on Accompanist Permissions. |
+
+Android permission-state utilities are available separately from [TrackedPermissions](https://github.com/w2sv/TrackedPermissions).
 
 ## Installation
 
@@ -42,7 +43,6 @@ Platform-specific utilities remain explicitly scoped to Android.
 dependencies {
     implementation("io.github.w2sv:composed-core:<version>")
     implementation("io.github.w2sv:composed-material3:<version>")
-    implementation("io.github.w2sv:composed-permissions-android:<version>")
 }
 ```
 
@@ -55,7 +55,6 @@ w2sv-composed = "<version>"
 [libraries]
 w2sv-composed-core = { module = "io.github.w2sv:composed-core", version.ref = "w2sv-composed" }
 w2sv-composed-material3 = { module = "io.github.w2sv:composed-material3", version.ref = "w2sv-composed" }
-w2sv-composed-permissions-android = { module = "io.github.w2sv:composed-permissions-android", version.ref = "w2sv-composed" }
 ```
 
 **build.gradle.kts:**
@@ -64,7 +63,6 @@ w2sv-composed-permissions-android = { module = "io.github.w2sv:composed-permissi
 dependencies {
     implementation(libs.w2sv.composed.core)
     implementation(libs.w2sv.composed.material3)
-    implementation(libs.w2sv.composed.permissions.android)
 }
 ```
 

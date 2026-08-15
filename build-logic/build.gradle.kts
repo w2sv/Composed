@@ -10,7 +10,6 @@ dependencies {
 }
 
 dependencies {
-    implementation(plugin(libs.plugins.android.library))
     implementation(plugin(libs.plugins.android.kmp.library))
     implementation(plugin(libs.plugins.jetbrains.compose))
     implementation(plugin(libs.plugins.jetbrains.kotlin.multiplatform))
