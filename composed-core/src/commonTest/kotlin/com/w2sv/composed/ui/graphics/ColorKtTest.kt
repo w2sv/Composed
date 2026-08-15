@@ -4,10 +4,10 @@ import androidx.compose.ui.graphics.Color
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-class StringKtTest {
+class ColorKtTest {
 
     @Test
-    fun toComposeColor() {
+    fun `String toComposeColor`() {
         assertEquals(
             Color.Red,
             "#FFFF0000".toComposeColor()

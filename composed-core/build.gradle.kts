@@ -6,6 +6,7 @@ plugins {
 kotlin {
     sourceSets {
         commonMain.dependencies {
+            implementation(libs.jetbrains.compose.foundation)
             api(libs.jetbrains.compose.runtime)
             api(libs.jetbrains.compose.ui)
             api(libs.jetbrains.androidx.lifecycle.runtime.compose)
@@ -13,7 +14,6 @@ kotlin {
         }
 
         commonTest.dependencies {
-            implementation(libs.jetbrains.compose.foundation)
             implementation(kotlin("test"))
         }
 
