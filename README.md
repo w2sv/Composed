@@ -18,26 +18,35 @@
 <img src="https://img.shields.io/github/license/w2sv/Composed" alt="GitHub License">
 </p>
 
+<p align="center">
+<img src="https://img.shields.io/badge/Android-3DDC84?logo=android&amp;logoColor=white" alt="Android">
+<img src="https://img.shields.io/badge/JVM%2FDesktop-4C2A73?logo=openjdk&amp;logoColor=white" alt="JVM and Desktop">
+<img src="https://img.shields.io/badge/iOS-000000?logo=apple&amp;logoColor=white" alt="iOS">
+<img src="https://img.shields.io/badge/Wasm-654FF0?logo=webassembly&amp;logoColor=white" alt="WebAssembly">
+</p>
+
 ---
 
 <p align="center">
 <b>A collection of utilities for Compose Multiplatform.</b>
 </p>
 
-Composed provides small, focused helpers for common Compose patterns, including effects, savers, modifiers, and Material 3 state handling.
-It is not a UI component library or design system.
+Composed provides small, focused helpers for common Compose patterns, including effects, savers, modifiers, gesture handling and Material 3 state handling.
+It is not a UI component library or design system. It just helps you get the job done with even more streamlined compose code.
+
 Platform-specific utilities remain explicitly scoped to Android.
+Web/Wasm support follows Compose Multiplatform's Beta status.
 
 ---
 
 ## 📦 Modules
 
-| Module | Platforms | Description |
-|---|---|---|
-| `composed-core` | Android, JVM/Desktop, iOS | General-purpose Compose utilities for effects, savers, modifiers, collections, colors, and dimensions. Android resource, configuration, and View-system extensions are available on Android only. |
-| `composed-material3` | Android, JVM/Desktop, iOS | Utilities and extensions for Compose Material 3 layouts, drawers, and snackbars. |
+| Module | Description |
+|---|---|
+| `composed-core` | General-purpose Compose utilities for effects, savers, modifiers, collections, colors, and dimensions. Android resource, configuration, and View-system extensions are available on Android only. |
+| `composed-material3` | Utilities and extensions for Compose Material 3 layouts, drawers, and snackbars. |
 
-Android permission-state utilities are available separately from [TrackedPermissions](https://github.com/w2sv/TrackedPermissions).
+Android permission-state utilities are available separately at [AugmentedPermissions](https://github.com/w2sv/AugmentedPermissions).
 
 ## 🚀 Installation
 

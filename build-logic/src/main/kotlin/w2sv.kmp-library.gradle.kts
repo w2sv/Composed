@@ -1,3 +1,4 @@
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -26,6 +27,21 @@ kotlin {
     }
 
     jvm()
+
+    @OptIn(ExperimentalWasmDsl::class)
+    wasmJs {
+        browser {
+            testTask {
+                useKarma {
+                    useChromeHeadless()
+                    useConfigDirectory(
+                        rootProject.projectDir.resolve("karma.config.d")
+                    )
+                }
+            }
+        }
+    }
+
     iosArm64()
     iosSimulatorArm64()
 }
@@ -34,6 +50,6 @@ mavenPublishing {
     // Use module name as artifactId.
     coordinates(
         artifactId = project.name,
-        version = rootProject.version.toString(),
+        version = rootProject.version.toString()
     )
 }
