@@ -1,41 +1,51 @@
-<h1 align="center">Composed</h1>
+<p align="center">
+    <img src="assets/composed-banner.webp" alt="Composed — Compose without Overdose.">
+</p>
 
 <p align="center">
-    <a href="https://android-arsenal.com/api?level=21">
-    <img src="https://img.shields.io/badge/API-21%2B-brightgreen.svg?style=flat" alt="API">
+    <img src="https://img.shields.io/badge/Kotlin-Multiplatform-7F52FF?logo=kotlin&logoColor=white" alt="Kotlin Multiplatform">
+    <img src="https://img.shields.io/badge/Compose-Multiplatform-4285F4" alt="Compose Multiplatform">
+
+<a href="https://android-arsenal.com/api?level=21">
+    <img src="https://img.shields.io/badge/API-21%2B-brightgreen.svg?style=flat" alt="API 21+">
 </a>
 
-<img src="https://img.shields.io/maven-central/v/io.github.w2sv/composed-core" alt="Maven Central Version">
+<a href="https://central.sonatype.com/artifact/io.github.w2sv/composed-core">
+    <img src="https://img.shields.io/maven-central/v/io.github.w2sv/composed-core" alt="Maven Central">
+</a>
 
 <a href="https://w2sv.github.io/Composed/">
     <img src="https://img.shields.io/badge/docs-API_reference-blue" alt="API Reference">
 </a>
 
-<a href="https://github.com/w2sv/Composed/actions/workflows/workflow.yaml">
-    <img src="https://github.com/w2sv/Composed/actions/workflows/workflow.yaml/badge.svg" alt="Build">
+<a href="https://github.com/w2sv/Composed/actions/workflows/build.yaml">
+    <img src="https://github.com/w2sv/Composed/actions/workflows/build.yaml/badge.svg" alt="Build">
 </a>
 
-<img src="https://img.shields.io/github/license/w2sv/Composed" alt="GitHub License">
+<img src="https://img.shields.io/github/license/w2sv/Composed" alt="License">
 </p>
 
 <p align="center">
-<img src="https://img.shields.io/badge/Android-3DDC84?logo=android&amp;logoColor=white" alt="Android">
-<img src="https://img.shields.io/badge/JVM%2FDesktop-4C2A73?logo=openjdk&amp;logoColor=white" alt="JVM and Desktop">
-<img src="https://img.shields.io/badge/iOS-000000?logo=apple&amp;logoColor=white" alt="iOS">
-<img src="https://img.shields.io/badge/Wasm-654FF0?logo=webassembly&amp;logoColor=white" alt="WebAssembly">
+    <img src="https://img.shields.io/badge/Android-3DDC84?logo=android&logoColor=white" alt="Android">
+    <img src="https://img.shields.io/badge/iOS-000000?logo=apple&logoColor=white" alt="iOS">
+    <img src="https://img.shields.io/badge/JVM%2FDesktop-4C2A73?logo=openjdk&logoColor=white" alt="JVM and Desktop">
+    <img src="https://img.shields.io/badge/Wasm-654FF0?logo=webassembly&logoColor=white" alt="WebAssembly">
 </p>
 
 ---
 
 <p align="center">
-<b>A collection of utilities for Compose Multiplatform.</b>
+    <b>Small Compose helpers you keep pasting from project to project.</b>
 </p>
 
-Composed provides small, focused helpers for common Compose patterns, including effects, savers, modifiers, gesture handling and Material 3 state handling.
-It is not a UI component library or design system. It just helps you get the job done with even more streamlined compose code.
+Composed is a lightweight utility library for [Compose Multiplatform](https://github.com/jetbrains/compose-multiplatform) that fills in recurring gaps around Compose APIs.
+It provides focused helpers for effects, snapshot state and savers, modifiers, gesture coordination, focus handling, and Material 3 behavior — without introducing a framework, design system, or collection of opinionated UI components.
 
-Platform-specific utilities remain explicitly scoped to Android.
-Web/Wasm support follows Compose Multiplatform's Beta status.
+Platform-specific utilities stay explicitly scoped to their respective targets, while the common API remains usable across supported Compose Multiplatform platforms.
+
+See the [API reference](https://w2sv.github.io/Composed/) for the full documentation.
+
+> Web/Wasm support follows Compose Multiplatform's Beta status.
 
 ---
 
@@ -81,6 +91,6 @@ dependencies {
 
 ## 📄 License
 
-Designed and developed by 2024 w2sv (Janek Zangenberg).
+Designed and developed by w2sv (Janek Zangenberg).
 
 Licensed under the [Apache License 2.0](LICENSE).
