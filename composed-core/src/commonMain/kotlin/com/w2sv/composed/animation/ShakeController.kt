@@ -1,5 +1,7 @@
 package com.w2sv.composed.animation
 
+import androidx.annotation.FloatRange
+import androidx.annotation.IntRange
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.keyframesWithSpline
 import androidx.compose.animation.core.tween
@@ -16,14 +18,26 @@ import kotlin.math.roundToInt
 
 /**
  * Controls a horizontal shake animation applied through [Modifier.shakenBy].
+ *
+ * @param amplitude Maximum horizontal displacement of the shake.
+ * @param durationMillis Total duration of the shake animation in milliseconds.
+ * @param frequencyHz Desired number of complete oscillations per second.
+ * @param decay Amount by which the amplitude decreases between successive
+ * shake cycles. `0f` disables decay, while `1f` applies maximum decay.
  */
 @Stable
-class ShakeController internal constructor(
-    internal val amplitude: Dp,
-    private val durationMillis: Int,
-    private val frequencyHz: Float,
-    private val decay: Float
+class ShakeController(
+    internal val amplitude: Dp = 20.dp,
+    @IntRange(0L) private val durationMillis: Int = 400,
+    @FloatRange(0.0) private val frequencyHz: Float = 8f,
+    @FloatRange(0.0, 1.0) private val decay: Float = 0.7f
 ) {
+    init {
+        require(durationMillis > 0) { "durationMillis must be greater than 0" }
+        require(frequencyHz > 0f) { "frequencyHz must be greater than 0" }
+        require(decay in 0f..1f) { "decay must be between 0 and 1" }
+    }
+
     private val animatable = Animatable(0f)
 
     /**
@@ -101,15 +115,11 @@ class ShakeController internal constructor(
 @Composable
 fun rememberShakeController(
     amplitude: Dp = 20.dp,
-    durationMillis: Int = 400,
-    frequencyHz: Float = 8f,
-    decay: Float = 0.5f
-): ShakeController {
-    require(durationMillis > 0) { "durationMillis must be greater than 0" }
-    require(frequencyHz > 0f) { "frequencyHz must be greater than 0" }
-    require(decay in 0f..1f) { "decay must be between 0 and 1" }
-
-    return remember(amplitude, durationMillis, frequencyHz, decay) {
+    @IntRange(0L) durationMillis: Int = 400,
+    @FloatRange(0.0) frequencyHz: Float = 8f,
+    @FloatRange(0.0, 1.0) decay: Float = 0.7f
+): ShakeController =
+    remember(amplitude, durationMillis, frequencyHz, decay) {
         ShakeController(
             amplitude = amplitude,
             durationMillis = durationMillis,
@@ -117,7 +127,6 @@ fun rememberShakeController(
             decay = decay
         )
     }
-}
 
 /**
  * Applies the horizontal shake translation controlled by [controller].
