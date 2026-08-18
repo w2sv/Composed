@@ -24,3 +24,4 @@ rootProject.name = "composed"
 
 include(":composed-core")
 include(":composed-material3")
+include(":playground")
