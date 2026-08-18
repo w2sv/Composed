@@ -38,25 +38,93 @@
     <b>Small Compose helpers you keep pasting from project to project.</b>
 </p>
 
-Composed is a lightweight utility library for [Compose Multiplatform](https://github.com/jetbrains/compose-multiplatform) that fills in recurring gaps around Compose APIs.
-It provides focused helpers for effects, snapshot state and savers, modifiers, gesture coordination, focus handling, and Material 3 behavior — without introducing a framework, design system, or collection of opinionated UI components.
+Composed is a lightweight utility library
+for [Compose Multiplatform](https://github.com/jetbrains/compose-multiplatform) that fills in
+recurring gaps around Compose APIs.
+It provides focused helpers for **effects, snapshot state and savers, modifier composition, layout,
+gesture coordination, focus handling, animations, and Material 3 behavior** — without introducing a
+framework, design system, or collection of opinionated UI components.
 
-Platform-specific utilities stay explicitly scoped to their respective targets, while the common API remains usable across supported Compose Multiplatform platforms.
+Platform-specific utilities stay explicitly scoped to their respective targets, while the common API
+remains usable across supported Compose Multiplatform platforms.
 
 See the [API reference](https://w2sv.github.io/Composed/) for the full documentation.
 
 > Web/Wasm support follows Compose Multiplatform's Beta status.
 
----
+## ✨ API highlights
+
+### Modifier composition
+
+Conditionally build modifier chains without repeatedly starting from `Modifier`:
+
+```kotlin
+Modifier
+    .padding(16.dp)
+    .then {
+        when {
+            isSelected -> background(Color.Green)
+            isDisabled -> alpha(0.5f)
+            else -> this
+        }
+    }
+    .thenIf(isFocused) {
+        border(1.dp, Color.Blue)
+    }
+    .thenIfNotNull(backgroundColor) {
+        background(it)
+    }
+```
+
+### Shake animation
+
+Apply a configurable horizontal shake animation:
+
+```kotlin
+val shakeController = rememberShakeController(
+    amplitude = 20.dp,
+    durationMillis = 400,
+    frequencyHz = 8f,
+    decay = 0.5f
+)
+
+Box(modifier = Modifier.shakenBy(shakeController))
+
+scope.launch {
+    shakeController.shake()
+}
+```
+
+### Focus clearing
+
+Coordinate focus clearing from anywhere in the composition without passing around a `FocusManager`:
+
+```kotlin
+val focusClearingController = rememberFocusClearingController()
+
+focusClearingController.Bind()
+
+Column(modifier = Modifier.clearFocusOnTap(focusClearingController)) {
+    // ...
+}
+
+Button(onClick = focusClearingController::requestClearFocus) {
+    Text("Clear focus")
+}
+```
+
+`FocusClearingController` can also automatically clear focus when the IME transitions from visible
+to hidden.
 
 ## 📦 Modules
 
-| Module | Description |
-|---|---|
-| `composed-core` | General-purpose Compose utilities for effects, savers, modifiers, collections, colors, and dimensions. Android resource, configuration, and View-system extensions are available on Android only. |
+| Module               | Description                                                                      |
+|----------------------|----------------------------------------------------------------------------------|
+| `composed-core`      | General-purpose Compose utilities. Contains also Android-only utilities.         |
 | `composed-material3` | Utilities and extensions for Compose Material 3 layouts, drawers, and snackbars. |
 
-Android permission-state utilities are available separately at [AugmentedPermissions](https://github.com/w2sv/AugmentedPermissions).
+Android permission-state utilities are available separately
+at [AugmentedPermissions](https://github.com/w2sv/AugmentedPermissions).
 
 ## 🚀 Installation
 
@@ -87,6 +155,23 @@ dependencies {
     implementation(libs.w2sv.composed.core)
     implementation(libs.w2sv.composed.material3)
 }
+```
+
+## 🖥️ Desktop playground
+
+The [`playground`](playground) module contains a Compose Desktop app for interactively
+testing visual and behavioral APIs.
+
+Run it with:
+
+```bash
+./gradlew :playground:run
+```
+
+Or launch it with Compose Hot Reload:
+
+```bash
+./gradlew :playground:hotRunJvm --auto
 ```
 
 ## 📄 License
