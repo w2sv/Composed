@@ -16,7 +16,7 @@ fun SnackbarHostState.dismissCurrentSnackbar() {
  * Dismisses the currently showing snackbar if there is one and shows a new one with the given [snackbarVisuals].
  * @see SnackbarHostState.showSnackbar
  */
-suspend fun SnackbarHostState.dismissCurrentSnackbarAndShow(snackbarVisuals: SnackbarVisuals): SnackbarResult {
+suspend fun SnackbarHostState.showReplacing(snackbarVisuals: SnackbarVisuals): SnackbarResult {
     dismissCurrentSnackbar()
     return showSnackbar(snackbarVisuals)
 }
@@ -25,7 +25,7 @@ suspend fun SnackbarHostState.dismissCurrentSnackbarAndShow(snackbarVisuals: Sna
  * Dismisses the currently showing snackbar if there is one and shows a new one with the given parameters.
  * @see SnackbarHostState.showSnackbar
  */
-suspend fun SnackbarHostState.dismissCurrentSnackbarAndShow(
+suspend fun SnackbarHostState.showReplacing(
     message: String,
     actionLabel: String? = null,
     withDismissAction: Boolean = false,

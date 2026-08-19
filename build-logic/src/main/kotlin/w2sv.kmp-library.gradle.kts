@@ -13,6 +13,8 @@ plugins {
 rootProject.dependencies.add("dokka", project)
 
 kotlin {
+    compilerOptions { freeCompilerArgs.add("-Xexpect-actual-classes") }
+
     android {
         namespace = "com.w2sv.${path.removePrefix(":").replace(':', '.').replace('-', '.')}"
         compileSdk = 37

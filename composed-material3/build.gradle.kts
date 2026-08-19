@@ -19,5 +19,23 @@ kotlin {
             implementation(libs.junit)
             implementation(libs.roboelectric)
         }
+
+        applyDefaultHierarchyTemplate()
+
+        val nonAndroidMain by creating {
+            dependsOn(commonMain.get())
+        }
+
+        jvmMain {
+            dependsOn(nonAndroidMain)
+        }
+
+        wasmJsMain {
+            dependsOn(nonAndroidMain)
+        }
+
+        appleMain {
+            dependsOn(nonAndroidMain)
+        }
     }
 }
