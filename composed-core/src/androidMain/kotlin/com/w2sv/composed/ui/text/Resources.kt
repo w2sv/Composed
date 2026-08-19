@@ -1,4 +1,4 @@
-/**
+/*
  * Functions adopted from https://stackoverflow.com/a/70162451/12083276.
  */
 
@@ -125,6 +125,7 @@ private fun spannableStringToAnnotatedString(text: Spanned, density: Density?): 
                                 // FontFamily.SansSerif.name -> FontFamily.SansSerif
                                 // FontFamily.Serif.name -> FontFamily.Serif
                                 FontFamily.Monospace.name -> FontFamily.Monospace
+
                                 // FontFamily.Cursive.name -> FontFamily.Cursive
                                 else -> FontFamily.Default
                             }
@@ -137,11 +138,16 @@ private fun spannableStringToAnnotatedString(text: Spanned, density: Density?): 
                         }
 
                         is RelativeSizeSpan -> SpanStyle(fontSize = span.sizeChange.em)
+
                         // is StrikethroughSpan -> SpanStyle(textDecoration = TextDecoration.LineThrough)
                         is UnderlineSpan -> SpanStyle(textDecoration = TextDecoration.Underline)
+
                         is SuperscriptSpan -> SpanStyle(baselineShift = BaselineShift.Superscript)
+
                         is SubscriptSpan -> SpanStyle(baselineShift = BaselineShift.Subscript)
+
                         is ForegroundColorSpan -> SpanStyle(color = Color(span.foregroundColor))
+
                         else -> SpanStyle()
                     },
                     text.getSpanStart(span),

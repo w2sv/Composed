@@ -95,6 +95,40 @@ scope.launch {
 }
 ```
 
+### Lazy grid item entrances
+
+Stagger lazy grid items from the edge associated with the current scroll direction:
+
+```kotlin
+val gridState = rememberLazyGridState()
+val entranceState = rememberLazyGridItemEntranceState(gridState)
+
+LazyVerticalGrid(
+    columns = GridCells.Fixed(3),
+    state = gridState
+) {
+    items(
+        items = products,
+        key = { it.id }
+    ) { product ->
+        ProductCard(
+            product = product,
+            modifier = Modifier.animateLazyGridItemEntrance(
+                itemKey = product.id,
+                state = entranceState,
+                delay = LazyGridItemEntranceDelay.diagonal(
+                    mainAxisInterval = 200.milliseconds,
+                    crossAxisInterval = 100.milliseconds
+                )
+            )
+        )
+    }
+}
+```
+
+The API also supports horizontal grids. You can implement your own LazyGridItemEntranceDelay strategies,
+configure whether an item animation should be shown on every composition or only once per key, and more.
+
 ### Snackbar launching
 
 Show snackbars from event handlers without manually carrying around a `SnackbarHostState`, `CoroutineScope`, and, on Android, a `Context`:
@@ -161,6 +195,7 @@ to hidden.
 | Module               | Description                                                                      |
 |----------------------|----------------------------------------------------------------------------------|
 | `composed-core`      | General-purpose Compose utilities. Contains also Android-only utilities.         |
+| `composed-animation` | Reusable Compose animation controllers and lazy-grid entrance effects.           |
 | `composed-material3` | Utilities and extensions for Compose Material 3 layouts, drawers, and snackbars. |
 
 Android permission-state utilities are available separately
@@ -172,6 +207,7 @@ at [AugmentedPermissions](https://github.com/w2sv/AugmentedPermissions).
 
 ```kotlin
 dependencies {
+    implementation("io.github.w2sv:composed-animation:<version>")
     implementation("io.github.w2sv:composed-core:<version>")
     implementation("io.github.w2sv:composed-material3:<version>")
 }
@@ -184,6 +220,7 @@ dependencies {
 w2sv-composed = "<version>"
 
 [libraries]
+w2sv-composed-animation = { module = "io.github.w2sv:composed-animation", version.ref = "w2sv-composed" }
 w2sv-composed-core = { module = "io.github.w2sv:composed-core", version.ref = "w2sv-composed" }
 w2sv-composed-material3 = { module = "io.github.w2sv:composed-material3", version.ref = "w2sv-composed" }
 ```
@@ -192,6 +229,7 @@ w2sv-composed-material3 = { module = "io.github.w2sv:composed-material3", versio
 
 ```kotlin
 dependencies {
+    implementation(libs.w2sv.composed.animation)
     implementation(libs.w2sv.composed.core)
     implementation(libs.w2sv.composed.material3)
 }
@@ -208,10 +246,28 @@ Run it with:
 ./gradlew :playground:run
 ```
 
+Without arguments, the playground opens a sample picker. To launch a sample directly:
+
+```bash
+./gradlew :playground:run --args=lazy-grid-item-entrance
+```
+
 Or launch it with Compose Hot Reload:
 
 ```bash
 ./gradlew :playground:hotRunJvm --auto
+```
+
+Direct sample selection uses the same argument with hot reload:
+
+```bash
+./gradlew :playground:hotRunJvm --auto --args=lazy-grid-item-entrance
+```
+
+Show launch options and available sample IDs with:
+
+```bash
+./gradlew :playground:usage
 ```
 
 ## 📄 License

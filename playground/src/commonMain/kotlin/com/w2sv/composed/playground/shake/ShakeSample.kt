@@ -1,7 +1,6 @@
-package com.w2sv.composed.playground
+package com.w2sv.composed.playground.shake
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
@@ -13,7 +12,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -27,10 +25,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.w2sv.composed.animation.rememberShakeController
 import com.w2sv.composed.animation.shakenBy
+import com.w2sv.composed.playground.shared.ParameterSlider
+import com.w2sv.composed.playground.shared.PlaygroundDefaults
 import kotlin.math.roundToInt
 import kotlinx.coroutines.launch
-
-private val verticalSpacing = 24.dp
 
 @Composable
 fun ShakeSample() {
@@ -52,10 +50,10 @@ fun ShakeSample() {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 32.dp)
+            .padding(horizontal = PlaygroundDefaults.ContentPadding)
             .verticalScroll(scrollState)
-            .padding(vertical = verticalSpacing),
-        verticalArrangement = Arrangement.spacedBy(verticalSpacing),
+            .padding(vertical = PlaygroundDefaults.ContentPadding),
+        verticalArrangement = Arrangement.spacedBy(PlaygroundDefaults.SectionSpacing),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Button(
@@ -105,40 +103,19 @@ fun ShakeSample() {
             style = MaterialTheme.typography.bodyMedium
         )
 
-        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            OutlinedButton(onClick = { scope.launch { controller.cancel() } }, modifier = Modifier.weight(1f)) {
+        Row(horizontalArrangement = Arrangement.spacedBy(PlaygroundDefaults.ControlSpacing)) {
+            OutlinedButton(
+                onClick = { scope.launch { controller.cancel() } },
+                modifier = Modifier.weight(1f)
+            ) {
                 Text("Cancel")
             }
-            OutlinedButton(onClick = { scope.launch { controller.cancel(animated = true) } }, modifier = Modifier.weight(1f)) {
+            OutlinedButton(
+                onClick = { scope.launch { controller.cancel(animated = true) } },
+                modifier = Modifier.weight(1f)
+            ) {
                 Text("Cancel animated")
             }
-        }
-    }
-}
-
-@Composable
-private fun ParameterSlider(
-    label: String,
-    valueLabel: String,
-    value: Float,
-    valueRange: ClosedFloatingPointRange<Float>,
-    onValueChange: (Float) -> Unit
-) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Box(modifier = Modifier.weight(0.3f), contentAlignment = Alignment.Center) {
-            Text(label)
-        }
-        Slider(
-            value = value,
-            onValueChange = onValueChange,
-            valueRange = valueRange,
-            modifier = Modifier.weight(1f)
-        )
-        Box(modifier = Modifier.weight(0.3f), contentAlignment = Alignment.Center) {
-            Text(valueLabel)
         }
     }
 }

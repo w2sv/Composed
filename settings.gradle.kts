@@ -23,5 +23,6 @@ plugins {
 rootProject.name = "composed"
 
 include(":composed-core")
+include(":composed-animation")
 include(":composed-material3")
 include(":playground")

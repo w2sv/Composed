@@ -5,11 +5,13 @@ androidx-annotation = "1.10.0"
 androidx-core-ktx = "1.19.0"
 compose = "1.11.1"
 compose-material3 = "1.9.0"
+jlleitschuh-gradle-ktlint = "14.2.0"
 junit = "4.13.2"
 kotlin = "2.4.10"
 kotlinx-coroutines = "1.11.0"
 kover = "0.9.9"
-ktlint = "14.2.0"
+# @pin
+ktlint = "1.8.0"
 lifecycle = "2.11.0"
 org-jetbrains-dokka = "2.2.0"
 robolectric = "4.16.1"
@@ -37,9 +39,9 @@ roboelectric = { module = "org.robolectric:robolectric", version.ref = "robolect
 android-kmp-library = { id = "com.android.kotlin.multiplatform.library", version.ref = "agp" }
 jetbrains-compose = { id = "org.jetbrains.compose", version.ref = "compose" }
 jetbrains-kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+jlleitschuh-gradle-ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "jlleitschuh-gradle-ktlint" }
 kotlin-compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kover" }
-ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlint" }
 org-jetbrains-dokka = { id = "org.jetbrains.dokka", version.ref = "org-jetbrains-dokka" }
 vanniktech-maven-publish = { id = "com.vanniktech.maven.publish", version.ref = "vanniktech-maven-publish" }
 versionCatalogUpdate = { id = "nl.littlerobots.version-catalog-update", version.ref = "versionCatalogUpdate" }

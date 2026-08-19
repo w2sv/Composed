@@ -12,9 +12,13 @@ plugins {
 // Include every module applying this convention plugin in the root Dokka site.
 rootProject.dependencies.add("dokka", project)
 
+ktlint {
+    version.set(libs.version("ktlint"))
+}
+
 kotlin {
     android {
-        namespace = "com.w2sv.${path.removePrefix(":").replace(':', '.').replace('-', '.')}"
+        namespace = pathBasedPackageName
         compileSdk = 37
         minSdk = 21
 
