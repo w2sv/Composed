@@ -106,3 +106,4 @@ secret.properties
 
 version.txt
 release-notes.txt
+/.claude/

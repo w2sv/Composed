@@ -23,9 +23,9 @@ kotlin {
             implementation(libs.androidx.core.ktx)
         }
 
-        getByName("androidHostTest").dependencies {
-            implementation(libs.jetbrains.compose.material3)
+        androidHostTest.dependencies {
             implementation(kotlin("test"))
+            implementation(libs.jetbrains.compose.material3)
             implementation(libs.androidx.activity.compose)
             implementation(libs.jetbrains.compose.ui.test.junit4)
             implementation(libs.jetbrains.kotlinx.coroutines.test)

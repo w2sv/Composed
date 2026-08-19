@@ -95,6 +95,46 @@ scope.launch {
 }
 ```
 
+### Snackbar launching
+
+Show snackbars from event handlers without manually carrying around a `SnackbarHostState`, `CoroutineScope`, and, on Android, a `Context`:
+
+```kotlin
+val snackbarLauncher = rememberSnackbarLauncher(snackbarHostState)
+
+Button(
+    onClick = {
+        snackbarLauncher.show { MySnackbarVisuals(message = getString(R.string.saved)) }
+    }
+) {
+    Text("Save")
+}
+```
+
+Compared to the usual pattern:
+
+```kotlin
+val scope = rememberCoroutineScope()
+val context = LocalContext.current
+
+Button(
+    onClick = {
+        scope.launch {
+            snackbarHostState.showSnackbar(
+                MySnackbarVisuals(
+                    message = context.getString(R.string.saved)
+                )
+            )
+        }
+    }
+) {
+    Text("Save")
+}
+```
+
+`SnackbarLauncher` keeps coroutine launching and snackbar presentation behind one non-suspending API while still exposing the current snackbar state and explicit replacement or dismissal operations.
+For suspending snackbar display, you may use the `SnackbarController`.
+
 ### Focus clearing
 
 Coordinate focus clearing from anywhere in the composition without passing around a `FocusManager`:
