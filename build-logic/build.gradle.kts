@@ -13,9 +13,10 @@ dependencies {
     implementation(plugin(libs.plugins.android.kmp.library))
     implementation(plugin(libs.plugins.jetbrains.compose))
     implementation(plugin(libs.plugins.jetbrains.kotlin.multiplatform))
-    implementation(plugin(libs.plugins.kotlin.compose.compiler))
     implementation(plugin(libs.plugins.jlleitschuh.gradle.ktlint))
-    implementation(plugin(libs.plugins.org.jetbrains.dokka))
+    implementation(plugin(libs.plugins.kotlin.compose.compiler))
+    implementation(plugin(libs.plugins.jetbrains.kotlinx.kover))
+    implementation(plugin(libs.plugins.jetbrains.dokka))
     implementation(plugin(libs.plugins.vanniktech.maven.publish))
 }
 

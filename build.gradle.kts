@@ -5,9 +5,9 @@ plugins {
     alias(libs.plugins.jetbrains.compose) apply false
     alias(libs.plugins.jetbrains.kotlin.multiplatform) apply false
     alias(libs.plugins.kotlin.compose.compiler) apply false
-    alias(libs.plugins.kover) apply false
+    alias(libs.plugins.jetbrains.kotlinx.kover) apply false
     alias(libs.plugins.jlleitschuh.gradle.ktlint)
-    alias(libs.plugins.org.jetbrains.dokka)
+    alias(libs.plugins.jetbrains.dokka)
     alias(libs.plugins.versionCatalogUpdate)
 }
 

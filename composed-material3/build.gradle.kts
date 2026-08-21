@@ -1,6 +1,6 @@
 plugins {
-    id("w2sv.cmp-library")
-    alias(libs.plugins.kover)
+    id("w2sv.cmp")
+    id("w2sv.kmp-library")
 }
 
 kotlin {
@@ -23,25 +23,9 @@ kotlin {
             }
     }
 
-    applyDefaultHierarchyTemplate()
+    configureNonAndroidSourceSets()
 
     sourceSets {
-        val nonAndroidMain = create("nonAndroidMain") {
-            dependsOn(commonMain.get())
-        }
-
-        jvmMain { dependsOn(nonAndroidMain) }
-        wasmJsMain { dependsOn(nonAndroidMain) }
-        appleMain { dependsOn(nonAndroidMain) }
-
-        val nonAndroidTest = create("nonAndroidTest") {
-            dependsOn(commonTest.get())
-        }
-
-        jvmTest { dependsOn(nonAndroidTest) }
-        wasmJsTest { dependsOn(nonAndroidTest) }
-        appleTest { dependsOn(nonAndroidTest) }
-
         commonMain.dependencies {
             implementation(projects.composed.composedCore)
             api(libs.jetbrains.compose.foundation)
@@ -50,9 +34,11 @@ kotlin {
             api(libs.jetbrains.compose.ui)
         }
 
-        nonAndroidTest.dependencies {
-            implementation(kotlin("test"))
-            implementation(libs.jetbrains.compose.ui.test)
+        named("nonAndroidTest") {
+            dependencies {
+                implementation(kotlin("test"))
+                implementation(libs.jetbrains.compose.ui.test)
+            }
         }
 
         jvmTest.dependencies {

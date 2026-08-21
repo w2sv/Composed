@@ -1,6 +1,6 @@
 plugins {
-    id("w2sv.cmp-library")
-    alias(libs.plugins.kover)
+    id("w2sv.cmp")
+    id("w2sv.kmp-library")
 }
 
 kotlin {

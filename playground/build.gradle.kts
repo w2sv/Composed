@@ -1,8 +1,6 @@
 plugins {
-    alias(libs.plugins.jetbrains.kotlin.multiplatform)
-    alias(libs.plugins.jetbrains.compose)
-    alias(libs.plugins.kotlin.compose.compiler)
-    alias(libs.plugins.jlleitschuh.gradle.ktlint)
+    id("w2sv.cmp")
+    id("w2sv.kmp")
 }
 
 kotlin {

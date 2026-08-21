@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-    <img src="https://img.shields.io/badge/Kotlin-Multiplatform-7F52FF?logo=kotlin&logoColor=white" alt="Kotlin Multiplatform">
+    <img src="https://img.shields.io/badge/Kotlin-2.3.21-7F52FF?logo=kotlin&logoColor=white" alt="Kotlin Version">
     <img src="https://img.shields.io/badge/Compose-Multiplatform-4285F4" alt="Compose Multiplatform">
 
 <a href="https://android-arsenal.com/api?level=21">
