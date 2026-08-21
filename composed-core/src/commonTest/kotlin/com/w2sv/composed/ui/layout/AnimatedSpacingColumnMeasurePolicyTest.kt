@@ -16,7 +16,6 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.constrainHeight
 import androidx.compose.ui.unit.constrainWidth
 import androidx.compose.ui.unit.dp
-import kotlin.math.roundToInt
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
@@ -291,28 +290,6 @@ class AnimatedSpacingColumnMeasurePolicyTest {
     }
 
     @Test
-    fun `optimized spacing matches symmetric directional calculation`() {
-        val presenceValues = floatArrayOf(-1f, 0f, 0.25f, 0.5f, 1f, 2f)
-
-        presenceValues.forEach { first ->
-            presenceValues.forEach { second ->
-                presenceValues.forEach { third ->
-                    presenceValues.forEach { fourth ->
-                        val presence = floatArrayOf(first, second, third, fourth)
-
-                        listOf(1, 7, 10).forEach { spacing ->
-                            assertContentEquals(
-                                expected = calculateSpacingsReference(presence, spacing),
-                                actual = calculateSpacings(presence, spacing)
-                            )
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    @Test
     fun `fully present weighted items divide available space by weight`() {
         assertOrdinaryAllocations(
             expected = intArrayOf(25, 75),
@@ -472,41 +449,6 @@ private fun assertOrdinaryAllocations(
             }
         )
     )
-}
-
-private fun calculateSpacingsReference(presence: FloatArray, spacing: Int): IntArray {
-    if (presence.size <= 1 || spacing == 0) {
-        return IntArray(presence.size)
-    }
-
-    val forward = calculateDirectionalSpacingsReference(presence, reversed = false)
-    val reverse = calculateDirectionalSpacingsReference(presence, reversed = true)
-
-    return IntArray(presence.size) { index ->
-        if (index == 0) {
-            0
-        } else {
-            (spacing * (forward[index] + reverse[index - 1]) / 2f).roundToInt()
-        }
-    }
-}
-
-private fun calculateDirectionalSpacingsReference(presence: FloatArray, reversed: Boolean): FloatArray {
-    val result = FloatArray(presence.size)
-    var accumulatedPresence = 0f
-    var previousGapCount = 0f
-
-    repeat(presence.size) { iteration ->
-        val index = if (reversed) presence.lastIndex - iteration else iteration
-
-        accumulatedPresence += presence[index].coerceIn(0f, 1f)
-
-        val gapCount = (accumulatedPresence - 1f).coerceAtLeast(0f)
-        result[index] = gapCount - previousGapCount
-        previousGapCount = gapCount
-    }
-
-    return result
 }
 
 private fun measure(

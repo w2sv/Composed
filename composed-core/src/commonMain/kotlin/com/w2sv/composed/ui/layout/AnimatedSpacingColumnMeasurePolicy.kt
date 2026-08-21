@@ -269,15 +269,11 @@ private fun calculateForwardSpacings(presence: FloatArray): FloatArray {
     var previousGapCount = 0f
 
     repeat(presence.size) { index ->
-        accumulatedPresence +=
-            presence[index].coerceIn(0f, 1f)
+        accumulatedPresence += presence[index].coerceIn(0f, 1f)
 
-        val gapCount = (
-            accumulatedPresence - 1f
-            ).coerceAtLeast(0f)
+        val gapCount = (accumulatedPresence - 1f).coerceAtLeast(0f)
 
-        result[index] =
-            gapCount - previousGapCount
+        result[index] = gapCount - previousGapCount
 
         previousGapCount = gapCount
     }
@@ -427,8 +423,8 @@ internal fun calculateAnimatedWeightedAllocations(
 
             allocations[recipient] +=
                 redistributedSpace *
-                effectiveWeight /
-                recipientWeight
+                    effectiveWeight /
+                    recipientWeight
         }
     }
 
