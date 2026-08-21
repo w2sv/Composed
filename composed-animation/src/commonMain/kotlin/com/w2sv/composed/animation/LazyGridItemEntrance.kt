@@ -286,10 +286,7 @@ private class LazyGridItemEntranceNode(
     }
 
     private fun initialProgress() =
-        if (
-            repeatMode == LazyGridItemEntranceRepeatMode.OncePerKey &&
-            state.hasEntered(itemKey)
-        ) {
+        if (repeatMode == LazyGridItemEntranceRepeatMode.OncePerKey && state.hasEntered(itemKey)) {
             1f
         } else {
             0f

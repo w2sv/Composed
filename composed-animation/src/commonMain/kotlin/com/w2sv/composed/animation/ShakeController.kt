@@ -133,7 +133,4 @@ fun rememberShakeController(
  */
 @Stable
 fun Modifier.shakenBy(controller: ShakeController): Modifier =
-    graphicsLayer {
-        translationX =
-            controller.translationFraction * controller.amplitude.toPx()
-    }
+    graphicsLayer { translationX = controller.translationFraction * controller.amplitude.toPx() }
