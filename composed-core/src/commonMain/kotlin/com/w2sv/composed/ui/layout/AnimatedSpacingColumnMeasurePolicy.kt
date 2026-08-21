@@ -48,6 +48,7 @@ internal class AnimatedSpacingColumnMeasurePolicy(private val spacing: Dp, priva
 
         var fixedHeight = 0
         var totalWeight = 0f
+        var hasVisibilityControlledWeight = false
 
         measurables.forEachIndexed { index, measurable ->
             val data = parentData[index]
@@ -55,6 +56,8 @@ internal class AnimatedSpacingColumnMeasurePolicy(private val spacing: Dp, priva
 
             if (weight > 0f && boundedHeight) {
                 totalWeight += weight
+                hasVisibilityControlledWeight =
+                    hasVisibilityControlledWeight || data?.visibilityControlled == true
                 return@forEachIndexed
             }
 
@@ -84,11 +87,19 @@ internal class AnimatedSpacingColumnMeasurePolicy(private val spacing: Dp, priva
                     fixedHeight
                 ).coerceAtLeast(0)
 
-            val allocations = calculateWeightedAllocations(
-                availableSpace = availableHeight,
-                parentData = parentData,
-                presence = presence
-            )
+            val allocations = if (hasVisibilityControlledWeight) {
+                calculateAnimatedWeightedAllocations(
+                    availableSpace = availableHeight,
+                    parentData = parentData,
+                    presence = presence
+                )
+            } else {
+                calculateOrdinaryWeightedAllocations(
+                    availableSpace = availableHeight,
+                    parentData = parentData,
+                    totalWeight = totalWeight
+                )
+            }
 
             measurables.forEachIndexed { index, measurable ->
                 val data = parentData[index] ?: return@forEachIndexed
@@ -229,43 +240,35 @@ internal fun calculateSpacings(presence: FloatArray, spacing: Int): IntArray {
         return IntArray(presence.size)
     }
 
-    val forward = calculateDirectionalSpacings(
-        presence = presence,
-        reversed = false
-    )
+    val forward = calculateForwardSpacings(presence)
 
-    val reverse = calculateDirectionalSpacings(
-        presence = presence,
-        reversed = true
-    )
+    val result = IntArray(presence.size)
+    var accumulatedPresence = 0f
+    var previousGapCount = 0f
 
-    return IntArray(presence.size) { index ->
-        if (index == 0) {
-            0
-        } else {
-            (
-                spacing *
-                    (forward[index] + reverse[index - 1]) /
-                    2f
-                ).roundToInt()
+    for (index in presence.lastIndex downTo 0) {
+        accumulatedPresence += presence[index].coerceIn(0f, 1f)
+
+        val gapCount = (accumulatedPresence - 1f).coerceAtLeast(0f)
+        val reverseSpacing = gapCount - previousGapCount
+
+        if (index < presence.lastIndex) {
+            result[index + 1] = (spacing * (forward[index + 1] + reverseSpacing) / 2f).roundToInt()
         }
+
+        previousGapCount = gapCount
     }
+
+    return result
 }
 
-private fun calculateDirectionalSpacings(presence: FloatArray, reversed: Boolean): FloatArray {
+private fun calculateForwardSpacings(presence: FloatArray): FloatArray {
     val result = FloatArray(presence.size)
 
     var accumulatedPresence = 0f
     var previousGapCount = 0f
 
-    repeat(presence.size) { iteration ->
-        val index =
-            if (reversed) {
-                presence.lastIndex - iteration
-            } else {
-                iteration
-            }
-
+    repeat(presence.size) { index ->
         accumulatedPresence +=
             presence[index].coerceIn(0f, 1f)
 
@@ -282,6 +285,47 @@ private fun calculateDirectionalSpacings(presence: FloatArray, reversed: Boolean
     return result
 }
 
+/* Calculate ordinary Column-style weight allocations in linear time. */
+internal fun calculateOrdinaryWeightedAllocations(
+    availableSpace: Int,
+    parentData: Array<AnimatedSpacingColumnParentData?>,
+    totalWeight: Float = parentData.fold(0f) { total, data ->
+        total + (data?.weight ?: 0f)
+    }
+): IntArray {
+    val allocations = IntArray(parentData.size)
+
+    if (totalWeight == 0f || availableSpace == 0) {
+        return allocations
+    }
+
+    var allocationSum = 0f
+    var used = 0
+
+    parentData.forEachIndexed { index, data ->
+        val weight = data?.weight ?: 0f
+        val allocation = availableSpace * weight / totalWeight
+
+        allocationSum += allocation
+        allocations[index] = floor(allocation).toInt().coerceAtLeast(0)
+        used += allocations[index]
+    }
+
+    var remainder = allocationSum
+        .coerceAtMost(availableSpace.toFloat())
+        .roundToInt() - used
+
+    for (index in allocations.indices) {
+        if (remainder == 0) break
+        if ((parentData[index]?.weight ?: 0f) <= 0f) continue
+
+        allocations[index]++
+        remainder--
+    }
+
+    return allocations
+}
+
 /*
  * Begin with the normal fully-present weighted allocation.
  *
@@ -296,7 +340,7 @@ private fun calculateDirectionalSpacings(presence: FloatArray, reversed: Boolean
  * With one transitioning weighted item it linearly interpolates between
  * the two endpoint layouts.
  */
-internal fun calculateWeightedAllocations(
+internal fun calculateAnimatedWeightedAllocations(
     availableSpace: Int,
     parentData: Array<AnimatedSpacingColumnParentData?>,
     presence: FloatArray

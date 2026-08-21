@@ -1,5 +1,6 @@
 package com.w2sv.composed.ui.layout
 
+import kotlin.math.roundToInt
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 
@@ -72,11 +73,32 @@ class AnimatedSpacingColumnMeasurePolicyTest {
     }
 
     @Test
+    fun `optimized spacing matches symmetric directional calculation`() {
+        val presenceValues = floatArrayOf(-1f, 0f, 0.25f, 0.5f, 1f, 2f)
+
+        presenceValues.forEach { first ->
+            presenceValues.forEach { second ->
+                presenceValues.forEach { third ->
+                    presenceValues.forEach { fourth ->
+                        val presence = floatArrayOf(first, second, third, fourth)
+
+                        listOf(1, 7, 10).forEach { spacing ->
+                            assertContentEquals(
+                                expected = calculateSpacingsReference(presence, spacing),
+                                actual = calculateSpacings(presence, spacing)
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
     fun `fully present weighted items divide available space by weight`() {
-        assertAllocations(
+        assertOrdinaryAllocations(
             expected = intArrayOf(25, 75),
-            weights = arrayOf(1f, 3f),
-            presence = floatArrayOf(1f, 1f)
+            weights = arrayOf(1f, 3f)
         )
     }
 
@@ -128,27 +150,57 @@ class AnimatedSpacingColumnMeasurePolicyTest {
 
     @Test
     fun `weighted allocation distributes rounding remainder from the start`() {
-        assertAllocations(
+        assertOrdinaryAllocations(
             expected = intArrayOf(4, 3, 3),
             weights = arrayOf(1f, 1f, 1f),
-            presence = floatArrayOf(1f, 1f, 1f),
             availableSpace = 10
         )
     }
 
     @Test
     fun `weighted allocation handles no available space or weights`() {
-        assertAllocations(
+        assertOrdinaryAllocations(
             expected = intArrayOf(0, 0),
             weights = arrayOf(1f, 1f),
-            presence = floatArrayOf(1f, 1f),
             availableSpace = 0
         )
-        assertAllocations(
+        assertOrdinaryAllocations(
             expected = intArrayOf(0, 0),
-            weights = arrayOf(null, null),
-            presence = floatArrayOf(1f, 1f)
+            weights = arrayOf(null, null)
         )
+    }
+
+    @Test
+    fun `ordinary weight fast path matches all-present animated allocation`() {
+        val weightSets = listOf(
+            arrayOf<Float?>(1f),
+            arrayOf(1f, 1f),
+            arrayOf(1f, 3f),
+            arrayOf(1f, null, 2f, 4f),
+            arrayOf<Float?>(null, null)
+        )
+
+        weightSets.forEach { weights ->
+            val parentData = Array(weights.size) { index ->
+                weights[index]?.let { weight ->
+                    AnimatedSpacingColumnParentData(weight = weight)
+                }
+            }
+
+            listOf(0, 1, 10, 99, 100).forEach { availableSpace ->
+                assertContentEquals(
+                    expected = calculateAnimatedWeightedAllocations(
+                        availableSpace = availableSpace,
+                        parentData = parentData,
+                        presence = FloatArray(weights.size) { 1f }
+                    ),
+                    actual = calculateOrdinaryWeightedAllocations(
+                        availableSpace = availableSpace,
+                        parentData = parentData
+                    )
+                )
+            }
+        }
     }
 
     private fun assertSpacings(
@@ -173,7 +225,7 @@ class AnimatedSpacingColumnMeasurePolicyTest {
     ) {
         assertContentEquals(
             expected = expected,
-            actual = calculateWeightedAllocations(
+            actual = calculateAnimatedWeightedAllocations(
                 availableSpace = availableSpace,
                 parentData = Array(weights.size) { index ->
                     weights[index]?.let { weight ->
@@ -183,5 +235,58 @@ class AnimatedSpacingColumnMeasurePolicyTest {
                 presence = presence
             )
         )
+    }
+
+    private fun assertOrdinaryAllocations(
+        expected: IntArray,
+        weights: Array<Float?>,
+        availableSpace: Int = 100
+    ) {
+        assertContentEquals(
+            expected = expected,
+            actual = calculateOrdinaryWeightedAllocations(
+                availableSpace = availableSpace,
+                parentData = Array(weights.size) { index ->
+                    weights[index]?.let { weight ->
+                        AnimatedSpacingColumnParentData(weight = weight)
+                    }
+                }
+            )
+        )
+    }
+
+    private fun calculateSpacingsReference(presence: FloatArray, spacing: Int): IntArray {
+        if (presence.size <= 1 || spacing == 0) {
+            return IntArray(presence.size)
+        }
+
+        val forward = calculateDirectionalSpacingsReference(presence, reversed = false)
+        val reverse = calculateDirectionalSpacingsReference(presence, reversed = true)
+
+        return IntArray(presence.size) { index ->
+            if (index == 0) {
+                0
+            } else {
+                (spacing * (forward[index] + reverse[index - 1]) / 2f).roundToInt()
+            }
+        }
+    }
+
+    private fun calculateDirectionalSpacingsReference(presence: FloatArray, reversed: Boolean): FloatArray {
+        val result = FloatArray(presence.size)
+        var accumulatedPresence = 0f
+        var previousGapCount = 0f
+
+        repeat(presence.size) { iteration ->
+            val index = if (reversed) presence.lastIndex - iteration else iteration
+
+            accumulatedPresence += presence[index].coerceIn(0f, 1f)
+
+            val gapCount = (accumulatedPresence - 1f).coerceAtLeast(0f)
+            result[index] = gapCount - previousGapCount
+            previousGapCount = gapCount
+        }
+
+        return result
     }
 }
