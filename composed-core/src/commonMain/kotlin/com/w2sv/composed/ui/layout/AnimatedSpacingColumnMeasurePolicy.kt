@@ -220,7 +220,7 @@ internal class AnimatedSpacingColumnMeasurePolicy(private val spacing: Dp, priva
                     }
                 }
 
-                placeable.placeRelative(x, y)
+                placeable.place(x, y)
                 y += placeable.height
             }
         }
@@ -427,8 +427,8 @@ internal fun calculateAnimatedWeightedAllocations(
 
             allocations[recipient] +=
                 redistributedSpace *
-                    effectiveWeight /
-                    recipientWeight
+                effectiveWeight /
+                recipientWeight
         }
     }
 
