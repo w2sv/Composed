@@ -8,6 +8,4 @@ internal object LazyGridItemEntranceDimens {
     val HorizontalWheelScrollDistance = 64.dp
     val HorizontalCollapsedConfigurationWidth = 360.dp
     val HorizontalConfigurationWidth = 640.dp
-    val ScrollbarEdgePadding = 6.dp
-    val ScrollbarThickness = 12.dp
 }

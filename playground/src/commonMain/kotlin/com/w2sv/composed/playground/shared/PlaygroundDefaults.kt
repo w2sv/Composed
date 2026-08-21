@@ -12,4 +12,6 @@ internal object PlaygroundDefaults {
     val SliderValueWidth = 72.dp
     val SamplePickerWidth = 640.dp
     val TopBarElevation = 2.dp
+    val ScrollbarEdgePadding = 6.dp
+    val ScrollbarThickness = 12.dp
 }

@@ -37,17 +37,11 @@ internal fun SamplePicker(onSampleSelected: (Sample) -> Unit) {
                     onClick = { onSampleSelected(sample) },
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Column(
-                        modifier = Modifier.padding(PlaygroundDefaults.ContentPadding),
-                        verticalArrangement = Arrangement.spacedBy(PlaygroundDefaults.CompactSpacing)
-                    ) {
-                        Text(sample.title, style = MaterialTheme.typography.titleLarge)
-                        Text(
-                            text = sample.description,
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
+                    Text(
+                        sample.title,
+                        style = MaterialTheme.typography.titleLarge,
+                        modifier = Modifier.padding(PlaygroundDefaults.ContentPadding)
+                    )
                 }
             }
         }

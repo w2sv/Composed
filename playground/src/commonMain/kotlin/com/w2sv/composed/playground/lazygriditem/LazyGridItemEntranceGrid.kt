@@ -34,6 +34,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import com.w2sv.composed.animation.LazyGridItemEntranceState
 import com.w2sv.composed.animation.animateLazyGridItemEntrance
 import com.w2sv.composed.playground.shared.PlaygroundDefaults
+import com.w2sv.composed.playground.shared.PlaygroundScrollbar
 import kotlin.math.abs
 
 private const val ITEM_COUNT = 100
@@ -75,7 +76,7 @@ internal fun LazyGridItemEntranceGrid(
                 entranceItems(configuration, entranceState)
             }
 
-            LazyGridScrollbar(
+            PlaygroundScrollbar(
                 state = gridState,
                 orientation = Orientation.Vertical,
                 modifier = Modifier
@@ -83,9 +84,9 @@ internal fun LazyGridItemEntranceGrid(
                     .fillMaxHeight()
                     .padding(
                         top = PlaygroundDefaults.ContentPadding,
-                        end = LazyGridItemEntranceDimens.ScrollbarEdgePadding,
+                        end = PlaygroundDefaults.ScrollbarEdgePadding,
                         bottom = LazyGridItemEntranceDimens.FabClearance
-                    ).width(LazyGridItemEntranceDimens.ScrollbarThickness)
+                    ).width(PlaygroundDefaults.ScrollbarThickness)
             )
         }
 
@@ -114,15 +115,15 @@ internal fun LazyGridItemEntranceGrid(
                 entranceItems(configuration, entranceState)
             }
 
-            LazyGridScrollbar(
+            PlaygroundScrollbar(
                 state = gridState,
                 orientation = Orientation.Horizontal,
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .fillMaxWidth()
                     .padding(horizontal = PlaygroundDefaults.ContentPadding)
-                    .padding(bottom = LazyGridItemEntranceDimens.ScrollbarEdgePadding)
-                    .height(LazyGridItemEntranceDimens.ScrollbarThickness)
+                    .padding(bottom = PlaygroundDefaults.ScrollbarEdgePadding)
+                    .height(PlaygroundDefaults.ScrollbarThickness)
             )
         }
     }

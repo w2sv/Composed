@@ -4,12 +4,15 @@ plugins {
 }
 
 kotlin {
+    compilerOptions { optIn.add("com.w2sv.composed.ui.layout.ExperimentalAnimatedSpacingApi") }
+
     jvm()
 
     sourceSets {
         commonMain.dependencies {
             implementation(project(":composed-animation"))
             implementation(project(":composed-core"))
+            implementation(project(":composed-material3"))
 
             implementation(libs.jetbrains.compose.runtime)
             implementation(libs.jetbrains.compose.foundation)

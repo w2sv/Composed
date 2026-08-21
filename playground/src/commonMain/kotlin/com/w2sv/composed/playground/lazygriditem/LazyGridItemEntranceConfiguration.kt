@@ -19,9 +19,13 @@ internal data class LazyGridItemEntranceConfiguration(
     val delay: LazyGridItemEntranceDelay
         get() = when (delayMode) {
             EntranceDelayMode.None -> LazyGridItemEntranceDelay.None
+
             EntranceDelayMode.MainAxis -> LazyGridItemEntranceDelay.alongMainAxis(mainAxisIntervalMillis.milliseconds)
+
             EntranceDelayMode.CrossAxis -> LazyGridItemEntranceDelay.alongCrossAxis(crossAxisIntervalMillis.milliseconds)
+
             EntranceDelayMode.Sequential -> LazyGridItemEntranceDelay.sequential(sequentialIntervalMillis.milliseconds)
+
             EntranceDelayMode.Diagonal -> LazyGridItemEntranceDelay.diagonal(
                 mainAxisInterval = mainAxisIntervalMillis.milliseconds,
                 crossAxisInterval = crossAxisIntervalMillis.milliseconds

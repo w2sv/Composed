@@ -19,6 +19,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import com.w2sv.composed.playground.animatedspacing.AnimatedSpacingSample
 import com.w2sv.composed.playground.lazygriditem.LazyGridItemEntranceSample
 import com.w2sv.composed.playground.shake.ShakeSample
 import com.w2sv.composed.playground.shared.PlaygroundDefaults
@@ -28,21 +29,20 @@ fun Playground(initialSample: Sample?) {
     var selectedSample by remember(initialSample) { mutableStateOf(initialSample) }
 
     MaterialTheme {
-        Surface(modifier = Modifier.fillMaxSize()) {
-            Scaffold(
-                topBar = {
-                    PlaygroundTopBar(
-                        selectedSample = selectedSample,
-                        onSampleSelected = { selectedSample = it }
-                    )
-                }
-            ) { contentPadding ->
-                Box(modifier = Modifier.fillMaxSize().padding(contentPadding)) {
-                    when (selectedSample) {
-                        null -> SamplePicker(onSampleSelected = { selectedSample = it })
-                        Sample.Shake -> ShakeSample()
-                        Sample.LazyGridItemEntrance -> LazyGridItemEntranceSample()
-                    }
+        Scaffold(
+            topBar = {
+                PlaygroundTopBar(
+                    selectedSample = selectedSample,
+                    onSampleSelected = { selectedSample = it }
+                )
+            }
+        ) { contentPadding ->
+            Box(modifier = Modifier.fillMaxSize().padding(contentPadding)) {
+                when (selectedSample) {
+                    null -> SamplePicker(onSampleSelected = { selectedSample = it })
+                    Sample.AnimatedSpacing -> AnimatedSpacingSample()
+                    Sample.Shake -> ShakeSample()
+                    Sample.LazyGridItemEntrance -> LazyGridItemEntranceSample()
                 }
             }
         }

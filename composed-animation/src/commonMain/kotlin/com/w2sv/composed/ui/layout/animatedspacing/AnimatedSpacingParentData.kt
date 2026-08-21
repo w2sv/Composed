@@ -1,0 +1,194 @@
+package com.w2sv.composed.ui.layout.animatedspacing
+
+import androidx.compose.runtime.State
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.AlignmentLine
+import androidx.compose.ui.layout.Measured
+import androidx.compose.ui.layout.Placeable
+import androidx.compose.ui.node.ModifierNodeElement
+import androidx.compose.ui.node.ParentDataModifierNode
+import androidx.compose.ui.platform.InspectorInfo
+import androidx.compose.ui.unit.Density
+import kotlin.jvm.JvmInline
+
+internal data class AnimatedSpacingParentData(
+    val weight: Float? = null,
+    val fill: Boolean = true,
+    val crossAxisAlignment: CrossAxisAlignment? = null,
+    val presence: State<Float>? = null,
+    val visibilityControlled: Boolean = false
+)
+
+internal sealed interface CrossAxisAlignment {
+    @JvmInline
+    value class Horizontal(val alignment: Alignment.Horizontal) : CrossAxisAlignment
+
+    @JvmInline
+    value class Vertical(val alignment: Alignment.Vertical) : CrossAxisAlignment
+
+    @JvmInline
+    value class Relative(val provider: AlignmentLineProvider) : CrossAxisAlignment
+}
+
+internal sealed interface AlignmentLineProvider {
+    fun position(placeable: Placeable): Int
+
+    @JvmInline
+    value class Value(val alignmentLine: AlignmentLine) : AlignmentLineProvider {
+        override fun position(placeable: Placeable): Int =
+            placeable[alignmentLine]
+    }
+
+    @JvmInline
+    value class Block(val block: (Measured) -> Int) : AlignmentLineProvider {
+        override fun position(placeable: Placeable): Int =
+            block(placeable)
+    }
+}
+
+internal fun Modifier.findAnimatedSpacingWeightFill(): Boolean? =
+    foldIn(null) { current, element ->
+        if (element is WeightElement) element.fill else current
+    }
+
+internal fun Modifier.animatedSpacingWeight(weight: Float, fill: Boolean): Modifier {
+    require(weight > 0f) { "weight must be greater than zero" }
+    return then(WeightElement(weight.coerceAtMost(Float.MAX_VALUE), fill))
+}
+
+internal fun Modifier.animatedSpacingColumnAlign(alignment: Alignment.Horizontal): Modifier =
+    then(HorizontalAlignmentElement(alignment))
+
+internal fun Modifier.animatedSpacingRowAlign(alignment: Alignment.Vertical): Modifier =
+    then(VerticalAlignmentElement(alignment))
+
+internal fun Modifier.animatedSpacingColumnAlignBy(provider: AlignmentLineProvider): Modifier =
+    then(AlignmentLineElement(provider))
+
+internal fun Modifier.animatedSpacingRowAlignBy(provider: AlignmentLineProvider): Modifier =
+    then(AlignmentLineElement(provider))
+
+internal fun Modifier.animatedSpacingPresence(presence: State<Float>): Modifier =
+    then(PresenceElement(presence))
+
+private fun Any?.animatedSpacingParentData(): AnimatedSpacingParentData =
+    this as? AnimatedSpacingParentData ?: AnimatedSpacingParentData()
+
+private data class WeightElement(val weight: Float, val fill: Boolean) : ModifierNodeElement<WeightNode>() {
+    override fun create(): WeightNode =
+        WeightNode(weight, fill)
+
+    override fun update(node: WeightNode) {
+        node.weight = weight
+        node.fill = fill
+    }
+
+    override fun InspectorInfo.inspectableProperties() {
+        name = "weight"
+        properties["weight"] = weight
+        properties["fill"] = fill
+    }
+}
+
+private class WeightNode(var weight: Float, var fill: Boolean) :
+    Modifier.Node(),
+    ParentDataModifierNode {
+    override fun Density.modifyParentData(parentData: Any?): Any =
+        parentData.animatedSpacingParentData().copy(weight = weight, fill = fill)
+}
+
+private data class HorizontalAlignmentElement(val alignment: Alignment.Horizontal) : ModifierNodeElement<HorizontalAlignmentNode>() {
+
+    override fun create(): HorizontalAlignmentNode =
+        HorizontalAlignmentNode(alignment)
+
+    override fun update(node: HorizontalAlignmentNode) {
+        node.alignment = alignment
+    }
+
+    override fun InspectorInfo.inspectableProperties() {
+        name = "align"
+        value = alignment
+    }
+}
+
+private class HorizontalAlignmentNode(var alignment: Alignment.Horizontal) :
+    Modifier.Node(),
+    ParentDataModifierNode {
+    override fun Density.modifyParentData(parentData: Any?): Any =
+        parentData.animatedSpacingParentData().copy(
+            crossAxisAlignment = CrossAxisAlignment.Horizontal(alignment)
+        )
+}
+
+private data class VerticalAlignmentElement(val alignment: Alignment.Vertical) : ModifierNodeElement<VerticalAlignmentNode>() {
+
+    override fun create(): VerticalAlignmentNode =
+        VerticalAlignmentNode(alignment)
+
+    override fun update(node: VerticalAlignmentNode) {
+        node.alignment = alignment
+    }
+
+    override fun InspectorInfo.inspectableProperties() {
+        name = "align"
+        value = alignment
+    }
+}
+
+private class VerticalAlignmentNode(var alignment: Alignment.Vertical) :
+    Modifier.Node(),
+    ParentDataModifierNode {
+    override fun Density.modifyParentData(parentData: Any?): Any =
+        parentData.animatedSpacingParentData().copy(
+            crossAxisAlignment = CrossAxisAlignment.Vertical(alignment)
+        )
+}
+
+private data class AlignmentLineElement(val provider: AlignmentLineProvider) : ModifierNodeElement<AlignmentLineNode>() {
+
+    override fun create(): AlignmentLineNode =
+        AlignmentLineNode(provider)
+
+    override fun update(node: AlignmentLineNode) {
+        node.provider = provider
+    }
+
+    override fun InspectorInfo.inspectableProperties() {
+        name = "alignBy"
+        value = provider
+    }
+}
+
+private class AlignmentLineNode(var provider: AlignmentLineProvider) :
+    Modifier.Node(),
+    ParentDataModifierNode {
+    override fun Density.modifyParentData(parentData: Any?): Any =
+        parentData.animatedSpacingParentData().copy(
+            crossAxisAlignment = CrossAxisAlignment.Relative(provider)
+        )
+}
+
+private data class PresenceElement(val presence: State<Float>) : ModifierNodeElement<PresenceNode>() {
+    override fun create(): PresenceNode =
+        PresenceNode(presence)
+
+    override fun update(node: PresenceNode) {
+        node.presence = presence
+    }
+
+    override fun InspectorInfo.inspectableProperties() {
+        name = "animatedSpacingPresence"
+    }
+}
+
+private class PresenceNode(var presence: State<Float>) :
+    Modifier.Node(),
+    ParentDataModifierNode {
+    override fun Density.modifyParentData(parentData: Any?): Any =
+        parentData.animatedSpacingParentData().copy(
+            presence = presence,
+            visibilityControlled = true
+        )
+}

@@ -1,15 +1,17 @@
 package com.w2sv.composed.playground
 
-enum class Sample(val id: String, val title: String, val description: String) {
+enum class Sample(val id: String, val title: String) {
+    AnimatedSpacing(
+        id = "animated-spacing",
+        title = "Animated Spacing"
+    ),
     Shake(
         id = "shake",
-        title = "Shake animation",
-        description = "Configure and trigger a horizontal shake animation."
+        title = "Shake animation"
     ),
     LazyGridItemEntrance(
         id = "lazy-grid-item-entrance",
-        title = "Lazy grid entrances",
-        description = "Explore entrance delays across vertical and horizontal lazy grids."
+        title = "Lazy grid entrances"
     );
 
     companion object {

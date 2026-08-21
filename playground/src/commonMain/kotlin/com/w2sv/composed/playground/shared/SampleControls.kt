@@ -2,6 +2,7 @@ package com.w2sv.composed.playground.shared
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
@@ -21,33 +22,40 @@ internal fun SampleConfigurationCard(
     description: String,
     modifier: Modifier = Modifier,
     contentModifier: Modifier = Modifier,
+    contentOverlay: (@Composable BoxScope.() -> Unit)? = null,
     headerAction: (@Composable () -> Unit)? = null,
+    showHeader: Boolean = true,
     content: @Composable () -> Unit
 ) {
     ElevatedCard(modifier = modifier) {
-        Column(
-            modifier = contentModifier.padding(PlaygroundDefaults.ContentPadding),
-            verticalArrangement = Arrangement.spacedBy(PlaygroundDefaults.SectionSpacing)
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(PlaygroundDefaults.ControlSpacing)
+        Box {
+            Column(
+                modifier = contentModifier.padding(PlaygroundDefaults.ContentPadding),
+                verticalArrangement = Arrangement.spacedBy(PlaygroundDefaults.SectionSpacing)
             ) {
-                Column(
-                    modifier = Modifier.weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(PlaygroundDefaults.CompactSpacing)
-                ) {
-                    Text(text = title, style = MaterialTheme.typography.headlineSmall)
-                    Text(
-                        text = description,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+                if (showHeader) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(PlaygroundDefaults.ControlSpacing)
+                    ) {
+                        Column(
+                            modifier = Modifier.weight(1f),
+                            verticalArrangement = Arrangement.spacedBy(PlaygroundDefaults.CompactSpacing)
+                        ) {
+                            Text(text = title, style = MaterialTheme.typography.headlineSmall)
+                            Text(
+                                text = description,
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                        headerAction?.invoke()
+                    }
                 }
-                headerAction?.invoke()
-            }
 
-            content()
+                content()
+            }
+            contentOverlay?.invoke(this)
         }
     }
 }
