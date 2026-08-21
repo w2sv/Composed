@@ -1,5 +1,6 @@
 package com.w2sv.composed.ui.layout
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.requiredSize
@@ -117,27 +118,26 @@ class VisibilityMeasurePolicyTest {
             .assertWidthIsEqualTo(20.dp)
             .assertHeightIsEqualTo(10.dp)
     }
-
-    @Composable
-    private fun VisibilityLayout(
-        presence: Float,
-        fillWeightedSpace: Boolean = false,
-        modifier: Modifier = Modifier,
-        content: @Composable () -> Unit
-    ) {
-        val presenceState = mutableStateOf(presence)
-
-        Layout(
-            content = content,
-            modifier = modifier.testTag(VISIBILITY_TAG),
-            measurePolicy = VisibilityMeasurePolicy(
-                presence = presenceState,
-                fillWeightedSpace = fillWeightedSpace
-            )
-        )
-    }
-
-    private companion object {
-        const val VISIBILITY_TAG = "visibility"
-    }
 }
+
+@Composable
+private fun VisibilityLayout(
+    presence: Float,
+    modifier: Modifier = Modifier,
+    fillWeightedSpace: Boolean = false,
+    content: @Composable () -> Unit
+) {
+    @SuppressLint("UnrememberedMutableState")
+    val presenceState = mutableStateOf(presence)
+
+    Layout(
+        content = content,
+        modifier = modifier.testTag(VISIBILITY_TAG),
+        measurePolicy = VisibilityMeasurePolicy(
+            presence = presenceState,
+            fillWeightedSpace = fillWeightedSpace
+        )
+    )
+}
+
+private const val VISIBILITY_TAG = "visibility"
