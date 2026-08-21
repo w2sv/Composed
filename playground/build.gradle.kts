@@ -4,6 +4,8 @@ plugins {
 }
 
 kotlin {
+    compilerOptions.freeCompilerArgs.addAll("-Xcontext-parameters", "-Xannotation-default-target=param-property")
+
     jvm()
 
     sourceSets {

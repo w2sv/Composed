@@ -9,6 +9,8 @@ plugins {
 }
 
 kotlin {
+    compilerOptions.freeCompilerArgs.addAll("-Xcontext-parameters", "-Xannotation-default-target=param-property")
+
     android {
         namespace = pathBasedPackageName
         compileSdk = 37
