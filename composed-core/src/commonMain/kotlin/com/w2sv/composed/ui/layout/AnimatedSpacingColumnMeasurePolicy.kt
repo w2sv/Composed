@@ -97,21 +97,19 @@ internal class AnimatedSpacingColumnMeasurePolicy(private val spacing: Dp, priva
                 val allocation = allocations[index]
                 val itemPresence = presence[index]
 
-                val measurementAllocation =
-                    if (data.visibilityControlled && itemPresence > 0f) {
-                        (allocation / itemPresence)
-                            .roundToInt()
-                            .coerceIn(0, availableHeight)
-                    } else {
-                        allocation
-                    }
+                val measurementAllocation = if (data.visibilityControlled && itemPresence > 0f) {
+                    (allocation / itemPresence)
+                        .roundToInt()
+                        .coerceIn(0, availableHeight)
+                } else {
+                    allocation
+                }
 
-                val minHeight =
-                    if (data.fill && !data.visibilityControlled) {
-                        measurementAllocation
-                    } else {
-                        0
-                    }
+                val minHeight = if (data.fill && !data.visibilityControlled) {
+                    measurementAllocation
+                } else {
+                    0
+                }
 
                 placeables[index] = measurable.measure(
                     Constraints(
@@ -226,7 +224,7 @@ internal class AnimatedSpacingColumnMeasurePolicy(private val spacing: Dp, priva
  * both sides symmetrically instead of arbitrarily owning the gap
  * preceding it.
  */
-private fun calculateSpacings(presence: FloatArray, spacing: Int): IntArray {
+internal fun calculateSpacings(presence: FloatArray, spacing: Int): IntArray {
     if (presence.size <= 1 || spacing == 0) {
         return IntArray(presence.size)
     }
@@ -298,7 +296,7 @@ private fun calculateDirectionalSpacings(presence: FloatArray, reversed: Boolean
  * With one transitioning weighted item it linearly interpolates between
  * the two endpoint layouts.
  */
-private fun calculateWeightedAllocations(
+internal fun calculateWeightedAllocations(
     availableSpace: Int,
     parentData: Array<AnimatedSpacingColumnParentData?>,
     presence: FloatArray
@@ -385,8 +383,8 @@ private fun calculateWeightedAllocations(
 
             allocations[recipient] +=
                 redistributedSpace *
-                effectiveWeight /
-                recipientWeight
+                    effectiveWeight /
+                    recipientWeight
         }
     }
 

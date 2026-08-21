@@ -36,10 +36,7 @@ internal class VisibilityMeasurePolicy(private val presence: State<Float>, priva
             }
         }
 
-        val animatedHeight = (
-            fullHeight *
-                presence.value.coerceIn(0f, 1f)
-            ).roundToInt()
+        val animatedHeight = (fullHeight * presence.value.coerceIn(0f, 1f)).roundToInt()
 
         return layout(
             width = constraints.constrainWidth(width),
