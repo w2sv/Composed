@@ -1,6 +1,7 @@
 package com.w2sv.composed.ui.layout
 
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.layout.AlignmentLine
 import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.MeasurePolicy
 import androidx.compose.ui.layout.MeasureResult
@@ -8,6 +9,7 @@ import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.constrainHeight
 import androidx.compose.ui.unit.constrainWidth
 import kotlin.math.floor
@@ -18,10 +20,7 @@ internal class AnimatedSpacingColumnMeasurePolicy(private val spacing: Dp, priva
 
     override fun MeasureScope.measure(measurables: List<Measurable>, constraints: Constraints): MeasureResult {
         if (measurables.isEmpty()) {
-            return layout(
-                constraints.minWidth,
-                constraints.minHeight
-            ) {}
+            return layout(constraints.minWidth, constraints.minHeight) {}
         }
 
         val count = measurables.size
@@ -45,16 +44,11 @@ internal class AnimatedSpacingColumnMeasurePolicy(private val spacing: Dp, priva
 
         val totalSpacing = spacings.sum()
         val placeables = arrayOfNulls<Placeable>(count)
-        val boundedHeight =
-            constraints.maxHeight != Constraints.Infinity
+        val boundedHeight = constraints.maxHeight != Constraints.Infinity
 
         var fixedHeight = 0
         var totalWeight = 0f
 
-        /*
-         * As with Column, weights only participate when the main axis is
-         * bounded. In an unbounded column they're measured normally.
-         */
         measurables.forEachIndexed { index, measurable ->
             val data = parentData[index]
             val weight = data?.weight ?: 0f
@@ -65,11 +59,7 @@ internal class AnimatedSpacingColumnMeasurePolicy(private val spacing: Dp, priva
             }
 
             val maxHeight = if (boundedHeight) {
-                (
-                    constraints.maxHeight -
-                        totalSpacing -
-                        fixedHeight
-                    ).coerceAtLeast(0)
+                (constraints.maxHeight - totalSpacing - fixedHeight).coerceAtLeast(0)
             } else {
                 Constraints.Infinity
             }
@@ -107,17 +97,6 @@ internal class AnimatedSpacingColumnMeasurePolicy(private val spacing: Dp, priva
                 val allocation = allocations[index]
                 val itemPresence = presence[index]
 
-                /*
-                 * VisibilityMeasurePolicy itself applies presence to its
-                 * measured height.
-                 *
-                 * Therefore, for a weighted AnimatedVisibility, give it the
-                 * pre-animation allocation so that:
-                 *
-                 *     preAllocation * presence == allocation
-                 *
-                 * and presence is applied exactly once.
-                 */
                 val measurementAllocation =
                     if (data.visibilityControlled && itemPresence > 0f) {
                         (allocation / itemPresence)
@@ -128,10 +107,7 @@ internal class AnimatedSpacingColumnMeasurePolicy(private val spacing: Dp, priva
                     }
 
                 val minHeight =
-                    if (
-                        data.fill &&
-                        !data.visibilityControlled
-                    ) {
+                    if (data.fill && !data.visibilityControlled) {
                         measurementAllocation
                     } else {
                         0
@@ -152,13 +128,43 @@ internal class AnimatedSpacingColumnMeasurePolicy(private val spacing: Dp, priva
         var contentHeight = totalSpacing
 
         placeables.forEach { placeable ->
-            if (placeable != null) {
-                contentWidth = maxOf(contentWidth, placeable.width)
-                contentHeight += placeable.height
-            }
+            placeable ?: return@forEach
+
+            contentWidth = maxOf(contentWidth, placeable.width)
+            contentHeight += placeable.height
         }
 
-        val width = constraints.constrainWidth(contentWidth)
+        var beforeAlignmentLine = 0
+        var afterAlignmentLine = 0
+
+        placeables.forEachIndexed { index, placeable ->
+            placeable ?: return@forEachIndexed
+
+            val alignment =
+                parentData[index]?.crossAxisAlignment as? CrossAxisAlignment.Relative
+                    ?: return@forEachIndexed
+
+            val linePosition = alignment.provider.position(placeable)
+            if (linePosition == AlignmentLine.Unspecified) return@forEachIndexed
+
+            beforeAlignmentLine = maxOf(
+                beforeAlignmentLine,
+                linePosition
+            )
+
+            afterAlignmentLine = maxOf(
+                afterAlignmentLine,
+                placeable.width - linePosition
+            )
+        }
+
+        val width = constraints.constrainWidth(
+            maxOf(
+                contentWidth,
+                beforeAlignmentLine + afterAlignmentLine
+            )
+        )
+
         val height = constraints.constrainHeight(contentHeight)
 
         return layout(width, height) {
@@ -169,15 +175,41 @@ internal class AnimatedSpacingColumnMeasurePolicy(private val spacing: Dp, priva
 
                 y += spacings[index]
 
-                val alignment =
-                    parentData[index]?.horizontalAlignment
-                        ?: horizontalAlignment
+                val x = when (
+                    val alignment = parentData[index]?.crossAxisAlignment
+                ) {
+                    is CrossAxisAlignment.Horizontal -> {
+                        alignment.alignment.align(
+                            size = placeable.width,
+                            space = width,
+                            layoutDirection = layoutDirection
+                        )
+                    }
 
-                val x = alignment.align(
-                    size = placeable.width,
-                    space = width,
-                    layoutDirection = layoutDirection
-                )
+                    is CrossAxisAlignment.Relative -> {
+                        val linePosition = alignment.provider.position(placeable)
+
+                        if (linePosition == AlignmentLine.Unspecified) {
+                            0
+                        } else {
+                            val offset = beforeAlignmentLine - linePosition
+
+                            if (layoutDirection == LayoutDirection.Ltr) {
+                                offset
+                            } else {
+                                width - placeable.width - offset
+                            }
+                        }
+                    }
+
+                    null -> {
+                        horizontalAlignment.align(
+                            size = placeable.width,
+                            space = width,
+                            layoutDirection = layoutDirection
+                        )
+                    }
+                }
 
                 placeable.placeRelative(x, y)
                 y += placeable.height
