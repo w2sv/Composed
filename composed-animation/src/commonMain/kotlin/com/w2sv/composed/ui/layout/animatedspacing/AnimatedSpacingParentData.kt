@@ -6,11 +6,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.AlignmentLine
 import androidx.compose.ui.layout.Measured
 import androidx.compose.ui.layout.Placeable
-import androidx.compose.ui.layout.VerticalAlignmentLine
 import androidx.compose.ui.node.ModifierNodeElement
 import androidx.compose.ui.node.ParentDataModifierNode
 import androidx.compose.ui.platform.InspectorInfo
 import androidx.compose.ui.unit.Density
+import kotlin.jvm.JvmInline
 
 internal data class AnimatedSpacingParentData(
     val weight: Float? = null,
@@ -21,22 +21,27 @@ internal data class AnimatedSpacingParentData(
 )
 
 internal sealed interface CrossAxisAlignment {
-    data class Horizontal(val alignment: Alignment.Horizontal) : CrossAxisAlignment
+    @JvmInline
+    value class Horizontal(val alignment: Alignment.Horizontal) : CrossAxisAlignment
 
-    data class Vertical(val alignment: Alignment.Vertical) : CrossAxisAlignment
+    @JvmInline
+    value class Vertical(val alignment: Alignment.Vertical) : CrossAxisAlignment
 
-    data class Relative(val provider: AlignmentLineProvider) : CrossAxisAlignment
+    @JvmInline
+    value class Relative(val provider: AlignmentLineProvider) : CrossAxisAlignment
 }
 
 internal sealed interface AlignmentLineProvider {
     fun position(placeable: Placeable): Int
 
-    data class Value(val alignmentLine: AlignmentLine) : AlignmentLineProvider {
+    @JvmInline
+    value class Value(val alignmentLine: AlignmentLine) : AlignmentLineProvider {
         override fun position(placeable: Placeable): Int =
             placeable[alignmentLine]
     }
 
-    data class Block(val block: (Measured) -> Int) : AlignmentLineProvider {
+    @JvmInline
+    value class Block(val block: (Measured) -> Int) : AlignmentLineProvider {
         override fun position(placeable: Placeable): Int =
             block(placeable)
     }
