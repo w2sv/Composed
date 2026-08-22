@@ -157,15 +157,13 @@ class AnimatedSpacingVisibilityIntegrationTest {
     fun `column reveal and collapse use their configured structural anchors`() {
         var entering by mutableStateOf(false)
         var exiting by mutableStateOf(true)
-        var enteringWrapperTop = 0f
-        var enteringContentTop = 0f
-        var exitingWrapperTop = 0f
-        var exitingContentTop = 0f
+        val enteringGeometry = AxisGeometry()
+        val exitingGeometry = AxisGeometry()
         composeTestRule.setContent {
             AnimatedSpacingColumn(0.dp) {
                 AnimatedVisibility(
                     visible = entering,
-                    modifier = Modifier.onGloballyPositioned { enteringWrapperTop = it.positionInRoot().y },
+                    modifier = Modifier.onGloballyPositioned { enteringGeometry.recordVerticalWrapper(it) },
                     expandFrom = Alignment.Bottom,
                     animationSpec = AnimationSpec,
                     fade = false
@@ -173,12 +171,12 @@ class AnimatedSpacingVisibilityIntegrationTest {
                     Box(
                         Modifier
                             .size(20.dp)
-                            .onGloballyPositioned { enteringContentTop = it.positionInRoot().y }
+                            .onGloballyPositioned { enteringGeometry.recordVerticalContent(it) }
                     )
                 }
                 AnimatedVisibility(
                     visible = exiting,
-                    modifier = Modifier.onGloballyPositioned { exitingWrapperTop = it.positionInRoot().y },
+                    modifier = Modifier.onGloballyPositioned { exitingGeometry.recordVerticalWrapper(it) },
                     shrinkTowards = Alignment.Bottom,
                     animationSpec = AnimationSpec,
                     fade = false
@@ -186,7 +184,7 @@ class AnimatedSpacingVisibilityIntegrationTest {
                     Box(
                         Modifier
                             .size(20.dp)
-                            .onGloballyPositioned { exitingContentTop = it.positionInRoot().y }
+                            .onGloballyPositioned { exitingGeometry.recordVerticalContent(it) }
                     )
                 }
             }
@@ -198,22 +196,21 @@ class AnimatedSpacingVisibilityIntegrationTest {
         }
         advanceHalfway()
         composeTestRule.runOnIdle {
-            assertEquals(-11f, enteringContentTop - enteringWrapperTop, 0.01f)
-            assertEquals(-9f, exitingContentTop - exitingWrapperTop, 0.01f)
+            enteringGeometry.assertVerticalAlignment(Alignment.Bottom)
+            exitingGeometry.assertVerticalAlignment(Alignment.Bottom)
         }
     }
 
     @Test
     fun `row logical anchors resolve in RTL for reveal and collapse`() {
         var visible by mutableStateOf(false)
-        var wrapperLeft = 0f
-        var contentLeft = 0f
+        val geometry = AxisGeometry()
         composeTestRule.setContent {
             CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
                 AnimatedSpacingRow(0.dp) {
                     AnimatedVisibility(
                         visible = visible,
-                        modifier = Modifier.onGloballyPositioned { wrapperLeft = it.positionInRoot().x },
+                        modifier = Modifier.onGloballyPositioned { geometry.recordHorizontalWrapper(it) },
                         expandFrom = Alignment.Start,
                         shrinkTowards = Alignment.End,
                         animationSpec = AnimationSpec,
@@ -222,7 +219,7 @@ class AnimatedSpacingVisibilityIntegrationTest {
                         Box(
                             Modifier
                                 .size(20.dp)
-                                .onGloballyPositioned { contentLeft = it.positionInRoot().x }
+                                .onGloballyPositioned { geometry.recordHorizontalContent(it) }
                         )
                     }
                 }
@@ -231,11 +228,75 @@ class AnimatedSpacingVisibilityIntegrationTest {
 
         startTransition { visible = true }
         advanceHalfway()
-        composeTestRule.runOnIdle { assertEquals(-11f, contentLeft - wrapperLeft, 0.01f) }
+        composeTestRule.runOnIdle { geometry.assertHorizontalAlignment(Alignment.Start, LayoutDirection.Rtl) }
 
         finishEnterAndStartExit { visible = false }
         advanceHalfway()
-        composeTestRule.runOnIdle { assertEquals(0f, contentLeft - wrapperLeft, 0.01f) }
+        composeTestRule.runOnIdle { geometry.assertHorizontalAlignment(Alignment.End, LayoutDirection.Rtl) }
+    }
+
+    @Test
+    fun `reversing exit back to enter preserves its collapse anchor without a position jump`() {
+        var visible by mutableStateOf(true)
+        val geometry = AxisGeometry()
+        composeTestRule.setContent {
+            AnimatedSpacingColumn(0.dp) {
+                AnimatedVisibility(
+                    visible = visible,
+                    modifier = Modifier.onGloballyPositioned { geometry.recordVerticalWrapper(it) },
+                    expandFrom = Alignment.Top,
+                    shrinkTowards = Alignment.Bottom,
+                    animationSpec = AnimationSpec,
+                    fade = false
+                ) {
+                    Box(Modifier.size(20.dp).onGloballyPositioned { geometry.recordVerticalContent(it) })
+                }
+            }
+        }
+
+        startTransition { visible = false }
+        composeTestRule.mainClock.advanceTimeBy(300, ignoreFrameDuration = true)
+        composeTestRule.waitForIdle()
+        geometry.assertVerticalAlignment(Alignment.Bottom)
+        val beforeReversal = geometry.snapshot()
+
+        startTransition { visible = true }
+        composeTestRule.runOnIdle {
+            geometry.assertVerticalAlignment(Alignment.Bottom)
+            geometry.assertNoAnchorSwitchSince(beforeReversal)
+        }
+    }
+
+    @Test
+    fun `reversing enter back to exit preserves its reveal anchor without a position jump`() {
+        var visible by mutableStateOf(false)
+        val geometry = AxisGeometry()
+        composeTestRule.setContent {
+            AnimatedSpacingColumn(0.dp) {
+                AnimatedVisibility(
+                    visible = visible,
+                    modifier = Modifier.onGloballyPositioned { geometry.recordVerticalWrapper(it) },
+                    expandFrom = Alignment.Bottom,
+                    shrinkTowards = Alignment.Top,
+                    animationSpec = AnimationSpec,
+                    fade = false
+                ) {
+                    Box(Modifier.size(20.dp).onGloballyPositioned { geometry.recordVerticalContent(it) })
+                }
+            }
+        }
+
+        startTransition { visible = true }
+        composeTestRule.mainClock.advanceTimeBy(300, ignoreFrameDuration = true)
+        composeTestRule.waitForIdle()
+        geometry.assertVerticalAlignment(Alignment.Bottom)
+        val beforeReversal = geometry.snapshot()
+
+        startTransition { visible = false }
+        composeTestRule.runOnIdle {
+            geometry.assertVerticalAlignment(Alignment.Bottom)
+            geometry.assertNoAnchorSwitchSince(beforeReversal)
+        }
     }
 
     private fun advanceHalfway() {
@@ -244,14 +305,8 @@ class AnimatedSpacingVisibilityIntegrationTest {
     }
 
     private fun finishEnterAndStartExit(startExit: () -> Unit) {
-        finishTransition()
+        completeTransition()
         startTransition(startExit)
-    }
-
-    private fun finishTransition() {
-        composeTestRule.mainClock.advanceTimeBy(500, ignoreFrameDuration = true)
-        composeTestRule.mainClock.advanceTimeByFrame()
-        composeTestRule.waitForIdle()
     }
 
     private fun completeTransition() {
@@ -279,4 +334,50 @@ class AnimatedSpacingVisibilityIntegrationTest {
     private companion object {
         val AnimationSpec = tween<Float>(durationMillis = 1_000, easing = LinearEasing)
     }
+}
+
+private class AxisGeometry {
+    private var wrapperPosition = 0f
+    private var contentPosition = 0f
+    private var wrapperSize = 0
+    private var contentSize = 0
+
+    fun recordVerticalWrapper(coordinates: androidx.compose.ui.layout.LayoutCoordinates) {
+        wrapperPosition = coordinates.positionInRoot().y
+        wrapperSize = coordinates.size.height
+    }
+
+    fun recordVerticalContent(coordinates: androidx.compose.ui.layout.LayoutCoordinates) {
+        contentPosition = coordinates.positionInRoot().y
+        contentSize = coordinates.size.height
+    }
+
+    fun recordHorizontalWrapper(coordinates: androidx.compose.ui.layout.LayoutCoordinates) {
+        wrapperPosition = coordinates.positionInRoot().x
+        wrapperSize = coordinates.size.width
+    }
+
+    fun recordHorizontalContent(coordinates: androidx.compose.ui.layout.LayoutCoordinates) {
+        contentPosition = coordinates.positionInRoot().x
+        contentSize = coordinates.size.width
+    }
+
+    fun assertVerticalAlignment(alignment: Alignment.Vertical) {
+        assertEquals(alignment.align(contentSize, wrapperSize).toFloat(), offset, 0.01f)
+    }
+
+    fun assertHorizontalAlignment(alignment: Alignment.Horizontal, layoutDirection: LayoutDirection) {
+        assertEquals(alignment.align(contentSize, wrapperSize, layoutDirection).toFloat(), offset, 0.01f)
+    }
+
+    fun snapshot() =
+        Snapshot(offset, wrapperSize)
+
+    fun assertNoAnchorSwitchSince(previous: Snapshot) {
+        assertEquals((wrapperSize - previous.wrapperSize).toFloat(), offset - previous.offset, 0.01f)
+    }
+
+    private val offset get() = contentPosition - wrapperPosition
+
+    data class Snapshot(val offset: Float, val wrapperSize: Int)
 }

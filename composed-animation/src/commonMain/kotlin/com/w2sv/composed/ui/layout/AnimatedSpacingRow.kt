@@ -86,8 +86,8 @@ interface AnimatedSpacingRowScope : RowScope {
      * @param visible whether the content should occupy its full measured width.
      * @param modifier modifier applied to the visibility wrapper. Row scope modifiers such as `weight`, `align`, and
      * `alignBy` are supported.
-     * @param expandFrom logical or absolute edge from which content is structurally revealed while entering.
-     * @param shrinkTowards logical or absolute edge towards which content structurally collapses while exiting.
+     * @param expandFrom logical or absolute alignment from which content is structurally revealed while entering.
+     * @param shrinkTowards logical or absolute alignment towards which content structurally collapses while exiting.
      * @param animationSpec animation used for the shared visibility-progress value.
      * @param fade whether to apply the visibility progress as alpha in addition to clipping the width. This is a
      * temporary, deliberately limited visual-effect option. It is expected to be replaced by a Compose-native

@@ -5,7 +5,10 @@ import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
@@ -89,6 +92,10 @@ private fun AnimatedSpacingVisibility(
     ) { isVisible ->
         if (isVisible) 1f else 0f
     }
+    var entering by remember { mutableStateOf(!transition.currentState) }
+    if (transition.currentState == transition.targetState) {
+        entering = !transition.currentState
+    }
     val fillWeightedSpace = modifier.findAnimatedSpacingWeightFill()
 
     Layout(
@@ -99,12 +106,12 @@ private fun AnimatedSpacingVisibility(
                 clip = true
                 if (fade) alpha = presence.value.coerceIn(0f, 1f)
             },
-        measurePolicy = remember(presence, fillWeightedSpace, structuralAlignment, transition.targetState) {
+        measurePolicy = remember(presence, fillWeightedSpace, structuralAlignment, entering) {
             VisibilityMeasurePolicy(
                 presence = presence,
                 fillWeightedSpace = fillWeightedSpace == true,
                 structuralAlignment = structuralAlignment,
-                expanding = transition.targetState
+                entering = entering
             )
         }
     )
@@ -119,7 +126,7 @@ internal sealed interface StructuralAlignment {
         contentSize: Int,
         animatedSize: Int,
         layoutDirection: LayoutDirection,
-        expanding: Boolean
+        entering: Boolean
     ): Int
 
     data class Vertical(val expandFrom: Alignment.Vertical, val shrinkTowards: Alignment.Vertical) : StructuralAlignment {
@@ -129,9 +136,9 @@ internal sealed interface StructuralAlignment {
             contentSize: Int,
             animatedSize: Int,
             layoutDirection: LayoutDirection,
-            expanding: Boolean
+            entering: Boolean
         ): Int =
-            (if (expanding) expandFrom else shrinkTowards).align(contentSize, animatedSize)
+            (if (entering) expandFrom else shrinkTowards).align(contentSize, animatedSize)
     }
 
     data class Horizontal(val expandFrom: Alignment.Horizontal, val shrinkTowards: Alignment.Horizontal) : StructuralAlignment {
@@ -141,9 +148,9 @@ internal sealed interface StructuralAlignment {
             contentSize: Int,
             animatedSize: Int,
             layoutDirection: LayoutDirection,
-            expanding: Boolean
+            entering: Boolean
         ): Int =
-            (if (expanding) expandFrom else shrinkTowards).align(contentSize, animatedSize, layoutDirection)
+            (if (entering) expandFrom else shrinkTowards).align(contentSize, animatedSize, layoutDirection)
     }
 }
 
@@ -151,7 +158,7 @@ internal class VisibilityMeasurePolicy(
     private val presence: State<Float>,
     private val fillWeightedSpace: Boolean,
     private val structuralAlignment: StructuralAlignment = StructuralAlignment.Vertical(Alignment.Top, Alignment.Top),
-    private val expanding: Boolean = true
+    private val entering: Boolean = true
 ) : MeasurePolicy {
 
     override fun MeasureScope.measure(measurables: List<Measurable>, constraints: Constraints): MeasureResult {
@@ -183,7 +190,7 @@ internal class VisibilityMeasurePolicy(
             contentSize = if (structuralAlignment.axis == VisibilityAxis.Horizontal) contentSize.width else contentSize.height,
             animatedSize = if (structuralAlignment.axis == VisibilityAxis.Horizontal) width else height,
             layoutDirection = layoutDirection,
-            expanding = expanding
+            entering = entering
         )
 
         return layout(width, height) {
