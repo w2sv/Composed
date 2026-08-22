@@ -12,7 +12,7 @@ import androidx.compose.ui.node.ParentDataModifierNode
 import androidx.compose.ui.platform.InspectorInfo
 import androidx.compose.ui.unit.Density
 
-internal data class AnimatedSpacingColumnParentData(
+internal data class AnimatedSpacingParentData(
     val weight: Float? = null,
     val fill: Boolean = true,
     val crossAxisAlignment: CrossAxisAlignment? = null,
@@ -42,12 +42,12 @@ internal sealed interface AlignmentLineProvider {
     }
 }
 
-internal fun Modifier.findAnimatedSpacingColumnWeightFill(): Boolean? =
+internal fun Modifier.findAnimatedSpacingWeightFill(): Boolean? =
     foldIn(null) { current, element ->
         if (element is WeightElement) element.fill else current
     }
 
-internal fun Modifier.animatedSpacingColumnWeight(weight: Float, fill: Boolean): Modifier {
+internal fun Modifier.animatedSpacingWeight(weight: Float, fill: Boolean): Modifier {
     require(weight > 0f) { "weight must be greater than zero" }
     return then(WeightElement(weight.coerceAtMost(Float.MAX_VALUE), fill))
 }
@@ -64,11 +64,11 @@ internal fun Modifier.animatedSpacingColumnAlignBy(provider: AlignmentLineProvid
 internal fun Modifier.animatedSpacingRowAlignBy(provider: AlignmentLineProvider): Modifier =
     then(AlignmentLineElement(provider))
 
-internal fun Modifier.animatedSpacingColumnPresence(presence: State<Float>): Modifier =
+internal fun Modifier.animatedSpacingPresence(presence: State<Float>): Modifier =
     then(PresenceElement(presence))
 
-private fun Any?.animatedSpacingColumnParentData(): AnimatedSpacingColumnParentData =
-    this as? AnimatedSpacingColumnParentData ?: AnimatedSpacingColumnParentData()
+private fun Any?.animatedSpacingParentData(): AnimatedSpacingParentData =
+    this as? AnimatedSpacingParentData ?: AnimatedSpacingParentData()
 
 private data class WeightElement(val weight: Float, val fill: Boolean) : ModifierNodeElement<WeightNode>() {
     override fun create(): WeightNode =
@@ -90,7 +90,7 @@ private class WeightNode(var weight: Float, var fill: Boolean) :
     Modifier.Node(),
     ParentDataModifierNode {
     override fun Density.modifyParentData(parentData: Any?): Any =
-        parentData.animatedSpacingColumnParentData().copy(weight = weight, fill = fill)
+        parentData.animatedSpacingParentData().copy(weight = weight, fill = fill)
 }
 
 private data class HorizontalAlignmentElement(val alignment: Alignment.Horizontal) : ModifierNodeElement<HorizontalAlignmentNode>() {
@@ -112,7 +112,7 @@ private class HorizontalAlignmentNode(var alignment: Alignment.Horizontal) :
     Modifier.Node(),
     ParentDataModifierNode {
     override fun Density.modifyParentData(parentData: Any?): Any =
-        parentData.animatedSpacingColumnParentData().copy(
+        parentData.animatedSpacingParentData().copy(
             crossAxisAlignment = CrossAxisAlignment.Horizontal(alignment)
         )
 }
@@ -136,7 +136,7 @@ private class VerticalAlignmentNode(var alignment: Alignment.Vertical) :
     Modifier.Node(),
     ParentDataModifierNode {
     override fun Density.modifyParentData(parentData: Any?): Any =
-        parentData.animatedSpacingColumnParentData().copy(
+        parentData.animatedSpacingParentData().copy(
             crossAxisAlignment = CrossAxisAlignment.Vertical(alignment)
         )
 }
@@ -160,7 +160,7 @@ private class AlignmentLineNode(var provider: AlignmentLineProvider) :
     Modifier.Node(),
     ParentDataModifierNode {
     override fun Density.modifyParentData(parentData: Any?): Any =
-        parentData.animatedSpacingColumnParentData().copy(
+        parentData.animatedSpacingParentData().copy(
             crossAxisAlignment = CrossAxisAlignment.Relative(provider)
         )
 }
@@ -182,7 +182,7 @@ private class PresenceNode(var presence: State<Float>) :
     Modifier.Node(),
     ParentDataModifierNode {
     override fun Density.modifyParentData(parentData: Any?): Any =
-        parentData.animatedSpacingColumnParentData().copy(
+        parentData.animatedSpacingParentData().copy(
             presence = presence,
             visibilityControlled = true
         )

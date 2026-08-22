@@ -19,7 +19,7 @@ import com.w2sv.composed.ui.layout.animatedspacing.AnimatedSpacingColumnMeasureP
 import com.w2sv.composed.ui.layout.animatedspacing.AnimatedSpacingColumnVisibility
 import com.w2sv.composed.ui.layout.animatedspacing.animatedSpacingColumnAlign
 import com.w2sv.composed.ui.layout.animatedspacing.animatedSpacingColumnAlignBy
-import com.w2sv.composed.ui.layout.animatedspacing.animatedSpacingColumnWeight
+import com.w2sv.composed.ui.layout.animatedspacing.animatedSpacingWeight
 
 /**
  * Places children vertically and animates both a child's occupied height and its surrounding spacing when the child
@@ -27,21 +27,15 @@ import com.w2sv.composed.ui.layout.animatedspacing.animatedSpacingColumnWeight
  *
  * Unlike [androidx.compose.foundation.layout.Column], spacing is derived from the visibility progress of adjacent
  * children. This keeps the gap on both sides of an entering or leaving child visually symmetric. The animation is
- * driven during measurement: it does not use lookahead and does not recompose the layout for each animation frame.
- * Child-specific horizontal alignment, alignment lines, and [ColumnScope.weight] retain their usual scope semantics.
- * When a weighted animated child disappears, its released allocation is progressively redistributed among the other
- * visible weighted children.
+ * driven by the same progress that collapses the child. Child-specific horizontal alignment, alignment lines, and
+ * [ColumnScope.weight] retain their usual scope semantics. When a weighted animated child disappears, its released
+ * allocation is progressively redistributed among the other visible weighted children.
  *
  * This layout is eager and is not a replacement for a lazy list. It supports one fixed, non-negative [spacing] value
  * rather than the complete set of stock `Arrangement.Vertical` strategies. Only children wrapped in
  * [AnimatedSpacingColumnScope.AnimatedVisibility] participate in animated spacing, and the visibility wrapper overlays
- * multiple direct content children at the same origin. Intrinsic measurement is not specialized.
- *
- * With no visibility-controlled children, measurement and ordinary weight allocation are O(n), matching the
- * asymptotic cost of a stock [androidx.compose.foundation.layout.Column], though this custom layout still has its own
- * parent-data and measurement overhead. Animated spacing remains O(n). Visibility-controlled weighted children use
- * O(n²) redistribution so each disappearing child's released share can account for every eligible recipient, and
- * fading/clipping adds a graphics layer per animated child.
+ * multiple direct content children at the same origin. Intrinsic measurement is not specialized. Prefer the stock
+ * [androidx.compose.foundation.layout.Column] when its spacing does not need to participate in visibility transitions.
  *
  * @param spacing fixed distance between fully visible adjacent children. It must not be negative.
  * @param modifier modifier applied to the layout.
@@ -92,7 +86,10 @@ interface AnimatedSpacingColumnScope : ColumnScope {
      * @param modifier modifier applied to the visibility wrapper. Column scope modifiers such as `weight`, `align`, and
      * `alignBy` are supported.
      * @param animationSpec animation used for the shared visibility-progress value.
-     * @param fade whether to apply the visibility progress as alpha in addition to clipping the height.
+     * @param fade whether to apply the visibility progress as alpha in addition to clipping the height. This is a
+     * temporary, deliberately limited visual-effect option. It is expected to be replaced by a Compose-native
+     * `EnterTransition` / `ExitTransition` API once the project can depend on a Compose version that exposes enough
+     * transition configuration to safely reject size-changing expand and shrink transitions.
      * @param label label used for Compose animation tooling.
      * @param content content shown while the transition's current or target state is visible.
      */
@@ -111,7 +108,7 @@ interface AnimatedSpacingColumnScope : ColumnScope {
 private object AnimatedSpacingColumnScopeInstance : AnimatedSpacingColumnScope {
 
     override fun Modifier.weight(weight: Float, fill: Boolean): Modifier =
-        animatedSpacingColumnWeight(weight, fill)
+        animatedSpacingWeight(weight, fill)
 
     override fun Modifier.align(alignment: Alignment.Horizontal): Modifier =
         animatedSpacingColumnAlign(alignment)

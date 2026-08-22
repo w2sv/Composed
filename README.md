@@ -174,12 +174,11 @@ fun FilterList(filters: List<Filter>, selectedFilters: Set<Filter>) {
 
 Both layouts retain the respective stock scope's weight and alignment modifiers, including alignment lines and row
 baselines. Animated weighted children progressively release and redistribute their allocation as they disappear.
-Animation is measurement-driven—without lookahead or per-frame recomposition—and ordinary, non-animated weights stay
-on an O(n) path.
+Ordinary weighted children follow the stock `Row` and `Column` allocation behavior.
 
 These are eager experimental layouts, not lazy containers or drop-in replacements for every `Row`/`Column` arrangement.
-They support fixed spacing, add a clipping graphics layer around animated children, and weighted redistribution involving
-visibility-controlled weighted children is O(n²). See the API reference for the complete behavior and limitations.
+They support fixed spacing, and animated weight redistribution costs more than ordinary weight measurement. See the API
+reference for the complete behavior and limitations.
 
 ### Snackbar launching
 

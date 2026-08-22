@@ -2,6 +2,8 @@ package com.w2sv.composed.ui.layout
 
 import androidx.compose.animation.core.snap
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.size
@@ -44,6 +46,27 @@ class AnimatedSpacingRowTest {
         composeTestRule.onNodeWithTag("weighted")
             .assertWidthIsEqualTo(70.dp)
             .assertLeftPositionInRootIsEqualTo(30.dp)
+    }
+
+    @Test
+    fun `ordinary weight rounding matches stock Row`() {
+        composeTestRule.setContent {
+            Column {
+                Row(Modifier.size(width = 5.dp, height = 10.dp)) {
+                    Spacer(Modifier.weight(1f).testTag("stock-first"))
+                    Spacer(Modifier.weight(1f).testTag("stock-second"))
+                }
+                AnimatedSpacingRow(0.dp, Modifier.size(width = 5.dp, height = 10.dp)) {
+                    Spacer(Modifier.weight(1f).testTag("animated-first"))
+                    Spacer(Modifier.weight(1f).testTag("animated-second"))
+                }
+            }
+        }
+
+        composeTestRule.onNodeWithTag("stock-first").assertWidthIsEqualTo(2.dp)
+        composeTestRule.onNodeWithTag("animated-first").assertWidthIsEqualTo(2.dp)
+        composeTestRule.onNodeWithTag("stock-second").assertWidthIsEqualTo(3.dp)
+        composeTestRule.onNodeWithTag("animated-second").assertWidthIsEqualTo(3.dp)
     }
 
     @Test

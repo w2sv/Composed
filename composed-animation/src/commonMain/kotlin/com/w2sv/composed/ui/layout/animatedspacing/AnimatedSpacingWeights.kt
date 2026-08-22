@@ -2,34 +2,31 @@ package com.w2sv.composed.ui.layout.animatedspacing
 
 import kotlin.math.floor
 import kotlin.math.roundToInt
+import kotlin.math.sign
 
+/** Matches Foundation's rounded weight-unit allocation and signed remainder distribution. */
 internal fun calculateOrdinaryWeightedAllocations(
     availableSpace: Int,
-    parentData: Array<AnimatedSpacingColumnParentData?>,
+    parentData: Array<AnimatedSpacingParentData?>,
     totalWeight: Float = parentData.fold(0f) { total, data -> total + (data?.weight ?: 0f) }
 ): IntArray {
     val allocations = IntArray(parentData.size)
     if (totalWeight == 0f || availableSpace == 0) return allocations
 
-    var allocationSum = 0f
-    var used = 0
+    val weightUnitSpace = availableSpace / totalWeight
+    var remainder = availableSpace
 
-    parentData.forEachIndexed { index, data ->
-        val allocation = availableSpace * (data?.weight ?: 0f) / totalWeight
-
-        allocationSum += allocation
-        allocations[index] = floor(allocation).toInt().coerceAtLeast(0)
-        used += allocations[index]
+    parentData.forEach { data ->
+        remainder -= (weightUnitSpace * (data?.weight ?: 0f)).roundToInt()
     }
 
-    var remainder = allocationSum.coerceAtMost(availableSpace.toFloat()).roundToInt() - used
+    parentData.forEachIndexed { index, data ->
+        val weight = data?.weight ?: 0f
+        if (weight <= 0f) return@forEachIndexed
 
-    for (index in allocations.indices) {
-        if (remainder == 0) break
-        if ((parentData[index]?.weight ?: 0f) <= 0f) continue
-
-        allocations[index]++
-        remainder--
+        val remainderUnit = remainder.sign
+        remainder -= remainderUnit
+        allocations[index] = ((weightUnitSpace * weight).roundToInt() + remainderUnit).coerceAtLeast(0)
     }
 
     return allocations
@@ -38,10 +35,13 @@ internal fun calculateOrdinaryWeightedAllocations(
 /**
  * A disappearing weighted child keeps its visible share of its normal allocation.
  * Its remaining share is redistributed symmetrically among visible weighted siblings.
+ *
+ * This branch intentionally compares every visibility-controlled weighted source with every potential recipient.
+ * Ordinary weights never enter it.
  */
 internal fun calculateAnimatedWeightedAllocations(
     availableSpace: Int,
-    parentData: Array<AnimatedSpacingColumnParentData?>,
+    parentData: Array<AnimatedSpacingParentData?>,
     presence: FloatArray
 ): IntArray {
     val weights = FloatArray(parentData.size) { index -> parentData[index]?.weight ?: 0f }
@@ -107,16 +107,13 @@ private fun FloatArray.roundAllocations(maximum: Int): IntArray {
 
     while (remainder > 0) {
         var distributed = false
-
         for (index in indices) {
             if (remainder == 0) break
             if (this[index] <= 0f) continue
-
             result[index]++
             remainder--
             distributed = true
         }
-
         if (!distributed) break
     }
 

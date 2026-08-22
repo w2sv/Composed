@@ -2,8 +2,9 @@ package com.w2sv.composed.ui.layout.animatedspacing
 
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
+import kotlin.test.assertEquals
 
-class AnimatedSpacingColumnWeightsTest {
+class AnimatedSpacingWeightsTest {
 
     @Test
     fun `fully present weighted items divide available space by weight`() {
@@ -35,6 +36,7 @@ class AnimatedSpacingColumnWeightsTest {
     @Test
     fun `weighted allocation distributes rounding remainder from the start`() {
         assertOrdinaryAllocations(intArrayOf(4, 3, 3), arrayOf(1f, 1f, 1f), availableSpace = 10)
+        assertOrdinaryAllocations(intArrayOf(2, 3), arrayOf(1f, 1f), availableSpace = 5)
     }
 
     @Test
@@ -44,7 +46,7 @@ class AnimatedSpacingColumnWeightsTest {
     }
 
     @Test
-    fun `ordinary fast path matches all-present animated allocation`() {
+    fun `ordinary fast path preserves the available-space total`() {
         val weightSets: List<Array<Float?>> = listOf(
             arrayOf<Float?>(1f),
             arrayOf(1f, 1f),
@@ -57,14 +59,8 @@ class AnimatedSpacingColumnWeightsTest {
             val parentData = weights.toParentData()
 
             listOf(0, 1, 10, 99, 100).forEach { availableSpace ->
-                assertContentEquals(
-                    calculateAnimatedWeightedAllocations(
-                        availableSpace,
-                        parentData,
-                        FloatArray(weights.size) { 1f }
-                    ),
-                    calculateOrdinaryWeightedAllocations(availableSpace, parentData)
-                )
+                val expected = if (weights.any { it != null }) availableSpace else 0
+                assertEquals(expected, calculateOrdinaryWeightedAllocations(availableSpace, parentData).sum())
             }
         }
     }
@@ -92,6 +88,6 @@ class AnimatedSpacingColumnWeightsTest {
         )
     }
 
-    private fun Array<Float?>.toParentData(): Array<AnimatedSpacingColumnParentData?> =
-        Array(size) { index -> this[index]?.let { AnimatedSpacingColumnParentData(weight = it) } }
+    private fun Array<Float?>.toParentData(): Array<AnimatedSpacingParentData?> =
+        Array(size) { index -> this[index]?.let { AnimatedSpacingParentData(weight = it) } }
 }

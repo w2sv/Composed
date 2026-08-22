@@ -20,7 +20,7 @@ class AnimatedSpacingRowMeasurePolicyTest {
     @Test
     fun `measure allocates ordinary weight after fixed content and spacing`() {
         val fixed = TestMeasurable(20, 20)
-        val weighted = TestMeasurable(0, 20, AnimatedSpacingColumnParentData(weight = 1f))
+        val weighted = TestMeasurable(0, 20, AnimatedSpacingParentData(weight = 1f))
 
         val result = measureRow(listOf(fixed, weighted), Constraints(maxWidth = 100, maxHeight = 100), spacing = 10)
         result.placeChildren()
@@ -31,8 +31,33 @@ class AnimatedSpacingRowMeasurePolicyTest {
     }
 
     @Test
+    fun `measure progressively constrains fixed children under tight width`() {
+        val first = TestMeasurable(70, 20)
+        val second = TestMeasurable(70, 20)
+
+        val result = measureRow(listOf(first, second), Constraints(maxWidth = 100, maxHeight = 100), spacing = 10)
+        result.placeChildren()
+
+        assertEquals(100, first.measuredConstraints.maxWidth)
+        assertEquals(20, second.measuredConstraints.maxWidth)
+        assertEquals(IntOffset(0, 0), first.placeable.position)
+        assertEquals(IntOffset(80, 0), second.placeable.position)
+    }
+
+    @Test
+    fun `measure applies Foundation rounding order to ordinary weights`() {
+        val first = TestMeasurable(0, 10, AnimatedSpacingParentData(weight = 1f))
+        val second = TestMeasurable(0, 10, AnimatedSpacingParentData(weight = 1f))
+
+        measureRow(listOf(first, second), Constraints(maxWidth = 5, maxHeight = 100))
+
+        assertEquals(2, first.measuredConstraints.maxWidth)
+        assertEquals(3, second.measuredConstraints.maxWidth)
+    }
+
+    @Test
     fun `measure ignores weight under unbounded width`() {
-        val weighted = TestMeasurable(30, 20, AnimatedSpacingColumnParentData(weight = 1f))
+        val weighted = TestMeasurable(30, 20, AnimatedSpacingParentData(weight = 1f))
         val result = measureRow(listOf(weighted), Constraints(maxHeight = 100))
 
         assertEquals(30, result.width)
@@ -44,10 +69,10 @@ class AnimatedSpacingRowMeasurePolicyTest {
         val animated = TestMeasurable(
             50,
             20,
-            AnimatedSpacingColumnParentData(weight = 1f, presence = mutableStateOf(0.5f), visibilityControlled = true),
+            AnimatedSpacingParentData(weight = 1f, presence = mutableStateOf(0.5f), visibilityControlled = true),
             size = { IntSize(it.maxWidth / 2, 20) }
         )
-        val ordinary = TestMeasurable(0, 20, AnimatedSpacingColumnParentData(weight = 1f))
+        val ordinary = TestMeasurable(0, 20, AnimatedSpacingParentData(weight = 1f))
 
         val result = measureRow(listOf(animated, ordinary), Constraints(maxWidth = 100, maxHeight = 100))
 
@@ -62,7 +87,7 @@ class AnimatedSpacingRowMeasurePolicyTest {
         val bottom = TestMeasurable(
             10,
             10,
-            AnimatedSpacingColumnParentData(crossAxisAlignment = CrossAxisAlignment.Vertical(Alignment.Bottom))
+            AnimatedSpacingParentData(crossAxisAlignment = CrossAxisAlignment.Vertical(Alignment.Bottom))
         )
         val first = TestMeasurable(10, 20, relativeParentData(TestHorizontalAlignmentLine), mapOf(TestHorizontalAlignmentLine to 5))
         val second = TestMeasurable(10, 30, relativeParentData(TestHorizontalAlignmentLine), mapOf(TestHorizontalAlignmentLine to 10))

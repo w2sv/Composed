@@ -61,12 +61,12 @@ private fun AnimatedSpacingVisibility(
     ) { isVisible ->
         if (isVisible) 1f else 0f
     }
-    val fillWeightedSpace = modifier.findAnimatedSpacingColumnWeightFill()
+    val fillWeightedSpace = modifier.findAnimatedSpacingWeightFill()
 
     Layout(
         content = { if (transition.currentState || transition.targetState) content() },
         modifier = modifier
-            .animatedSpacingColumnPresence(presence)
+            .animatedSpacingPresence(presence)
             .graphicsLayer {
                 clip = true
                 if (fade) alpha = presence.value.coerceIn(0f, 1f)

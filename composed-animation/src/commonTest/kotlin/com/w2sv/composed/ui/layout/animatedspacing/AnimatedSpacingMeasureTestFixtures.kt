@@ -42,12 +42,12 @@ internal fun measureRow(
 }
 
 internal fun relativeParentData(alignmentLine: VerticalAlignmentLine) =
-    AnimatedSpacingColumnParentData(
+    AnimatedSpacingParentData(
         crossAxisAlignment = CrossAxisAlignment.Relative(AlignmentLineProvider.Value(alignmentLine))
     )
 
 internal fun relativeParentData(alignmentLine: HorizontalAlignmentLine) =
-    AnimatedSpacingColumnParentData(
+    AnimatedSpacingParentData(
         crossAxisAlignment = CrossAxisAlignment.Relative(AlignmentLineProvider.Value(alignmentLine))
     )
 

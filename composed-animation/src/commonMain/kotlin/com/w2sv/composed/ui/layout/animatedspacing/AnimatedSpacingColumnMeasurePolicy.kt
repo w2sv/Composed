@@ -25,7 +25,7 @@ internal class AnimatedSpacingColumnMeasurePolicy(private val spacing: Dp, priva
 
     override fun position(
         placeable: Placeable,
-        parentData: AnimatedSpacingColumnParentData?,
+        parentData: AnimatedSpacingParentData?,
         lineSpace: AlignmentLineSpace,
         crossAxisSize: Int,
         layoutDirection: LayoutDirection
