@@ -26,8 +26,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.w2sv.composed.ui.layout.AnimatedSpacingColumn
+import com.w2sv.composed.ui.layout.ExperimentalAnimatedSpacingApi
 
 @Composable
+@OptIn(ExperimentalAnimatedSpacingApi::class)
 fun AnimatedSpacingSample() {
     var firstVisible by remember { mutableStateOf(true) }
     var middleVisible by remember { mutableStateOf(true) }

@@ -26,6 +26,7 @@ import com.w2sv.composed.ui.layout.animatedspacing.animatedSpacingColumnWeight
  * [AnimatedSpacingColumnScope.AnimatedVisibility].
  */
 @Composable
+@ExperimentalAnimatedSpacingApi
 fun AnimatedSpacingColumn(
     spacing: Dp,
     modifier: Modifier = Modifier,
@@ -47,6 +48,7 @@ fun AnimatedSpacingColumn(
 
 @LayoutScopeMarker
 @Immutable
+@ExperimentalAnimatedSpacingApi
 interface AnimatedSpacingColumnScope : ColumnScope {
 
     /** Animates a child's height, optional fade, surrounding spacing, and weighted allocation. */
@@ -61,6 +63,7 @@ interface AnimatedSpacingColumnScope : ColumnScope {
     )
 }
 
+@OptIn(ExperimentalAnimatedSpacingApi::class)
 private object AnimatedSpacingColumnScopeInstance : AnimatedSpacingColumnScope {
 
     override fun Modifier.weight(weight: Float, fill: Boolean): Modifier =

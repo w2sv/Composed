@@ -26,6 +26,7 @@ import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [36])
+@OptIn(ExperimentalAnimatedSpacingApi::class)
 class AnimatedSpacingRowTest {
 
     @get:Rule

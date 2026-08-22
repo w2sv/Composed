@@ -26,6 +26,7 @@ import com.w2sv.composed.ui.layout.animatedspacing.animatedSpacingRowAlignBy
  * [AnimatedSpacingRowScope.AnimatedVisibility].
  */
 @Composable
+@ExperimentalAnimatedSpacingApi
 fun AnimatedSpacingRow(
     spacing: Dp,
     modifier: Modifier = Modifier,
@@ -47,6 +48,7 @@ fun AnimatedSpacingRow(
 
 @LayoutScopeMarker
 @Immutable
+@ExperimentalAnimatedSpacingApi
 interface AnimatedSpacingRowScope : RowScope {
 
     /** Animates a child's width, optional fade, surrounding spacing, and weighted allocation. */
@@ -61,6 +63,7 @@ interface AnimatedSpacingRowScope : RowScope {
     )
 }
 
+@OptIn(ExperimentalAnimatedSpacingApi::class)
 private object AnimatedSpacingRowScopeInstance : AnimatedSpacingRowScope {
 
     override fun Modifier.weight(weight: Float, fill: Boolean): Modifier =
