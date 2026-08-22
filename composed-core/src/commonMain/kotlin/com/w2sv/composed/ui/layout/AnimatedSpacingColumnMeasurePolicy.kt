@@ -234,7 +234,7 @@ private fun Placeable.horizontalPosition(
     when (val alignment = parentData?.crossAxisAlignment) {
         is CrossAxisAlignment.Horizontal -> alignment.alignment.align(this.width, width, layoutDirection)
         is CrossAxisAlignment.Relative -> alignmentLinePosition(alignment, alignmentLineSpace, width, layoutDirection)
-        null -> defaultAlignment.align(this.width, width, layoutDirection)
+        else -> defaultAlignment.align(this.width, width, layoutDirection)
     }
 
 private fun Placeable.alignmentLinePosition(

@@ -29,6 +29,31 @@ internal fun AnimatedSpacingColumnVisibility(
     label: String,
     content: @Composable () -> Unit
 ) {
+    AnimatedSpacingVisibility(visible, modifier, animationSpec, fade, label, VisibilityAxis.Vertical, content)
+}
+
+@Composable
+internal fun AnimatedSpacingRowVisibility(
+    visible: Boolean,
+    modifier: Modifier,
+    animationSpec: FiniteAnimationSpec<Float>,
+    fade: Boolean,
+    label: String,
+    content: @Composable () -> Unit
+) {
+    AnimatedSpacingVisibility(visible, modifier, animationSpec, fade, label, VisibilityAxis.Horizontal, content)
+}
+
+@Composable
+private fun AnimatedSpacingVisibility(
+    visible: Boolean,
+    modifier: Modifier,
+    animationSpec: FiniteAnimationSpec<Float>,
+    fade: Boolean,
+    label: String,
+    axis: VisibilityAxis,
+    content: @Composable () -> Unit
+) {
     val transition = updateTransition(targetState = visible, label = label)
     val presence = transition.animateFloat(
         transitionSpec = { animationSpec },
@@ -46,23 +71,38 @@ internal fun AnimatedSpacingColumnVisibility(
                 clip = true
                 if (fade) alpha = presence.value.coerceIn(0f, 1f)
             },
-        measurePolicy = remember(presence, fillWeightedSpace) {
-            VisibilityMeasurePolicy(presence, fillWeightedSpace == true)
+        measurePolicy = remember(presence, fillWeightedSpace, axis) {
+            VisibilityMeasurePolicy(presence, fillWeightedSpace == true, axis)
         }
     )
 }
 
-internal class VisibilityMeasurePolicy(private val presence: State<Float>, private val fillWeightedSpace: Boolean) : MeasurePolicy {
+internal enum class VisibilityAxis { Horizontal, Vertical }
+
+internal class VisibilityMeasurePolicy(
+    private val presence: State<Float>,
+    private val fillWeightedSpace: Boolean,
+    private val axis: VisibilityAxis = VisibilityAxis.Vertical
+) : MeasurePolicy {
 
     override fun MeasureScope.measure(measurables: List<Measurable>, constraints: Constraints): MeasureResult {
-        val minHeight = if (fillWeightedSpace && constraints.maxHeight != Constraints.Infinity) constraints.maxHeight else 0
-        val childConstraints = constraints.copy(minHeight = minHeight)
+        val childConstraints = when (axis) {
+            VisibilityAxis.Horizontal -> constraints.copy(
+                minWidth = if (fillWeightedSpace && constraints.maxWidth != Constraints.Infinity) constraints.maxWidth else 0
+            )
+
+            VisibilityAxis.Vertical -> constraints.copy(
+                minHeight = if (fillWeightedSpace && constraints.maxHeight != Constraints.Infinity) constraints.maxHeight else 0
+            )
+        }
         val placeables = Array(measurables.size) { index -> measurables[index].measure(childConstraints) }
         val contentSize = placeables.maxContentSize()
-        val animatedHeight = (contentSize.height * presence.value.coerceIn(0f, 1f)).roundToInt()
+        val progress = presence.value.coerceIn(0f, 1f)
+        val animatedWidth = if (axis == VisibilityAxis.Horizontal) (contentSize.width * progress).roundToInt() else contentSize.width
+        val animatedHeight = if (axis == VisibilityAxis.Vertical) (contentSize.height * progress).roundToInt() else contentSize.height
 
         return layout(
-            width = constraints.constrainWidth(contentSize.width),
+            width = constraints.constrainWidth(animatedWidth),
             height = constraints.constrainHeight(animatedHeight)
         ) {
             placeables.forEach { it.placeRelative(0, 0) }

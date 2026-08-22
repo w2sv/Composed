@@ -3,6 +3,7 @@ package com.w2sv.composed.ui.layout
 import androidx.compose.runtime.State
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.AlignmentLine
 import androidx.compose.ui.layout.Measured
 import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.layout.VerticalAlignmentLine
@@ -22,13 +23,15 @@ internal data class AnimatedSpacingColumnParentData(
 internal sealed interface CrossAxisAlignment {
     data class Horizontal(val alignment: Alignment.Horizontal) : CrossAxisAlignment
 
+    data class Vertical(val alignment: Alignment.Vertical) : CrossAxisAlignment
+
     data class Relative(val provider: AlignmentLineProvider) : CrossAxisAlignment
 }
 
 internal sealed interface AlignmentLineProvider {
     fun position(placeable: Placeable): Int
 
-    data class Value(val alignmentLine: VerticalAlignmentLine) : AlignmentLineProvider {
+    data class Value(val alignmentLine: AlignmentLine) : AlignmentLineProvider {
         override fun position(placeable: Placeable): Int =
             placeable[alignmentLine]
     }
@@ -52,7 +55,13 @@ internal fun Modifier.animatedSpacingColumnWeight(weight: Float, fill: Boolean):
 internal fun Modifier.animatedSpacingColumnAlign(alignment: Alignment.Horizontal): Modifier =
     then(HorizontalAlignmentElement(alignment))
 
+internal fun Modifier.animatedSpacingRowAlign(alignment: Alignment.Vertical): Modifier =
+    then(VerticalAlignmentElement(alignment))
+
 internal fun Modifier.animatedSpacingColumnAlignBy(provider: AlignmentLineProvider): Modifier =
+    then(AlignmentLineElement(provider))
+
+internal fun Modifier.animatedSpacingRowAlignBy(provider: AlignmentLineProvider): Modifier =
     then(AlignmentLineElement(provider))
 
 internal fun Modifier.animatedSpacingColumnPresence(presence: State<Float>): Modifier =
@@ -105,6 +114,30 @@ private class HorizontalAlignmentNode(var alignment: Alignment.Horizontal) :
     override fun Density.modifyParentData(parentData: Any?): Any =
         parentData.animatedSpacingColumnParentData().copy(
             crossAxisAlignment = CrossAxisAlignment.Horizontal(alignment)
+        )
+}
+
+private data class VerticalAlignmentElement(val alignment: Alignment.Vertical) : ModifierNodeElement<VerticalAlignmentNode>() {
+
+    override fun create(): VerticalAlignmentNode =
+        VerticalAlignmentNode(alignment)
+
+    override fun update(node: VerticalAlignmentNode) {
+        node.alignment = alignment
+    }
+
+    override fun InspectorInfo.inspectableProperties() {
+        name = "align"
+        value = alignment
+    }
+}
+
+private class VerticalAlignmentNode(var alignment: Alignment.Vertical) :
+    Modifier.Node(),
+    ParentDataModifierNode {
+    override fun Density.modifyParentData(parentData: Any?): Any =
+        parentData.animatedSpacingColumnParentData().copy(
+            crossAxisAlignment = CrossAxisAlignment.Vertical(alignment)
         )
 }
 

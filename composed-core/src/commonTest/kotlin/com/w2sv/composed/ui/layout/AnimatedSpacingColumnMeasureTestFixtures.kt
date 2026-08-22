@@ -3,6 +3,7 @@ package com.w2sv.composed.ui.layout
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.GraphicsLayerScope
 import androidx.compose.ui.layout.AlignmentLine
+import androidx.compose.ui.layout.HorizontalAlignmentLine
 import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
@@ -29,7 +30,23 @@ internal fun measureColumn(
     return with(policy) { scope.measure(measurables, constraints) }
 }
 
+internal fun measureRow(
+    measurables: List<Measurable>,
+    constraints: Constraints,
+    spacing: Int = 0,
+    verticalAlignment: Alignment.Vertical = Alignment.Top,
+    layoutDirection: LayoutDirection = LayoutDirection.Ltr
+): MeasureResult {
+    val policy = AnimatedSpacingRowMeasurePolicy(spacing.dp, verticalAlignment)
+    return with(policy) { TestMeasureScope(layoutDirection).measure(measurables, constraints) }
+}
+
 internal fun relativeParentData(alignmentLine: VerticalAlignmentLine) =
+    AnimatedSpacingColumnParentData(
+        crossAxisAlignment = CrossAxisAlignment.Relative(AlignmentLineProvider.Value(alignmentLine))
+    )
+
+internal fun relativeParentData(alignmentLine: HorizontalAlignmentLine) =
     AnimatedSpacingColumnParentData(
         crossAxisAlignment = CrossAxisAlignment.Relative(AlignmentLineProvider.Value(alignmentLine))
     )
@@ -102,3 +119,4 @@ internal class TestPlaceable(measuredSize: IntSize, constraints: Constraints, pr
 }
 
 internal val TestAlignmentLine = VerticalAlignmentLine(::minOf)
+internal val TestHorizontalAlignmentLine = HorizontalAlignmentLine(::minOf)
