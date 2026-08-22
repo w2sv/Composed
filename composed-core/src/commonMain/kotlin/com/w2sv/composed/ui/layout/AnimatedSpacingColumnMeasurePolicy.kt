@@ -13,6 +13,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.constrainHeight
 import androidx.compose.ui.unit.constrainWidth
+import kotlin.jvm.JvmInline
 import kotlin.math.roundToInt
 
 internal class AnimatedSpacingColumnMeasurePolicy(private val spacing: Dp, private val horizontalAlignment: Alignment.Horizontal) :
@@ -22,9 +23,10 @@ internal class AnimatedSpacingColumnMeasurePolicy(private val spacing: Dp, priva
         if (measurables.isEmpty()) return layout(constraints.minWidth, constraints.minHeight) {}
 
         val parentData = measurables.parentData()
-        val presence = parentData.presence()
-        val spacings = calculateSpacings(presence, spacing.roundToPx())
-        val totalSpacing = spacings.sum()
+        val presence = parentData.animatedPresenceOrNull()
+        val spacingPx = spacing.roundToPx()
+        val animatedSpacings = presence?.let { calculateSpacings(it, spacingPx) }
+        val totalSpacing = animatedSpacings?.sum() ?: (spacingPx * (measurables.size - 1))
         val placeables = arrayOfNulls<Placeable>(measurables.size)
         val weightSummary = measureFixedChildren(measurables, parentData, placeables, constraints, totalSpacing)
 
@@ -49,7 +51,7 @@ internal class AnimatedSpacingColumnMeasurePolicy(private val spacing: Dp, priva
             placeables.forEachIndexed { index, placeable ->
                 placeable ?: return@forEachIndexed
 
-                y += spacings[index]
+                y += animatedSpacings.spacingBefore(index, spacingPx)
                 val x = placeable.horizontalPosition(
                     parentData = parentData[index],
                     defaultAlignment = horizontalAlignment,
@@ -67,8 +69,19 @@ internal class AnimatedSpacingColumnMeasurePolicy(private val spacing: Dp, priva
 
 private data class WeightSummary(val fixedHeight: Int, val totalWeight: Float, val hasVisibilityControlledWeight: Boolean)
 
-private data class AlignmentLineSpace(val before: Int = 0, val after: Int = 0) {
+@JvmInline
+private value class AlignmentLineSpace(private val packed: Long) {
+    constructor(before: Int, after: Int) : this((before.toLong() shl Int.SIZE_BITS) or (after.toLong() and UINT_MASK))
+
+    val before: Int get() = (packed shr Int.SIZE_BITS).toInt()
+
+    val after: Int get() = packed.toInt()
+
     val width: Int get() = before + after
+
+    private companion object {
+        const val UINT_MASK = 0xffffffffL
+    }
 }
 
 private fun List<Measurable>.parentData(): Array<AnimatedSpacingColumnParentData?> =
@@ -76,10 +89,16 @@ private fun List<Measurable>.parentData(): Array<AnimatedSpacingColumnParentData
         this[index].parentData as? AnimatedSpacingColumnParentData
     }
 
-private fun Array<AnimatedSpacingColumnParentData?>.presence(): FloatArray =
-    FloatArray(size) { index ->
+private fun Array<AnimatedSpacingColumnParentData?>.animatedPresenceOrNull(): FloatArray? {
+    if (none { it?.visibilityControlled == true }) return null
+
+    return FloatArray(size) { index ->
         this[index]?.presence?.value?.coerceIn(0f, 1f) ?: 1f
     }
+}
+
+private fun IntArray?.spacingBefore(index: Int, ordinarySpacing: Int): Int =
+    this?.get(index) ?: if (index == 0) 0 else ordinarySpacing
 
 private fun measureFixedChildren(
     measurables: List<Measurable>,
@@ -121,7 +140,7 @@ private fun measureFixedChildren(
 private fun measureWeightedChildren(
     measurables: List<Measurable>,
     parentData: Array<AnimatedSpacingColumnParentData?>,
-    presence: FloatArray,
+    presence: FloatArray?,
     placeables: Array<Placeable?>,
     constraints: Constraints,
     totalSpacing: Int,
@@ -136,7 +155,7 @@ private fun measureWeightedChildren(
         val data = parentData[index]?.takeIf { it.weight != null } ?: return@forEachIndexed
         val measurementAllocation = data.measurementAllocation(
             allocation = allocations[index],
-            presence = presence[index],
+            presence = presence?.get(index) ?: 1f,
             availableHeight = availableHeight
         )
         val minHeight = if (data.fill && !data.visibilityControlled) measurementAllocation else 0
@@ -154,11 +173,11 @@ private fun measureWeightedChildren(
 private fun calculateWeightAllocations(
     availableHeight: Int,
     parentData: Array<AnimatedSpacingColumnParentData?>,
-    presence: FloatArray,
+    presence: FloatArray?,
     weightSummary: WeightSummary
 ): IntArray =
     if (weightSummary.hasVisibilityControlledWeight) {
-        calculateAnimatedWeightedAllocations(availableHeight, parentData, presence)
+        calculateAnimatedWeightedAllocations(availableHeight, parentData, checkNotNull(presence))
     } else {
         calculateOrdinaryWeightedAllocations(availableHeight, parentData, weightSummary.totalWeight)
     }

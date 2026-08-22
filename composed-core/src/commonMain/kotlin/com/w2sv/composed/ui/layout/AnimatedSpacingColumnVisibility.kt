@@ -15,6 +15,7 @@ import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.unit.Constraints
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.constrainHeight
 import androidx.compose.ui.unit.constrainWidth
 import kotlin.math.roundToInt
@@ -69,9 +70,7 @@ internal class VisibilityMeasurePolicy(private val presence: State<Float>, priva
     }
 }
 
-private data class ContentSize(val width: Int, val height: Int)
-
-private fun Array<Placeable>.maxContentSize(): ContentSize {
+private fun Array<Placeable>.maxContentSize(): IntSize {
     var width = 0
     var height = 0
 
@@ -80,5 +79,5 @@ private fun Array<Placeable>.maxContentSize(): ContentSize {
         height = maxOf(height, placeable.height)
     }
 
-    return ContentSize(width, height)
+    return IntSize(width, height)
 }
