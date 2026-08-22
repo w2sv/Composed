@@ -10,6 +10,7 @@ import androidx.compose.ui.window.application
 fun main(args: Array<String>) =
     when {
         args.contentEquals(arrayOf("--help")) -> println(playgroundUsage)
+
         else -> runCatching { parseInitialSample(args) }.fold(
             onSuccess = ::launchPlayground,
             onFailure = ::printUsageError

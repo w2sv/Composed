@@ -1,25 +1,27 @@
 package com.w2sv.composed.playground.lazygriditem
 
-import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.ExpandLess
+import androidx.compose.material.icons.rounded.ExpandMore
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.w2sv.composed.animation.LazyGridItemEntranceRepeatMode
 import com.w2sv.composed.playground.shared.LabeledChoices
 import com.w2sv.composed.playground.shared.ParameterSlider
 import com.w2sv.composed.playground.shared.PlaygroundDefaults
+import com.w2sv.composed.playground.shared.ResetButton
 import com.w2sv.composed.playground.shared.SampleConfigurationCard
 import com.w2sv.composed.playground.shared.SampleControlPair
 import com.w2sv.composed.playground.shared.SampleControlSection
+import com.w2sv.composed.playground.shared.toFixed
 import com.w2sv.composed.ui.layout.AnimatedSpacingColumn
-import com.w2sv.composed.ui.layout.AnimatedSpacingRow
-import com.w2sv.composed.ui.thenIf
 import kotlin.math.roundToInt
 
 @Composable
@@ -28,148 +30,191 @@ internal fun LazyGridItemEntranceConfigurationPanel(
     onConfigurationChange: (LazyGridItemEntranceConfiguration) -> Unit,
     expanded: Boolean,
     onExpandedChange: (Boolean) -> Unit,
+    onReset: () -> Unit,
     horizontalLayout: Boolean,
+    width: Dp,
     modifier: Modifier = Modifier
 ) {
-    val horizontalWidth by animateDpAsState(
-        targetValue = if (expanded) {
-            LazyGridItemEntranceDimens.HorizontalConfigurationWidth
-        } else {
-            LazyGridItemEntranceDimens.HorizontalCollapsedConfigurationWidth
-        }
-    )
-
+    val panelExpanded = expanded || horizontalLayout
     SampleConfigurationCard(
-        title = "Lazy grid entrances",
-        description = "Configure the stagger, then replay it across the visible grid items.",
-        modifier = modifier.thenIf(horizontalLayout) { width(horizontalWidth) },
-        headerAction = {
-            TextButton(onClick = { onExpandedChange(!expanded) }) {
-                Text(if (expanded) "Collapse settings" else "Expand settings")
-            }
+        modifier = modifier.width(width),
+        expandContent = panelExpanded,
+        scrollable = horizontalLayout,
+        actions = {
+            ConfigurationActions(
+                configuration = configuration,
+                expanded = expanded,
+                showExpandButton = !horizontalLayout,
+                onExpandedChange = onExpandedChange,
+                onReset = onReset
+            )
         }
     ) {
-        ConfigurationVisibility(expanded, horizontalLayout) {
-            SampleControlPair(
-                first = {
-                    SampleControlSection(title = "Strategy") {
-                        LabeledChoices(
-                            label = "Orientation",
-                            values = GridOrientation.entries,
-                            selected = configuration.orientation,
-                            onSelected = { onConfigurationChange(configuration.copy(orientation = it)) },
-                            valueLabel = GridOrientation::label
-                        )
+        ConfigurationControls(configuration, onConfigurationChange, horizontalLayout)
+    }
+}
 
-                        LabeledChoices(
-                            label = "Repeat",
-                            values = LazyGridItemEntranceRepeatMode.entries,
-                            selected = configuration.repeatMode,
-                            onSelected = { onConfigurationChange(configuration.copy(repeatMode = it)) },
-                            valueLabel = LazyGridItemEntranceRepeatMode::label
-                        )
+@Composable
+private fun ConfigurationActions(
+    configuration: LazyGridItemEntranceConfiguration,
+    expanded: Boolean,
+    showExpandButton: Boolean,
+    onExpandedChange: (Boolean) -> Unit,
+    onReset: () -> Unit
+) {
+    if (showExpandButton) {
+        ExpandCollapseButton(expanded) { onExpandedChange(!expanded) }
+    }
+    ResetButton(
+        onClick = onReset,
+        enabled = configuration != LazyGridItemEntranceConfiguration()
+    )
+}
 
-                        LabeledChoices(
-                            label = "Delay",
-                            values = EntranceDelayMode.entries,
-                            selected = configuration.delayMode,
-                            onSelected = { onConfigurationChange(configuration.copy(delayMode = it)) },
-                            valueLabel = EntranceDelayMode::label
-                        )
-                    }
-                },
-                second = {
-                    Column(verticalArrangement = Arrangement.spacedBy(PlaygroundDefaults.SectionSpacing)) {
-                        SampleControlSection(title = "Timing") {
-                            AnimatedSpacingColumn(spacing = PlaygroundDefaults.ControlSpacing) {
-                                SampleControlPair(
-                                    first = {
-                                        ParameterSlider(
-                                            label = "Duration",
-                                            valueLabel = "${configuration.durationMillis} ms",
-                                            value = configuration.durationMillis.toFloat(),
-                                            valueRange = 100f..1_500f,
-                                            onValueChange = {
-                                                onConfigurationChange(
-                                                    configuration.copy(durationMillis = it.roundToInt())
-                                                )
-                                            }
-                                        )
-                                    },
-                                    second = { PrimaryIntervalControl(configuration, onConfigurationChange) }
-                                )
-
-                                AnimatedVisibility(configuration.delayMode == EntranceDelayMode.Diagonal) {
-                                    ParameterSlider(
-                                        label = "Cross axis",
-                                        valueLabel = "${configuration.crossAxisIntervalMillis} ms",
-                                        value = configuration.crossAxisIntervalMillis.toFloat(),
-                                        valueRange = 0f..500f,
-                                        onValueChange = {
-                                            onConfigurationChange(
-                                                configuration.copy(crossAxisIntervalMillis = it.roundToInt())
-                                            )
-                                        }
-                                    )
-                                }
-                            }
-                        }
-
-                        SampleControlSection(title = "Appearance and layout") {
-                            SampleControlPair(
-                                first = {
-                                    ParameterSlider(
-                                        label = "Scale",
-                                        valueLabel = "%.2f".format(configuration.initialScale),
-                                        value = configuration.initialScale,
-                                        valueRange = 0f..2f,
-                                        onValueChange = {
-                                            onConfigurationChange(configuration.copy(initialScale = it))
-                                        }
-                                    )
-                                },
-                                second = {
-                                    ParameterSlider(
-                                        label = "Alpha",
-                                        valueLabel = "%.2f".format(configuration.initialAlpha),
-                                        value = configuration.initialAlpha,
-                                        valueRange = 0f..1f,
-                                        onValueChange = {
-                                            onConfigurationChange(configuration.copy(initialAlpha = it))
-                                        }
-                                    )
-                                }
-                            )
-
-                            ParameterSlider(
-                                label = "Cross-axis count",
-                                valueLabel = configuration.crossAxisCount.toString(),
-                                value = configuration.crossAxisCount.toFloat(),
-                                valueRange = 2f..7f,
-                                onValueChange = { onConfigurationChange(configuration.copy(crossAxisCount = it.roundToInt())) }
-                            )
-                        }
-                    }
+@Composable
+private fun ConfigurationControls(
+    configuration: LazyGridItemEntranceConfiguration,
+    onConfigurationChange: (LazyGridItemEntranceConfiguration) -> Unit,
+    horizontalLayout: Boolean
+) {
+    if (horizontalLayout) {
+        Column(verticalArrangement = Arrangement.spacedBy(PlaygroundDefaults.SectionSpacing)) {
+            StrategyControls(configuration, onConfigurationChange)
+            TimingControls(configuration, onConfigurationChange, pairControls = false)
+            AppearanceControls(configuration, onConfigurationChange, pairControls = false)
+        }
+    } else {
+        SampleControlPair(
+            first = { StrategyControls(configuration, onConfigurationChange) },
+            second = {
+                Column(verticalArrangement = Arrangement.spacedBy(PlaygroundDefaults.SectionSpacing)) {
+                    TimingControls(configuration, onConfigurationChange, pairControls = true)
+                    AppearanceControls(configuration, onConfigurationChange, pairControls = true)
                 }
-            )
+            }
+        )
+    }
+}
+
+@Composable
+private fun ExpandCollapseButton(expanded: Boolean, onClick: () -> Unit) {
+    IconButton(onClick = onClick) {
+        Icon(if (expanded) Icons.Rounded.ExpandLess else Icons.Rounded.ExpandMore, contentDescription = null)
+    }
+}
+
+@Composable
+private fun StrategyControls(
+    configuration: LazyGridItemEntranceConfiguration,
+    onConfigurationChange: (LazyGridItemEntranceConfiguration) -> Unit
+) {
+    SampleControlSection(title = "Strategy") {
+        LabeledChoices(
+            label = "Orientation",
+            values = GridOrientation.entries,
+            selected = configuration.orientation,
+            onSelected = { onConfigurationChange(configuration.copy(orientation = it)) },
+            valueLabel = GridOrientation::label
+        )
+        LabeledChoices(
+            label = "Repeat",
+            values = LazyGridItemEntranceRepeatMode.entries,
+            selected = configuration.repeatMode,
+            onSelected = { onConfigurationChange(configuration.copy(repeatMode = it)) },
+            valueLabel = LazyGridItemEntranceRepeatMode::label
+        )
+        LabeledChoices(
+            label = "Delay",
+            values = EntranceDelayMode.entries,
+            selected = configuration.delayMode,
+            onSelected = { onConfigurationChange(configuration.copy(delayMode = it)) },
+            valueLabel = EntranceDelayMode::label
+        )
+    }
+}
+
+@Composable
+private fun TimingControls(
+    configuration: LazyGridItemEntranceConfiguration,
+    onConfigurationChange: (LazyGridItemEntranceConfiguration) -> Unit,
+    pairControls: Boolean
+) {
+    SampleControlSection(title = "Timing") {
+        AnimatedSpacingColumn(spacing = PlaygroundDefaults.ControlSpacing) {
+            val duration = @Composable {
+                ParameterSlider(
+                    label = "Duration",
+                    valueLabel = "${configuration.durationMillis} ms",
+                    value = configuration.durationMillis.toFloat(),
+                    valueRange = 100f..1_500f,
+                    onValueChange = {
+                        onConfigurationChange(configuration.copy(durationMillis = it.roundToInt()))
+                    }
+                )
+            }
+            if (pairControls) {
+                SampleControlPair(
+                    first = duration,
+                    second = { PrimaryIntervalControl(configuration, onConfigurationChange) }
+                )
+            } else {
+                duration()
+                PrimaryIntervalControl(configuration, onConfigurationChange)
+            }
+
+            AnimatedVisibility(configuration.delayMode == EntranceDelayMode.Diagonal) {
+                ParameterSlider(
+                    label = "Cross axis",
+                    valueLabel = "${configuration.crossAxisIntervalMillis} ms",
+                    value = configuration.crossAxisIntervalMillis.toFloat(),
+                    valueRange = 0f..500f,
+                    onValueChange = {
+                        onConfigurationChange(configuration.copy(crossAxisIntervalMillis = it.roundToInt()))
+                    }
+                )
+            }
         }
     }
 }
 
 @Composable
-private fun ConfigurationVisibility(
-    visible: Boolean,
-    horizontalLayout: Boolean,
-    content: @Composable () -> Unit
+private fun AppearanceControls(
+    configuration: LazyGridItemEntranceConfiguration,
+    onConfigurationChange: (LazyGridItemEntranceConfiguration) -> Unit,
+    pairControls: Boolean
 ) {
-    if (horizontalLayout) {
-        AnimatedSpacingRow(spacing = 0.dp) {
-            AnimatedVisibility(visible, content = content)
+    SampleControlSection(title = "Appearance and layout") {
+        val scale = @Composable {
+            ParameterSlider(
+                label = "Scale",
+                valueLabel = configuration.initialScale.toFixed(2),
+                value = configuration.initialScale,
+                valueRange = 0f..2f,
+                onValueChange = { onConfigurationChange(configuration.copy(initialScale = it)) }
+            )
         }
-    } else {
-        AnimatedSpacingColumn(spacing = 0.dp) {
-            AnimatedVisibility(visible, content = content)
+        val alpha = @Composable {
+            ParameterSlider(
+                label = "Alpha",
+                valueLabel = configuration.initialAlpha.toFixed(2),
+                value = configuration.initialAlpha,
+                valueRange = 0f..1f,
+                onValueChange = { onConfigurationChange(configuration.copy(initialAlpha = it)) }
+            )
         }
+        if (pairControls) {
+            SampleControlPair(first = scale, second = alpha)
+        } else {
+            scale()
+            alpha()
+        }
+        ParameterSlider(
+            label = "Cross-axis count",
+            valueLabel = configuration.crossAxisCount.toString(),
+            value = configuration.crossAxisCount.toFloat(),
+            valueRange = 2f..7f,
+            onValueChange = { onConfigurationChange(configuration.copy(crossAxisCount = it.roundToInt())) }
+        )
     }
 }
 

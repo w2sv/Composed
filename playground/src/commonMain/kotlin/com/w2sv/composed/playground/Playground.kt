@@ -1,44 +1,58 @@
 package com.w2sv.composed.playground
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.Crossfade
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DarkMode
+import androidx.compose.material.icons.filled.LightMode
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialExpressiveTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.expressiveLightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.w2sv.composed.playground.animatedspacing.AnimatedSpacingSample
 import com.w2sv.composed.playground.lazygriditem.LazyGridItemEntranceSample
 import com.w2sv.composed.playground.shake.ShakeSample
-import com.w2sv.composed.playground.shared.PlaygroundDefaults
 
 @Composable
 fun Playground(initialSample: Sample?) {
     var selectedSample by remember(initialSample) { mutableStateOf(initialSample) }
+    val systemInDarkTheme = isSystemInDarkTheme()
+    var darkTheme by remember { mutableStateOf(systemInDarkTheme) }
+    val colorScheme = if (darkTheme) darkColorScheme() else expressiveLightColorScheme()
 
-    MaterialTheme {
+    MaterialExpressiveTheme(colorScheme = colorScheme) {
         Scaffold(
             topBar = {
                 PlaygroundTopBar(
                     selectedSample = selectedSample,
-                    onSampleSelected = { selectedSample = it }
+                    onSampleSelected = { selectedSample = it },
+                    darkTheme = darkTheme,
+                    onDarkThemeChanged = { darkTheme = it }
                 )
             }
         ) { contentPadding ->
-            Box(modifier = Modifier.fillMaxSize().padding(contentPadding)) {
-                when (selectedSample) {
+            AnimatedContent(
+                selectedSample,
+                modifier = Modifier.fillMaxSize().padding(contentPadding)
+            ) { sample ->
+                when (sample) {
                     null -> SamplePicker(onSampleSelected = { selectedSample = it })
                     Sample.AnimatedSpacing -> AnimatedSpacingSample()
                     Sample.Shake -> ShakeSample()
@@ -50,22 +64,20 @@ fun Playground(initialSample: Sample?) {
 }
 
 @Composable
-private fun PlaygroundTopBar(selectedSample: Sample?, onSampleSelected: (Sample) -> Unit) {
+private fun PlaygroundTopBar(
+    selectedSample: Sample?,
+    onSampleSelected: (Sample) -> Unit,
+    darkTheme: Boolean,
+    onDarkThemeChanged: (Boolean) -> Unit
+) {
     var menuExpanded by remember { mutableStateOf(false) }
 
-    Surface(tonalElevation = PlaygroundDefaults.TopBarElevation) {
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = PlaygroundDefaults.ContentPadding),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = "Composed playground",
-                modifier = Modifier.weight(1f),
-                style = MaterialTheme.typography.titleLarge
-            )
+    TopAppBar(
+        title = { Text(text = selectedSample?.title ?: "Composed playground") },
+        navigationIcon = {
             Box {
-                TextButton(onClick = { menuExpanded = true }) {
-                    Text(selectedSample?.title ?: "Choose sample")
+                IconButton(onClick = { menuExpanded = true }) {
+                    Icon(Icons.Default.Menu, contentDescription = null)
                 }
                 DropdownMenu(
                     expanded = menuExpanded,
@@ -74,6 +86,7 @@ private fun PlaygroundTopBar(selectedSample: Sample?, onSampleSelected: (Sample)
                     Sample.entries.forEach { sample ->
                         DropdownMenuItem(
                             text = { Text(sample.title) },
+                            enabled = sample != selectedSample,
                             onClick = {
                                 menuExpanded = false
                                 onSampleSelected(sample)
@@ -82,6 +95,16 @@ private fun PlaygroundTopBar(selectedSample: Sample?, onSampleSelected: (Sample)
                     }
                 }
             }
+        },
+        actions = {
+            IconButton(onClick = { onDarkThemeChanged(!darkTheme) }) {
+                Crossfade(darkTheme) { darkTheme ->
+                    Icon(
+                        imageVector = if (darkTheme) Icons.Default.LightMode else Icons.Default.DarkMode,
+                        contentDescription = if (darkTheme) "Switch to light mode" else "Switch to dark mode"
+                    )
+                }
+            }
         }
-    }
+    )
 }

@@ -1,8 +1,10 @@
 package com.w2sv.composed.playground.animatedspacing
 
+import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.FiniteAnimationSpec
 import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.horizontalScroll
@@ -20,20 +22,25 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonGroupDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.ToggleButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.w2sv.composed.playground.shared.PlaygroundDefaults
+import com.w2sv.composed.playground.shared.SamplePreviewCard
+import com.w2sv.composed.playground.shared.connectedButtonShapes
 import com.w2sv.composed.ui.layout.AnimatedSpacingColumn
 import com.w2sv.composed.ui.layout.AnimatedSpacingColumnAnimation
 import com.w2sv.composed.ui.layout.AnimatedSpacingRow
@@ -48,60 +55,95 @@ internal fun AnimatedSpacingLayout(
     onReset: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    when (configuration.orientation) {
-        AnimatedSpacingOrientation.Column -> Row(
-            modifier = modifier.padding(PlaygroundDefaults.ContentPadding),
-            horizontalArrangement = Arrangement.spacedBy(PlaygroundDefaults.SectionSpacing)
-        ) {
-            Column(
-                modifier = Modifier.fillMaxHeight().weight(1f),
-                verticalArrangement = Arrangement.spacedBy(PlaygroundDefaults.CompactSpacing)
-            ) {
-                AnimatedSpacingConfigurationPanel(
-                    configuration = configuration,
-                    onConfigurationChange = onConfigurationChange,
-                    onReset = onReset,
-                    modifier = Modifier.fillMaxWidth().weight(1f),
-                    scrollable = true
-                )
-                VisibilityControls(visibility, onVisibilityChange)
+    BoxWithConstraints(modifier = modifier.padding(PlaygroundDefaults.ContentPadding)) {
+        val configurationPanelWidth by animateDpAsState(
+            targetValue = when (configuration.orientation) {
+                AnimatedSpacingOrientation.Column -> (maxWidth - PlaygroundDefaults.SectionSpacing) / 2
+                AnimatedSpacingOrientation.Row -> maxWidth
             }
+        )
 
-            PreviewCard(Modifier.fillMaxHeight().weight(1f)) {
-                AnimatedColumnPreview(configuration, visibility, onVisibilityChange)
-            }
-        }
-
-        AnimatedSpacingOrientation.Row -> Column(
-            modifier = modifier.padding(PlaygroundDefaults.ContentPadding),
-            verticalArrangement = Arrangement.spacedBy(PlaygroundDefaults.SectionSpacing)
-        ) {
-            AnimatedSpacingConfigurationPanel(
+        when (configuration.orientation) {
+            AnimatedSpacingOrientation.Column -> ColumnOrientationLayout(
                 configuration = configuration,
                 onConfigurationChange = onConfigurationChange,
+                visibility = visibility,
+                onVisibilityChange = onVisibilityChange,
                 onReset = onReset,
-                modifier = Modifier.fillMaxWidth(),
-                compact = true
+                configurationPanelWidth = configurationPanelWidth
             )
+
+            AnimatedSpacingOrientation.Row -> RowOrientationLayout(
+                configuration = configuration,
+                onConfigurationChange = onConfigurationChange,
+                visibility = visibility,
+                onVisibilityChange = onVisibilityChange,
+                onReset = onReset,
+                configurationPanelWidth = configurationPanelWidth
+            )
+        }
+    }
+}
+
+@Composable
+private fun ColumnOrientationLayout(
+    configuration: AnimatedSpacingConfiguration,
+    onConfigurationChange: (AnimatedSpacingConfiguration) -> Unit,
+    visibility: AnimatedSpacingVisibility,
+    onVisibilityChange: (AnimatedSpacingVisibility) -> Unit,
+    onReset: () -> Unit,
+    configurationPanelWidth: androidx.compose.ui.unit.Dp
+) {
+    Row(
+        modifier = Modifier.fillMaxSize(),
+        horizontalArrangement = Arrangement.spacedBy(PlaygroundDefaults.SectionSpacing)
+    ) {
+        AnimatedSpacingConfigurationPanel(
+            configuration = configuration,
+            onConfigurationChange = onConfigurationChange,
+            onReset = onReset,
+            modifier = Modifier.fillMaxHeight().width(configurationPanelWidth),
+            scrollable = true
+        )
+        Column(
+            modifier = Modifier.fillMaxHeight().weight(1f),
+            verticalArrangement = Arrangement.spacedBy(PlaygroundDefaults.CompactSpacing)
+        ) {
             VisibilityControls(visibility, onVisibilityChange)
-            PreviewCard(Modifier.fillMaxWidth().weight(1f)) {
-                AnimatedRowPreview(configuration, visibility, onVisibilityChange)
+            SamplePreviewCard(Modifier.fillMaxWidth().weight(1f)) {
+                AnimatedColumnPreview(configuration, visibility, onVisibilityChange)
             }
         }
     }
 }
 
 @Composable
-private fun PreviewCard(modifier: Modifier, content: @Composable () -> Unit) {
-    Card(
-        modifier = modifier,
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHighest)
+private fun RowOrientationLayout(
+    configuration: AnimatedSpacingConfiguration,
+    onConfigurationChange: (AnimatedSpacingConfiguration) -> Unit,
+    visibility: AnimatedSpacingVisibility,
+    onVisibilityChange: (AnimatedSpacingVisibility) -> Unit,
+    onReset: () -> Unit,
+    configurationPanelWidth: androidx.compose.ui.unit.Dp
+) {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.spacedBy(PlaygroundDefaults.SectionSpacing)
     ) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            content()
+        AnimatedSpacingConfigurationPanel(
+            configuration = configuration,
+            onConfigurationChange = onConfigurationChange,
+            onReset = onReset,
+            modifier = Modifier
+                .fillMaxHeight(AnimatedSpacingDimens.RowConfigurationHeightFraction)
+                .wrapContentWidth(Alignment.Start, unbounded = true)
+                .width(configurationPanelWidth),
+            compact = true,
+            scrollable = true
+        )
+        VisibilityControls(visibility, onVisibilityChange)
+        SamplePreviewCard(Modifier.fillMaxWidth().weight(1f)) {
+            AnimatedRowPreview(configuration, visibility, onVisibilityChange)
         }
     }
 }
@@ -109,30 +151,33 @@ private fun PreviewCard(modifier: Modifier, content: @Composable () -> Unit) {
 @Composable
 private fun VisibilityControls(visibility: AnimatedSpacingVisibility, onVisibilityChange: (AnimatedSpacingVisibility) -> Unit) {
     Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
-        FlowRow(horizontalArrangement = Arrangement.spacedBy(PlaygroundDefaults.ControlSpacing)) {
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween),
+            verticalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween)
+        ) {
             visibility.items.forEachIndexed { index, visible ->
-                VisibilityChip(itemLabel(index), visible) { onVisibilityChange(visibility.toggle(index)) }
+                ToggleButton(
+                    checked = visible,
+                    onCheckedChange = { onVisibilityChange(visibility.toggle(index)) },
+                    shapes = connectedButtonShapes(index, visibility.items.lastIndex)
+                ) {
+                    Text("Item ${itemLabel(index)}")
+                }
             }
-            Button(
+            FilledTonalButton(
                 onClick = {
                     onVisibilityChange(
                         if (visibility.allVisible) AnimatedSpacingVisibility.none() else AnimatedSpacingVisibility()
                     )
-                }
+                },
+                modifier = Modifier.padding(start = PlaygroundDefaults.ControlSpacing)
             ) {
-                Text(if (visibility.allVisible) "Hide all" else "Show all")
+                Crossfade(visibility.allVisible) { allVisible ->
+                    Text(if (allVisible) "Hide all" else "Show all")
+                }
             }
         }
     }
-}
-
-@Composable
-private fun VisibilityChip(
-    label: String,
-    visible: Boolean,
-    onClick: () -> Unit
-) {
-    FilterChip(selected = visible, onClick = onClick, label = { Text("Item $label") })
 }
 
 @Composable
@@ -169,7 +214,11 @@ private fun AnimatedColumnPreview(
                             containerColor = itemContainerColor(index),
                             contentColor = itemContentColor(index),
                             onClick = { onVisibilityChange(visibility.toggle(index)) },
-                            modifier = if (configuration.weighted) Modifier.fillMaxSize() else Modifier.fillMaxWidth().height(72.dp)
+                            modifier = if (configuration.weighted) {
+                                Modifier.fillMaxSize()
+                            } else {
+                                Modifier.fillMaxWidth().height(AnimatedSpacingDimens.ColumnItemHeight)
+                            }
                         )
                     }
                 }
@@ -212,7 +261,13 @@ private fun AnimatedRowPreview(
                             containerColor = itemContainerColor(index),
                             contentColor = itemContentColor(index),
                             onClick = { onVisibilityChange(visibility.toggle(index)) },
-                            modifier = if (configuration.weighted) Modifier.fillMaxSize() else Modifier.width(120.dp).height(96.dp)
+                            modifier = if (configuration.weighted) {
+                                Modifier.fillMaxSize()
+                            } else {
+                                Modifier
+                                    .width(AnimatedSpacingDimens.RowItemWidth)
+                                    .height(AnimatedSpacingDimens.RowItemHeight)
+                            }
                         )
                     }
                 }
@@ -280,3 +335,10 @@ private val AnimatedSpacingAnchor.horizontalAlignment
         AnimatedSpacingAnchor.Center -> Alignment.CenterHorizontally
         AnimatedSpacingAnchor.End -> Alignment.End
     }
+
+private object AnimatedSpacingDimens {
+    val RowConfigurationHeightFraction = 0.6f
+    val ColumnItemHeight = 72.dp
+    val RowItemWidth = 120.dp
+    val RowItemHeight = 96.dp
+}

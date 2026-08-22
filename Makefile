@@ -6,5 +6,5 @@ test-with-coverage:
 playground-usage:
 	@./gradlew :playground:usage
 
-playground-hot-reloading:
+run-playground:
 	@./gradlew :playground:hotRunJvm --auto

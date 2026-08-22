@@ -4,20 +4,12 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.w2sv.composed.playground.shared.LabeledChoices
 import com.w2sv.composed.playground.shared.ParameterSlider
 import com.w2sv.composed.playground.shared.PlaygroundDefaults
-import com.w2sv.composed.playground.shared.PlaygroundVerticalScrollbar
+import com.w2sv.composed.playground.shared.ResetButton
 import com.w2sv.composed.playground.shared.SampleConfigurationCard
 import com.w2sv.composed.playground.shared.SampleControlPair
 import com.w2sv.composed.playground.shared.SampleControlSection
@@ -33,52 +25,33 @@ internal fun AnimatedSpacingConfigurationPanel(
     compact: Boolean = false,
     scrollable: Boolean = false
 ) {
-    val scrollState = rememberScrollState()
     SampleConfigurationCard(
-        title = "Animated spacing layouts",
-        description = "Toggle items below and compare fixed sizing with animated weight redistribution in a row or column.",
         modifier = modifier,
-        contentModifier = if (scrollable) {
-            Modifier
-                .verticalScroll(scrollState)
-                .padding(end = PlaygroundDefaults.ScrollbarThickness + PlaygroundDefaults.ScrollbarEdgePadding)
-        } else {
-            Modifier
-        },
-        contentOverlay = if (scrollable) {
-            {
-                PlaygroundVerticalScrollbar(
-                    state = scrollState,
-                    modifier = Modifier
-                        .align(Alignment.CenterEnd)
-                        .fillMaxHeight()
-                        .padding(vertical = PlaygroundDefaults.ScrollbarEdgePadding)
-                        .width(PlaygroundDefaults.ScrollbarThickness)
-                )
-            }
-        } else {
-            null
-        },
-        showHeader = false
+        scrollable = scrollable,
+        actions = { ResetAction(configuration, onReset) }
     ) {
         if (compact) {
-            CompactControls(configuration, onConfigurationChange, onReset)
+            CompactControls(configuration, onConfigurationChange)
         } else {
-            StandardControls(configuration, onConfigurationChange, onReset)
+            StandardControls(configuration, onConfigurationChange)
         }
     }
 }
 
 @Composable
-private fun StandardControls(
-    configuration: AnimatedSpacingConfiguration,
-    onConfigurationChange: (AnimatedSpacingConfiguration) -> Unit,
-    onReset: () -> Unit
-) {
+private fun ResetAction(configuration: AnimatedSpacingConfiguration, onReset: () -> Unit) {
+    ResetButton(
+        onClick = onReset,
+        enabled = configuration != AnimatedSpacingConfiguration()
+    )
+}
+
+@Composable
+private fun StandardControls(configuration: AnimatedSpacingConfiguration, onConfigurationChange: (AnimatedSpacingConfiguration) -> Unit) {
     SampleControlPair(
         first = {
             Column(verticalArrangement = Arrangement.spacedBy(PlaygroundDefaults.SectionSpacing)) {
-                LayoutControls(configuration, onConfigurationChange, onReset)
+                LayoutControls(configuration, onConfigurationChange)
                 AnchorControls(configuration, onConfigurationChange)
             }
         },
@@ -87,13 +60,9 @@ private fun StandardControls(
 }
 
 @Composable
-private fun CompactControls(
-    configuration: AnimatedSpacingConfiguration,
-    onConfigurationChange: (AnimatedSpacingConfiguration) -> Unit,
-    onReset: () -> Unit
-) {
+private fun CompactControls(configuration: AnimatedSpacingConfiguration, onConfigurationChange: (AnimatedSpacingConfiguration) -> Unit) {
     Row(horizontalArrangement = Arrangement.spacedBy(PlaygroundDefaults.ControlSpacing)) {
-        Box(Modifier.weight(1f)) { LayoutControls(configuration, onConfigurationChange, onReset) }
+        Box(Modifier.weight(1f)) { LayoutControls(configuration, onConfigurationChange) }
         Box(Modifier.weight(1f)) { AnchorControls(configuration, onConfigurationChange) }
         Box(Modifier.weight(1f)) {
             SampleControlSection("Appearance") {
@@ -118,11 +87,7 @@ private fun CompactControls(
 }
 
 @Composable
-private fun LayoutControls(
-    configuration: AnimatedSpacingConfiguration,
-    onConfigurationChange: (AnimatedSpacingConfiguration) -> Unit,
-    onReset: () -> Unit
-) {
+private fun LayoutControls(configuration: AnimatedSpacingConfiguration, onConfigurationChange: (AnimatedSpacingConfiguration) -> Unit) {
     SampleControlSection("Layout") {
         LabeledChoices(
             label = "Orientation",
@@ -145,7 +110,6 @@ private fun LayoutControls(
             valueRange = 0f..64f,
             onValueChange = { onConfigurationChange(configuration.copy(spacingDp = it.roundToInt())) }
         )
-        OutlinedButton(onClick = onReset) { Text("Reset") }
     }
 }
 

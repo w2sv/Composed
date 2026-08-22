@@ -21,10 +21,7 @@ fun AnimatedSpacingSample() {
             onConfigurationChange = { configuration = it },
             visibility = visibility,
             onVisibilityChange = { visibility = it },
-            onReset = {
-                configuration = defaultConfiguration
-                visibility = AnimatedSpacingVisibility()
-            },
+            onReset = { configuration = defaultConfiguration },
             modifier = Modifier.fillMaxSize()
         )
     }

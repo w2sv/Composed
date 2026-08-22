@@ -4,7 +4,12 @@ plugins {
 }
 
 kotlin {
-    compilerOptions { optIn.add("com.w2sv.composed.ui.layout.ExperimentalAnimatedSpacingApi") }
+    compilerOptions {
+        optIn.addAll(
+            "androidx.compose.material3.ExperimentalMaterial3ExpressiveApi",
+            "com.w2sv.composed.ui.layout.ExperimentalAnimatedSpacingApi"
+        )
+    }
 
     jvm()
 
@@ -16,12 +21,16 @@ kotlin {
 
             implementation(libs.jetbrains.compose.runtime)
             implementation(libs.jetbrains.compose.foundation)
-            implementation(libs.jetbrains.compose.material3)
+            implementation(libs.jetbrains.compose.material.icons.extended)
+            implementation(libs.jetbrains.compose.material3.expressive)
             implementation(libs.jetbrains.compose.ui)
+            implementation(libs.oikvpqya.compose.fastscroller.core)
         }
 
         jvmMain.dependencies {
-            implementation(compose.desktop.currentOs)
+            implementation(compose.desktop.currentOs) {
+                exclude(group = "org.jetbrains.compose.material", module = "material")
+            }
         }
 
         jvmTest.dependencies {
