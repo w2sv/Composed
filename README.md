@@ -54,7 +54,9 @@ See the [API reference](https://w2sv.github.io/Composed/) for the full documenta
 
 ## ✨ API highlights
 
-### Modifier composition
+<details>
+<summary><strong>Modifier composition</strong></summary>
+<br>
 
 Conditionally build modifier chains without repeatedly starting from `Modifier`:
 
@@ -76,7 +78,11 @@ Modifier
     }
 ```
 
-### Shake animation
+</details>
+
+<details>
+<summary><strong>Shake animation</strong></summary>
+<br>
 
 Apply a configurable horizontal shake animation:
 
@@ -95,7 +101,11 @@ scope.launch {
 }
 ```
 
-### Lazy grid item entrances
+</details>
+
+<details>
+<summary><strong>Lazy grid item entrances</strong></summary>
+<br>
 
 Stagger lazy grid items from the edge associated with the current scroll direction:
 
@@ -129,7 +139,11 @@ LazyVerticalGrid(
 The API also supports horizontal grids. You can implement your own LazyGridItemEntranceDelay strategies,
 configure whether an item animation should be shown on every composition or only once per key, and more.
 
-### Animated spacing rows and columns
+</details>
+
+<details>
+<summary><strong>Animated spacing rows and columns</strong></summary>
+<br>
 
 Using `AnimatedVisibility` inside a stock `Column(verticalArrangement = Arrangement.spacedBy(...))` leaves the
 arrangement spacing outside the visibility animation. The child collapses, but the full gap remains until composition
@@ -181,7 +195,11 @@ They support fixed spacing, and animated weight redistribution costs more than o
 reference for the complete behavior and limitations, or read the concise
 [implementation notes](docs/animated-spacing.md) for measurement, rounding, and performance details.
 
-### Snackbar launching
+</details>
+
+<details>
+<summary><strong>Snackbar launching</strong></summary>
+<br>
 
 Show snackbars from event handlers without manually carrying around a `SnackbarHostState`, `CoroutineScope`, and, on Android, a `Context`:
 
@@ -221,7 +239,11 @@ Button(
 `SnackbarLauncher` keeps coroutine launching and snackbar presentation behind one non-suspending API while still exposing the current snackbar state and explicit replacement or dismissal operations.
 For suspending snackbar display, you may use the `SnackbarController`.
 
-### Focus clearing
+</details>
+
+<details>
+<summary><strong>Focus clearing</strong></summary>
+<br>
 
 Coordinate focus clearing from anywhere in the composition without passing around a `FocusManager`:
 
@@ -242,13 +264,15 @@ Button(onClick = focusClearingController::requestClearFocus) {
 `FocusClearingController` can also automatically clear focus when the IME transitions from visible
 to hidden.
 
+</details>
+
 ## 📦 Modules
 
-| Module               | Description                                                                      |
-|----------------------|----------------------------------------------------------------------------------|
-| `composed-core`      | General-purpose Compose utilities. Contains also Android-only utilities.         |
+| Module               | Description                                                                        |
+|----------------------|------------------------------------------------------------------------------------|
+| `composed-core`      | General-purpose Compose utilities. Contains also Android-only utilities.           |
 | `composed-animation` | Reusable animation controllers, animated spacing layouts, and lazy-grid entrances. |
-| `composed-material3` | Utilities and extensions for Compose Material 3 layouts, drawers, and snackbars. |
+| `composed-material3` | Utilities and extensions for Compose Material 3 layouts, drawers, and snackbars.   |
 
 Android permission-state utilities are available separately
 at [AugmentedPermissions](https://github.com/w2sv/AugmentedPermissions).
@@ -295,28 +319,11 @@ testing visual and behavioral APIs.
 Run it with:
 
 ```bash
-./gradlew :playground:run
+./gradlew :playground:run [--args=<sample-id>]
 ```
 
-Without arguments, the playground opens a sample picker. To launch a sample directly:
-
-```bash
-./gradlew :playground:run --args=lazy-grid-item-entrance
-```
-
-Or launch it with Compose Hot Reload:
-
-```bash
-./gradlew :playground:hotRunJvm --auto
-```
-
-Direct sample selection uses the same argument with hot reload:
-
-```bash
-./gradlew :playground:hotRunJvm --auto --args=lazy-grid-item-entrance
-```
-
-Show launch options and available sample IDs with:
+Without the --args option provided, the playground opens a sample picker.
+To see the available sample IDs and detailed usage instructions, run
 
 ```bash
 ./gradlew :playground:usage
