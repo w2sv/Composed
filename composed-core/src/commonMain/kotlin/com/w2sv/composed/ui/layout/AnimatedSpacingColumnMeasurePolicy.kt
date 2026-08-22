@@ -9,172 +9,39 @@ import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.constrainHeight
 import androidx.compose.ui.unit.constrainWidth
-import kotlin.math.floor
 import kotlin.math.roundToInt
 
 internal class AnimatedSpacingColumnMeasurePolicy(private val spacing: Dp, private val horizontalAlignment: Alignment.Horizontal) :
     MeasurePolicy {
 
     override fun MeasureScope.measure(measurables: List<Measurable>, constraints: Constraints): MeasureResult {
-        if (measurables.isEmpty()) {
-            return layout(constraints.minWidth, constraints.minHeight) {}
-        }
+        if (measurables.isEmpty()) return layout(constraints.minWidth, constraints.minHeight) {}
 
-        val count = measurables.size
-
-        val parentData = Array(count) { index ->
-            measurables[index].parentData as? AnimatedSpacingColumnParentData
-        }
-
-        val presence = FloatArray(count) { index ->
-            parentData[index]
-                ?.presence
-                ?.value
-                ?.coerceIn(0f, 1f)
-                ?: 1f
-        }
-
-        val spacings = calculateSpacings(
-            presence = presence,
-            spacing = spacing.roundToPx()
-        )
-
+        val parentData = measurables.parentData()
+        val presence = parentData.presence()
+        val spacings = calculateSpacings(presence, spacing.roundToPx())
         val totalSpacing = spacings.sum()
-        val placeables = arrayOfNulls<Placeable>(count)
-        val boundedHeight = constraints.maxHeight != Constraints.Infinity
+        val placeables = arrayOfNulls<Placeable>(measurables.size)
+        val weightSummary = measureFixedChildren(measurables, parentData, placeables, constraints, totalSpacing)
 
-        var fixedHeight = 0
-        var totalWeight = 0f
-        var hasVisibilityControlledWeight = false
-
-        measurables.forEachIndexed { index, measurable ->
-            val data = parentData[index]
-            val weight = data?.weight ?: 0f
-
-            if (weight > 0f && boundedHeight) {
-                totalWeight += weight
-                hasVisibilityControlledWeight =
-                    hasVisibilityControlledWeight || data?.visibilityControlled == true
-                return@forEachIndexed
-            }
-
-            val maxHeight = if (boundedHeight) {
-                (constraints.maxHeight - totalSpacing - fixedHeight).coerceAtLeast(0)
-            } else {
-                Constraints.Infinity
-            }
-
-            val placeable = measurable.measure(
-                Constraints(
-                    minWidth = 0,
-                    maxWidth = constraints.maxWidth,
-                    minHeight = 0,
-                    maxHeight = maxHeight
-                )
-            )
-
-            placeables[index] = placeable
-            fixedHeight += placeable.height
-        }
-
-        if (boundedHeight && totalWeight > 0f) {
-            val availableHeight = (
-                constraints.maxHeight -
-                    totalSpacing -
-                    fixedHeight
-                ).coerceAtLeast(0)
-
-            val allocations = if (hasVisibilityControlledWeight) {
-                calculateAnimatedWeightedAllocations(
-                    availableSpace = availableHeight,
-                    parentData = parentData,
-                    presence = presence
-                )
-            } else {
-                calculateOrdinaryWeightedAllocations(
-                    availableSpace = availableHeight,
-                    parentData = parentData,
-                    totalWeight = totalWeight
-                )
-            }
-
-            measurables.forEachIndexed { index, measurable ->
-                val data = parentData[index] ?: return@forEachIndexed
-                if (data.weight == null) return@forEachIndexed
-
-                val allocation = allocations[index]
-                val itemPresence = presence[index]
-
-                val measurementAllocation = if (data.visibilityControlled && itemPresence > 0f) {
-                    (allocation / itemPresence)
-                        .roundToInt()
-                        .coerceIn(0, availableHeight)
-                } else {
-                    allocation
-                }
-
-                val minHeight = if (data.fill && !data.visibilityControlled) {
-                    measurementAllocation
-                } else {
-                    0
-                }
-
-                placeables[index] = measurable.measure(
-                    Constraints(
-                        minWidth = 0,
-                        maxWidth = constraints.maxWidth,
-                        minHeight = minHeight,
-                        maxHeight = measurementAllocation
-                    )
-                )
-            }
-        }
-
-        var contentWidth = 0
-        var contentHeight = totalSpacing
-
-        placeables.forEach { placeable ->
-            placeable ?: return@forEach
-
-            contentWidth = maxOf(contentWidth, placeable.width)
-            contentHeight += placeable.height
-        }
-
-        var beforeAlignmentLine = 0
-        var afterAlignmentLine = 0
-
-        placeables.forEachIndexed { index, placeable ->
-            placeable ?: return@forEachIndexed
-
-            val alignment =
-                parentData[index]?.crossAxisAlignment as? CrossAxisAlignment.Relative
-                    ?: return@forEachIndexed
-
-            val linePosition = alignment.provider.position(placeable)
-            if (linePosition == AlignmentLine.Unspecified) return@forEachIndexed
-
-            beforeAlignmentLine = maxOf(
-                beforeAlignmentLine,
-                linePosition
-            )
-
-            afterAlignmentLine = maxOf(
-                afterAlignmentLine,
-                placeable.width - linePosition
-            )
-        }
-
-        val width = constraints.constrainWidth(
-            maxOf(
-                contentWidth,
-                beforeAlignmentLine + afterAlignmentLine
-            )
+        measureWeightedChildren(
+            measurables = measurables,
+            parentData = parentData,
+            presence = presence,
+            placeables = placeables,
+            constraints = constraints,
+            totalSpacing = totalSpacing,
+            weightSummary = weightSummary
         )
 
-        val height = constraints.constrainHeight(contentHeight)
+        val contentSize = placeables.contentSize(totalSpacing)
+        val alignmentLineSpace = placeables.alignmentLineSpace(parentData)
+        val width = constraints.constrainWidth(maxOf(contentSize.width, alignmentLineSpace.width))
+        val height = constraints.constrainHeight(contentSize.height)
 
         return layout(width, height) {
             var y = 0
@@ -183,42 +50,13 @@ internal class AnimatedSpacingColumnMeasurePolicy(private val spacing: Dp, priva
                 placeable ?: return@forEachIndexed
 
                 y += spacings[index]
-
-                val x = when (
-                    val alignment = parentData[index]?.crossAxisAlignment
-                ) {
-                    is CrossAxisAlignment.Horizontal -> {
-                        alignment.alignment.align(
-                            size = placeable.width,
-                            space = width,
-                            layoutDirection = layoutDirection
-                        )
-                    }
-
-                    is CrossAxisAlignment.Relative -> {
-                        val linePosition = alignment.provider.position(placeable)
-
-                        if (linePosition == AlignmentLine.Unspecified) {
-                            0
-                        } else {
-                            val offset = beforeAlignmentLine - linePosition
-
-                            if (layoutDirection == LayoutDirection.Ltr) {
-                                offset
-                            } else {
-                                width - placeable.width - offset
-                            }
-                        }
-                    }
-
-                    null -> {
-                        horizontalAlignment.align(
-                            size = placeable.width,
-                            space = width,
-                            layoutDirection = layoutDirection
-                        )
-                    }
-                }
+                val x = placeable.horizontalPosition(
+                    parentData = parentData[index],
+                    defaultAlignment = horizontalAlignment,
+                    alignmentLineSpace = alignmentLineSpace,
+                    width = width,
+                    layoutDirection = layoutDirection
+                )
 
                 placeable.place(x, y)
                 y += placeable.height
@@ -227,250 +65,168 @@ internal class AnimatedSpacingColumnMeasurePolicy(private val spacing: Dp, priva
     }
 }
 
-/*
- * Calculate the spacing once from top -> bottom and once from
- * bottom -> top, then average both interpretations.
- *
- * This means a disappearing middle child consumes the spacing on
- * both sides symmetrically instead of arbitrarily owning the gap
- * preceding it.
- */
-internal fun calculateSpacings(presence: FloatArray, spacing: Int): IntArray {
-    if (presence.size <= 1 || spacing == 0) {
-        return IntArray(presence.size)
-    }
+private data class WeightSummary(val fixedHeight: Int, val totalWeight: Float, val hasVisibilityControlledWeight: Boolean)
 
-    val forward = calculateForwardSpacings(presence)
-
-    val result = IntArray(presence.size)
-    var accumulatedPresence = 0f
-    var previousGapCount = 0f
-
-    for (index in presence.lastIndex downTo 0) {
-        accumulatedPresence += presence[index].coerceIn(0f, 1f)
-
-        val gapCount = (accumulatedPresence - 1f).coerceAtLeast(0f)
-        val reverseSpacing = gapCount - previousGapCount
-
-        if (index < presence.lastIndex) {
-            result[index + 1] = (spacing * (forward[index + 1] + reverseSpacing) / 2f).roundToInt()
-        }
-
-        previousGapCount = gapCount
-    }
-
-    return result
+private data class AlignmentLineSpace(val before: Int = 0, val after: Int = 0) {
+    val width: Int get() = before + after
 }
 
-private fun calculateForwardSpacings(presence: FloatArray): FloatArray {
-    val result = FloatArray(presence.size)
-
-    var accumulatedPresence = 0f
-    var previousGapCount = 0f
-
-    repeat(presence.size) { index ->
-        accumulatedPresence += presence[index].coerceIn(0f, 1f)
-
-        val gapCount = (accumulatedPresence - 1f).coerceAtLeast(0f)
-
-        result[index] = gapCount - previousGapCount
-
-        previousGapCount = gapCount
+private fun List<Measurable>.parentData(): Array<AnimatedSpacingColumnParentData?> =
+    Array(size) { index ->
+        this[index].parentData as? AnimatedSpacingColumnParentData
     }
 
-    return result
-}
+private fun Array<AnimatedSpacingColumnParentData?>.presence(): FloatArray =
+    FloatArray(size) { index ->
+        this[index]?.presence?.value?.coerceIn(0f, 1f) ?: 1f
+    }
 
-/* Calculate ordinary Column-style weight allocations in linear time. */
-internal fun calculateOrdinaryWeightedAllocations(
-    availableSpace: Int,
+private fun measureFixedChildren(
+    measurables: List<Measurable>,
     parentData: Array<AnimatedSpacingColumnParentData?>,
-    totalWeight: Float = parentData.fold(0f) { total, data ->
-        total + (data?.weight ?: 0f)
-    }
-): IntArray {
-    val allocations = IntArray(parentData.size)
+    placeables: Array<Placeable?>,
+    constraints: Constraints,
+    totalSpacing: Int
+): WeightSummary {
+    val boundedHeight = constraints.maxHeight != Constraints.Infinity
+    var fixedHeight = 0
+    var totalWeight = 0f
+    var hasVisibilityControlledWeight = false
 
-    if (totalWeight == 0f || availableSpace == 0) {
-        return allocations
-    }
-
-    var allocationSum = 0f
-    var used = 0
-
-    parentData.forEachIndexed { index, data ->
+    measurables.forEachIndexed { index, measurable ->
+        val data = parentData[index]
         val weight = data?.weight ?: 0f
-        val allocation = availableSpace * weight / totalWeight
 
-        allocationSum += allocation
-        allocations[index] = floor(allocation).toInt().coerceAtLeast(0)
-        used += allocations[index]
+        if (boundedHeight && weight > 0f) {
+            totalWeight += weight
+            hasVisibilityControlledWeight = hasVisibilityControlledWeight || data?.visibilityControlled == true
+        } else {
+            val maxHeight = if (boundedHeight) {
+                (constraints.maxHeight - totalSpacing - fixedHeight).coerceAtLeast(0)
+            } else {
+                Constraints.Infinity
+            }
+            val placeable = measurable.measure(
+                Constraints(maxWidth = constraints.maxWidth, maxHeight = maxHeight)
+            )
+
+            placeables[index] = placeable
+            fixedHeight += placeable.height
+        }
     }
 
-    var remainder = allocationSum
-        .coerceAtMost(availableSpace.toFloat())
-        .roundToInt() - used
-
-    for (index in allocations.indices) {
-        if (remainder == 0) break
-        if ((parentData[index]?.weight ?: 0f) <= 0f) continue
-
-        allocations[index]++
-        remainder--
-    }
-
-    return allocations
+    return WeightSummary(fixedHeight, totalWeight, hasVisibilityControlledWeight)
 }
 
-/*
- * Begin with the normal fully-present weighted allocation.
- *
- * Each item's presence keeps that fraction of its normal allocation.
- * The disappearing part of its allocation is redistributed to visible
- * weighted siblings.
- *
- * Redistribution is symmetric: it depends only on sibling weights and
- * presence, never on child order.
- *
- * At presence 0/1 this produces ordinary Column weight semantics.
- * With one transitioning weighted item it linearly interpolates between
- * the two endpoint layouts.
- */
-internal fun calculateAnimatedWeightedAllocations(
-    availableSpace: Int,
+private fun measureWeightedChildren(
+    measurables: List<Measurable>,
     parentData: Array<AnimatedSpacingColumnParentData?>,
-    presence: FloatArray
-): IntArray {
-    val count = parentData.size
-    val weights = FloatArray(count) { index ->
-        parentData[index]?.weight ?: 0f
+    presence: FloatArray,
+    placeables: Array<Placeable?>,
+    constraints: Constraints,
+    totalSpacing: Int,
+    weightSummary: WeightSummary
+) {
+    if (constraints.maxHeight == Constraints.Infinity || weightSummary.totalWeight <= 0f) return
+
+    val availableHeight = (constraints.maxHeight - totalSpacing - weightSummary.fixedHeight).coerceAtLeast(0)
+    val allocations = calculateWeightAllocations(availableHeight, parentData, presence, weightSummary)
+
+    measurables.forEachIndexed { index, measurable ->
+        val data = parentData[index]?.takeIf { it.weight != null } ?: return@forEachIndexed
+        val measurementAllocation = data.measurementAllocation(
+            allocation = allocations[index],
+            presence = presence[index],
+            availableHeight = availableHeight
+        )
+        val minHeight = if (data.fill && !data.visibilityControlled) measurementAllocation else 0
+
+        placeables[index] = measurable.measure(
+            Constraints(
+                maxWidth = constraints.maxWidth,
+                minHeight = minHeight,
+                maxHeight = measurementAllocation
+            )
+        )
     }
-
-    val totalWeight = weights.sum()
-
-    if (totalWeight == 0f || availableSpace == 0) {
-        return IntArray(count)
-    }
-
-    val baseAllocations = FloatArray(count) { index ->
-        availableSpace *
-            weights[index] /
-            totalWeight
-    }
-
-    val allocations = FloatArray(count) { index ->
-        baseAllocations[index] *
-            presence[index].coerceIn(0f, 1f)
-    }
-
-    for (source in 0 until count) {
-        if (weights[source] == 0f) continue
-
-        val sourcePresence =
-            presence[source].coerceIn(0f, 1f)
-
-        val freedSpace =
-            baseAllocations[source] *
-                (1f - sourcePresence)
-
-        if (freedSpace == 0f) continue
-
-        var recipientWeight = 0f
-        var allOtherItemsAbsent = 1f
-
-        for (recipient in 0 until count) {
-            if (
-                recipient == source ||
-                weights[recipient] == 0f
-            ) {
-                continue
-            }
-
-            val recipientPresence =
-                presence[recipient].coerceIn(0f, 1f)
-
-            recipientWeight +=
-                weights[recipient] * recipientPresence
-
-            allOtherItemsAbsent *=
-                1f - recipientPresence
-        }
-
-        if (recipientWeight == 0f) continue
-
-        /*
-         * If all siblings are disappearing too, some flexible space
-         * should itself disappear rather than being endlessly
-         * redistributed between disappearing children.
-         */
-        val redistributionFraction =
-            1f - allOtherItemsAbsent
-
-        val redistributedSpace =
-            freedSpace * redistributionFraction
-
-        for (recipient in 0 until count) {
-            if (
-                recipient == source ||
-                weights[recipient] == 0f
-            ) {
-                continue
-            }
-
-            val effectiveWeight =
-                weights[recipient] *
-                    presence[recipient].coerceIn(0f, 1f)
-
-            allocations[recipient] +=
-                redistributedSpace *
-                    effectiveWeight /
-                    recipientWeight
-        }
-    }
-
-    return allocations.roundAllocations(
-        maximum = availableSpace
-    )
 }
 
-private fun FloatArray.roundAllocations(maximum: Int): IntArray {
-    val result = IntArray(size)
-
-    val target = sum()
-        .coerceAtMost(maximum.toFloat())
-        .roundToInt()
-
-    var used = 0
-
-    indices.forEach { index ->
-        result[index] =
-            floor(this[index])
-                .toInt()
-                .coerceAtLeast(0)
-
-        used += result[index]
+private fun calculateWeightAllocations(
+    availableHeight: Int,
+    parentData: Array<AnimatedSpacingColumnParentData?>,
+    presence: FloatArray,
+    weightSummary: WeightSummary
+): IntArray =
+    if (weightSummary.hasVisibilityControlledWeight) {
+        calculateAnimatedWeightedAllocations(availableHeight, parentData, presence)
+    } else {
+        calculateOrdinaryWeightedAllocations(availableHeight, parentData, weightSummary.totalWeight)
     }
 
-    var remainder = target - used
+private fun AnimatedSpacingColumnParentData.measurementAllocation(
+    allocation: Int,
+    presence: Float,
+    availableHeight: Int
+): Int =
+    if (visibilityControlled && presence > 0f) {
+        (allocation / presence).roundToInt().coerceIn(0, availableHeight)
+    } else {
+        allocation
+    }
 
-    while (remainder > 0) {
-        var distributed = false
+private fun Array<Placeable?>.contentSize(totalSpacing: Int): IntSize {
+    var width = 0
+    var height = totalSpacing
 
-        for (index in indices) {
-            if (
-                remainder == 0 ||
-                this[index] <= 0f
-            ) {
-                continue
-            }
+    forEach { placeable ->
+        placeable ?: return@forEach
+        width = maxOf(width, placeable.width)
+        height += placeable.height
+    }
 
-            result[index]++
-            remainder--
-            distributed = true
+    return IntSize(width, height)
+}
+
+private fun Array<Placeable?>.alignmentLineSpace(parentData: Array<AnimatedSpacingColumnParentData?>): AlignmentLineSpace {
+    var before = 0
+    var after = 0
+
+    forEachIndexed { index, placeable ->
+        placeable ?: return@forEachIndexed
+        val alignment = parentData[index]?.crossAxisAlignment as? CrossAxisAlignment.Relative ?: return@forEachIndexed
+        val linePosition = alignment.provider.position(placeable)
+
+        if (linePosition != AlignmentLine.Unspecified) {
+            before = maxOf(before, linePosition)
+            after = maxOf(after, placeable.width - linePosition)
         }
-
-        if (!distributed) break
     }
 
-    return result
+    return AlignmentLineSpace(before, after)
+}
+
+private fun Placeable.horizontalPosition(
+    parentData: AnimatedSpacingColumnParentData?,
+    defaultAlignment: Alignment.Horizontal,
+    alignmentLineSpace: AlignmentLineSpace,
+    width: Int,
+    layoutDirection: LayoutDirection
+): Int =
+    when (val alignment = parentData?.crossAxisAlignment) {
+        is CrossAxisAlignment.Horizontal -> alignment.alignment.align(this.width, width, layoutDirection)
+        is CrossAxisAlignment.Relative -> alignmentLinePosition(alignment, alignmentLineSpace, width, layoutDirection)
+        null -> defaultAlignment.align(this.width, width, layoutDirection)
+    }
+
+private fun Placeable.alignmentLinePosition(
+    alignment: CrossAxisAlignment.Relative,
+    alignmentLineSpace: AlignmentLineSpace,
+    width: Int,
+    layoutDirection: LayoutDirection
+): Int {
+    val linePosition = alignment.provider.position(this)
+    if (linePosition == AlignmentLine.Unspecified) return 0
+
+    val offset = alignmentLineSpace.before - linePosition
+    return if (layoutDirection == LayoutDirection.Ltr) offset else width - this.width - offset
 }
