@@ -1,21 +1,16 @@
 package com.w2sv.composed.playground.animatedspacing
 
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.spring
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -25,78 +20,61 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.w2sv.composed.ui.layout.AnimatedSpacingColumn
+import com.w2sv.composed.playground.shared.PlaygroundDefaults
 import com.w2sv.composed.ui.layout.ExperimentalAnimatedSpacingApi
 
 @Composable
 @OptIn(ExperimentalAnimatedSpacingApi::class)
 fun AnimatedSpacingSample() {
-    var firstVisible by remember { mutableStateOf(true) }
-    var middleVisible by remember { mutableStateOf(true) }
-    var lastVisible by remember { mutableStateOf(true) }
+    val defaultConfiguration = remember { AnimatedSpacingConfiguration() }
+    var configuration by remember { mutableStateOf(defaultConfiguration) }
+    var visibility by remember { mutableStateOf(AnimatedSpacingVisibility()) }
 
-    Column(Modifier.padding(32.dp)) {
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            Button(onClick = { firstVisible = !firstVisible }) {
-                Text("A")
-            }
-
-            Button(onClick = { middleVisible = !middleVisible }) {
-                Text("B")
-            }
-
-            Button(onClick = { lastVisible = !lastVisible }) {
-                Text("C")
-            }
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        floatingActionButton = {
+            AnimatedSpacingActionsCard(
+                allVisible = visibility.allVisible,
+                onToggleAll = {
+                    visibility = if (visibility.allVisible) AnimatedSpacingVisibility.none() else AnimatedSpacingVisibility()
+                },
+                onReset = {
+                    configuration = defaultConfiguration
+                    visibility = AnimatedSpacingVisibility()
+                }
+            )
         }
-
-        Spacer(Modifier.height(32.dp))
-
-        AnimatedSpacingColumn(
-            spacing = 24.dp,
-            modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.secondaryContainer, shape = MaterialTheme.shapes.medium)
-        ) {
-            AnimatedVisibility(
-                visible = firstVisible,
-                animationSpec = spring(Spring.DampingRatioHighBouncy)
-            ) {
-                Item("A")
-            }
-
-            AnimatedVisibility(
-                visible = middleVisible,
-                animationSpec = spring(Spring.DampingRatioHighBouncy)
-            ) {
-                Item("B")
-            }
-
-            AnimatedVisibility(
-                visible = lastVisible,
-                animationSpec = spring(Spring.DampingRatioHighBouncy)
-            ) {
-                Item("C")
-            }
-
-            Spacer(Modifier.weight(1f))
-
-            Item("Footer")
+    ) { contentPadding ->
+        Box(Modifier.fillMaxSize().padding(contentPadding)) {
+            AnimatedSpacingLayout(
+                configuration = configuration,
+                onConfigurationChange = { configuration = it },
+                visibility = visibility,
+                onVisibilityChange = { visibility = it },
+                modifier = Modifier.fillMaxSize()
+            )
         }
     }
 }
 
 @Composable
-private fun Item(label: String) {
-    Surface(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(64.dp),
-        shape = RoundedCornerShape(12.dp),
-        tonalElevation = 2.dp
+private fun AnimatedSpacingActionsCard(
+    allVisible: Boolean,
+    onToggleAll: () -> Unit,
+    onReset: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.85f))
     ) {
-        Box(contentAlignment = Alignment.Center) {
-            Text(label)
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(PlaygroundDefaults.CompactSpacing),
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
+        ) {
+            OutlinedButton(onClick = onReset) { Text("Reset") }
+            Button(onClick = onToggleAll) { Text(if (allVisible) "Hide all" else "Show all") }
         }
     }
 }

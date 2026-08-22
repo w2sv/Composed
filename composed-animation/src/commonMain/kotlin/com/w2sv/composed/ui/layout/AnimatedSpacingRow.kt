@@ -22,8 +22,32 @@ import com.w2sv.composed.ui.layout.animatedspacing.animatedSpacingRowAlign
 import com.w2sv.composed.ui.layout.animatedspacing.animatedSpacingRowAlignBy
 
 /**
- * A row whose spacing responds to the visibility progress of children added through
- * [AnimatedSpacingRowScope.AnimatedVisibility].
+ * Places children horizontally and animates both a child's occupied width and its surrounding spacing when the child
+ * is emitted by [AnimatedSpacingRowScope.AnimatedVisibility].
+ *
+ * Unlike [androidx.compose.foundation.layout.Row], spacing is derived from the visibility progress of adjacent children.
+ * This keeps the gap on both sides of an entering or leaving child visually symmetric. The animation is driven during
+ * measurement: it does not use lookahead and does not recompose the layout for each animation frame. Child-specific
+ * vertical alignment, baselines, alignment lines, and [RowScope.weight] retain their usual scope semantics. When a
+ * weighted animated child disappears, its released allocation is progressively redistributed among the other visible
+ * weighted children. Placement follows layout direction, including RTL order.
+ *
+ * This layout is eager and is not a replacement for a lazy list. It supports one fixed, non-negative [spacing] value
+ * rather than the complete set of stock `Arrangement.Horizontal` strategies. Only children wrapped in
+ * [AnimatedSpacingRowScope.AnimatedVisibility] participate in animated spacing, and the visibility wrapper overlays
+ * multiple direct content children at the same origin. Intrinsic measurement is not specialized.
+ *
+ * With no visibility-controlled children, measurement and ordinary weight allocation are O(n), matching the
+ * asymptotic cost of a stock [androidx.compose.foundation.layout.Row], though this custom layout still has its own
+ * parent-data and measurement overhead. Animated spacing remains O(n). Visibility-controlled weighted children use
+ * O(n²) redistribution so each disappearing child's released share can account for every eligible recipient, and
+ * fading/clipping adds a graphics layer per animated child.
+ *
+ * @param spacing fixed distance between fully visible adjacent children. It must not be negative.
+ * @param modifier modifier applied to the layout.
+ * @param verticalAlignment default vertical alignment for children that do not provide a scope-specific alignment.
+ * @param content children placed by the row. Use [AnimatedSpacingRowScope.AnimatedVisibility] for children whose
+ * occupied width and adjacent spacing should animate.
  */
 @Composable
 @ExperimentalAnimatedSpacingApi
@@ -46,12 +70,32 @@ fun AnimatedSpacingRow(
     )
 }
 
+/**
+ * Receiver scope for [AnimatedSpacingRow]. It provides the standard [RowScope] parent-data modifiers together with
+ * visibility whose size, spacing, fade, and weighted allocation share one animation progress.
+ */
 @LayoutScopeMarker
 @Immutable
 @ExperimentalAnimatedSpacingApi
 interface AnimatedSpacingRowScope : RowScope {
 
-    /** Animates a child's width, optional fade, surrounding spacing, and weighted allocation. */
+    /**
+     * Emits [content] while entering or leaving and animates its occupied width between zero and the measured content
+     * width. The parent row uses the same progress to animate spacing symmetrically on both sides.
+     *
+     * The content is clipped to the animated width and can optionally fade on a graphics layer. If this modifier has
+     * [RowScope.weight], the visible share of its allocation follows the animation progress and released space is
+     * redistributed among visible weighted siblings. Multiple direct children are measured as an overlay rather than
+     * arranged in a row; wrap them in a layout when more than one child is required.
+     *
+     * @param visible whether the content should occupy its full measured width.
+     * @param modifier modifier applied to the visibility wrapper. Row scope modifiers such as `weight`, `align`, and
+     * `alignBy` are supported.
+     * @param animationSpec animation used for the shared visibility-progress value.
+     * @param fade whether to apply the visibility progress as alpha in addition to clipping the width.
+     * @param label label used for Compose animation tooling.
+     * @param content content shown while the transition's current or target state is visible.
+     */
     @Composable
     fun AnimatedVisibility(
         visible: Boolean,

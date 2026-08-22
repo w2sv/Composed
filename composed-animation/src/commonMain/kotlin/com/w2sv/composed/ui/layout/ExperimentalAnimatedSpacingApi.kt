@@ -1,6 +1,11 @@
 package com.w2sv.composed.ui.layout
 
-/** Marks APIs for animated spacing layouts that may change incompatibly. */
+/**
+ * Marks animated spacing layout APIs whose names, measurement semantics, or weight redistribution behavior may change
+ * based on usage feedback.
+ *
+ * Opting in acknowledges that source and binary compatibility is not guaranteed while the API remains experimental.
+ */
 @RequiresOptIn(
     message = "Animated spacing layout APIs are experimental and may change without notice.",
     level = RequiresOptIn.Level.WARNING

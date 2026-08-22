@@ -129,6 +129,58 @@ LazyVerticalGrid(
 The API also supports horizontal grids. You can implement your own LazyGridItemEntranceDelay strategies,
 configure whether an item animation should be shown on every composition or only once per key, and more.
 
+### Animated spacing rows and columns
+
+Using `AnimatedVisibility` inside a stock `Column(verticalArrangement = Arrangement.spacedBy(...))` leaves the
+arrangement spacing outside the visibility animation. The child collapses, but the full gap remains until composition
+changes, which can produce an empty gap or a visible jump. `AnimatedSpacingColumn` animates that spacing together with
+the child's occupied height and keeps the gaps on both sides symmetric. `AnimatedSpacingRow` provides the equivalent
+behavior for a horizontal layout.
+
+```kotlin
+// The 12.dp gaps do not participate in AnimatedVisibility's transition.
+Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+    AnimatedVisibility(visible = firstVisible) { FirstFilter() }
+    AnimatedVisibility(visible = secondVisible) { SecondFilter() }
+}
+```
+
+Use the animated-spacing scope instead:
+
+```kotlin
+@OptIn(ExperimentalAnimatedSpacingApi::class)
+@Composable
+fun FilterList(filters: List<Filter>, selectedFilters: Set<Filter>) {
+    AnimatedSpacingColumn(
+        spacing = 12.dp,
+        horizontalAlignment = Alignment.Start
+    ) {
+        filters.forEach { filter ->
+            AnimatedVisibility(
+                visible = filter in selectedFilters,
+                animationSpec = spring(),
+                label = "${filter.id}:visibility"
+            ) {
+                FilterChip(
+                    selected = true,
+                    onClick = { /* ... */ },
+                    label = { Text(filter.label) }
+                )
+            }
+        }
+    }
+}
+```
+
+Both layouts retain the respective stock scope's weight and alignment modifiers, including alignment lines and row
+baselines. Animated weighted children progressively release and redistribute their allocation as they disappear.
+Animation is measurement-driven—without lookahead or per-frame recomposition—and ordinary, non-animated weights stay
+on an O(n) path.
+
+These are eager experimental layouts, not lazy containers or drop-in replacements for every `Row`/`Column` arrangement.
+They support fixed spacing, add a clipping graphics layer around animated children, and weighted redistribution involving
+visibility-controlled weighted children is O(n²). See the API reference for the complete behavior and limitations.
+
 ### Snackbar launching
 
 Show snackbars from event handlers without manually carrying around a `SnackbarHostState`, `CoroutineScope`, and, on Android, a `Context`:
@@ -195,7 +247,7 @@ to hidden.
 | Module               | Description                                                                      |
 |----------------------|----------------------------------------------------------------------------------|
 | `composed-core`      | General-purpose Compose utilities. Contains also Android-only utilities.         |
-| `composed-animation` | Reusable Compose animation controllers and lazy-grid entrance effects.           |
+| `composed-animation` | Reusable animation controllers, animated spacing layouts, and lazy-grid entrances. |
 | `composed-material3` | Utilities and extensions for Compose Material 3 layouts, drawers, and snackbars. |
 
 Android permission-state utilities are available separately
