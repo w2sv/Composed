@@ -6,6 +6,7 @@ import androidx.compose.animation.core.updateTransition
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.Layout
@@ -16,6 +17,7 @@ import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.constrainHeight
 import androidx.compose.ui.unit.constrainWidth
 import kotlin.math.roundToInt
@@ -24,24 +26,50 @@ import kotlin.math.roundToInt
 internal fun AnimatedSpacingColumnVisibility(
     visible: Boolean,
     modifier: Modifier,
+    expandFrom: Alignment.Vertical,
+    shrinkTowards: Alignment.Vertical,
     animationSpec: FiniteAnimationSpec<Float>,
     fade: Boolean,
     label: String,
     content: @Composable () -> Unit
 ) {
-    AnimatedSpacingVisibility(visible, modifier, animationSpec, fade, label, VisibilityAxis.Vertical, content)
+    val structuralAlignment = remember(expandFrom, shrinkTowards) {
+        StructuralAlignment.Vertical(expandFrom, shrinkTowards)
+    }
+    AnimatedSpacingVisibility(
+        visible = visible,
+        modifier = modifier,
+        animationSpec = animationSpec,
+        fade = fade,
+        label = label,
+        structuralAlignment = structuralAlignment,
+        content = content
+    )
 }
 
 @Composable
 internal fun AnimatedSpacingRowVisibility(
     visible: Boolean,
     modifier: Modifier,
+    expandFrom: Alignment.Horizontal,
+    shrinkTowards: Alignment.Horizontal,
     animationSpec: FiniteAnimationSpec<Float>,
     fade: Boolean,
     label: String,
     content: @Composable () -> Unit
 ) {
-    AnimatedSpacingVisibility(visible, modifier, animationSpec, fade, label, VisibilityAxis.Horizontal, content)
+    val structuralAlignment = remember(expandFrom, shrinkTowards) {
+        StructuralAlignment.Horizontal(expandFrom, shrinkTowards)
+    }
+    AnimatedSpacingVisibility(
+        visible = visible,
+        modifier = modifier,
+        animationSpec = animationSpec,
+        fade = fade,
+        label = label,
+        structuralAlignment = structuralAlignment,
+        content = content
+    )
 }
 
 @Composable
@@ -51,7 +79,7 @@ private fun AnimatedSpacingVisibility(
     animationSpec: FiniteAnimationSpec<Float>,
     fade: Boolean,
     label: String,
-    axis: VisibilityAxis,
+    structuralAlignment: StructuralAlignment,
     content: @Composable () -> Unit
 ) {
     val transition = updateTransition(targetState = visible, label = label)
@@ -71,22 +99,63 @@ private fun AnimatedSpacingVisibility(
                 clip = true
                 if (fade) alpha = presence.value.coerceIn(0f, 1f)
             },
-        measurePolicy = remember(presence, fillWeightedSpace, axis) {
-            VisibilityMeasurePolicy(presence, fillWeightedSpace == true, axis)
+        measurePolicy = remember(presence, fillWeightedSpace, structuralAlignment, transition.targetState) {
+            VisibilityMeasurePolicy(
+                presence = presence,
+                fillWeightedSpace = fillWeightedSpace == true,
+                structuralAlignment = structuralAlignment,
+                expanding = transition.targetState
+            )
         }
     )
 }
 
 internal enum class VisibilityAxis { Horizontal, Vertical }
 
+internal sealed interface StructuralAlignment {
+    val axis: VisibilityAxis
+
+    fun mainAxisOffset(
+        contentSize: Int,
+        animatedSize: Int,
+        layoutDirection: LayoutDirection,
+        expanding: Boolean
+    ): Int
+
+    data class Vertical(val expandFrom: Alignment.Vertical, val shrinkTowards: Alignment.Vertical) : StructuralAlignment {
+        override val axis = VisibilityAxis.Vertical
+
+        override fun mainAxisOffset(
+            contentSize: Int,
+            animatedSize: Int,
+            layoutDirection: LayoutDirection,
+            expanding: Boolean
+        ): Int =
+            (if (expanding) expandFrom else shrinkTowards).align(contentSize, animatedSize)
+    }
+
+    data class Horizontal(val expandFrom: Alignment.Horizontal, val shrinkTowards: Alignment.Horizontal) : StructuralAlignment {
+        override val axis = VisibilityAxis.Horizontal
+
+        override fun mainAxisOffset(
+            contentSize: Int,
+            animatedSize: Int,
+            layoutDirection: LayoutDirection,
+            expanding: Boolean
+        ): Int =
+            (if (expanding) expandFrom else shrinkTowards).align(contentSize, animatedSize, layoutDirection)
+    }
+}
+
 internal class VisibilityMeasurePolicy(
     private val presence: State<Float>,
     private val fillWeightedSpace: Boolean,
-    private val axis: VisibilityAxis = VisibilityAxis.Vertical
+    private val structuralAlignment: StructuralAlignment = StructuralAlignment.Vertical(Alignment.Top, Alignment.Top),
+    private val expanding: Boolean = true
 ) : MeasurePolicy {
 
     override fun MeasureScope.measure(measurables: List<Measurable>, constraints: Constraints): MeasureResult {
-        val childConstraints = when (axis) {
+        val childConstraints = when (structuralAlignment.axis) {
             VisibilityAxis.Horizontal -> constraints.copy(
                 minWidth = if (fillWeightedSpace && constraints.maxWidth != Constraints.Infinity) constraints.maxWidth else 0
             )
@@ -98,14 +167,33 @@ internal class VisibilityMeasurePolicy(
         val placeables = Array(measurables.size) { index -> measurables[index].measure(childConstraints) }
         val contentSize = placeables.maxContentSize()
         val progress = presence.value.coerceIn(0f, 1f)
-        val animatedWidth = if (axis == VisibilityAxis.Horizontal) (contentSize.width * progress).roundToInt() else contentSize.width
-        val animatedHeight = if (axis == VisibilityAxis.Vertical) (contentSize.height * progress).roundToInt() else contentSize.height
+        val animatedWidth = if (structuralAlignment.axis == VisibilityAxis.Horizontal) {
+            (contentSize.width * progress).roundToInt()
+        } else {
+            contentSize.width
+        }
+        val animatedHeight = if (structuralAlignment.axis == VisibilityAxis.Vertical) {
+            (contentSize.height * progress).roundToInt()
+        } else {
+            contentSize.height
+        }
+        val width = constraints.constrainWidth(animatedWidth)
+        val height = constraints.constrainHeight(animatedHeight)
+        val mainAxisOffset = structuralAlignment.mainAxisOffset(
+            contentSize = if (structuralAlignment.axis == VisibilityAxis.Horizontal) contentSize.width else contentSize.height,
+            animatedSize = if (structuralAlignment.axis == VisibilityAxis.Horizontal) width else height,
+            layoutDirection = layoutDirection,
+            expanding = expanding
+        )
 
-        return layout(
-            width = constraints.constrainWidth(animatedWidth),
-            height = constraints.constrainHeight(animatedHeight)
-        ) {
-            placeables.forEach { it.placeRelative(0, 0) }
+        return layout(width, height) {
+            placeables.forEach {
+                if (structuralAlignment.axis == VisibilityAxis.Horizontal) {
+                    it.place(mainAxisOffset, 0)
+                } else {
+                    it.place(0, mainAxisOffset)
+                }
+            }
         }
     }
 }

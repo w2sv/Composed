@@ -7,6 +7,7 @@ import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
+import kotlin.math.roundToInt
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -143,6 +144,54 @@ class AnimatedSpacingColumnMeasurePolicyTest {
         assertEquals(IntSize(20, 25), animated.placeable.size)
         assertEquals(75, ordinary.measuredConstraints.minHeight)
         assertEquals(75, ordinary.measuredConstraints.maxHeight)
+    }
+
+    @Test
+    fun `measure realizes allocations for multiple animated weighted children`() {
+        val weights = floatArrayOf(1f, 2f, 4f)
+        val presences = floatArrayOf(0.2f, 0.55f, 0.8f)
+        val parentData = arrayOfNulls<AnimatedSpacingParentData>(weights.size)
+        weights.indices.forEach { index ->
+            AnimatedSpacingParentData(
+                weight = weights[index],
+                presence = mutableStateOf(presences[index]),
+                visibilityControlled = true
+            ).also { parentData[index] = it }
+        }
+        val expected = calculateAnimatedWeightedAllocations(101, parentData, presences)
+        val measurables = List(weights.size) { index ->
+            TestMeasurable(20, 0, parentData[index]) { constraints ->
+                IntSize(20, (constraints.maxHeight * presences[index]).roundToInt())
+            }
+        }
+
+        measureColumn(measurables, Constraints(maxWidth = 100, maxHeight = 101))
+
+        assertEquals(expected.toList(), measurables.map { it.placeable.height })
+    }
+
+    @Test
+    fun `animated weighted measurement may exceed available space to realize its occupied allocation`() {
+        val presences = floatArrayOf(0.05f, 0.5f)
+        val parentData = arrayOfNulls<AnimatedSpacingParentData>(2)
+        parentData.indices.forEach { index ->
+            AnimatedSpacingParentData(
+                weight = if (index == 0) 1f else 3f,
+                presence = mutableStateOf(presences[index]),
+                visibilityControlled = true
+            ).also { parentData[index] = it }
+        }
+        val expected = calculateAnimatedWeightedAllocations(1, parentData, presences)
+        val measurables = List(2) { index ->
+            TestMeasurable(20, 0, parentData[index]) { constraints ->
+                IntSize(20, (constraints.maxHeight * presences[index]).roundToInt())
+            }
+        }
+
+        measureColumn(measurables, Constraints(maxWidth = 100, maxHeight = 1))
+
+        assertEquals(expected.toList(), measurables.map { it.placeable.height })
+        assertEquals(20, measurables.first().measuredConstraints.maxHeight)
     }
 
     @Test

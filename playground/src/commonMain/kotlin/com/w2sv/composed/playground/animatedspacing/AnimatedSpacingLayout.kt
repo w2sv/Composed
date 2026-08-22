@@ -82,13 +82,28 @@ private fun AnimatedColumnPreview(configuration: AnimatedSpacingConfiguration, v
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         if (configuration.weighted) {
-            AnimatedVisibility(visibility.first, Modifier.weight(1f), configuration.animationSpec, configuration.fade) {
+            AnimatedVisibility(
+                visible = visibility.first,
+                modifier = Modifier.weight(1f),
+                animationSpec = configuration.animationSpec,
+                fade = configuration.fade
+            ) {
                 DemoItem("A", MaterialTheme.colorScheme.primaryContainer, Modifier.fillMaxSize())
             }
-            AnimatedVisibility(visibility.middle, Modifier.weight(1f), configuration.animationSpec, configuration.fade) {
+            AnimatedVisibility(
+                visible = visibility.middle,
+                modifier = Modifier.weight(1f),
+                animationSpec = configuration.animationSpec,
+                fade = configuration.fade
+            ) {
                 DemoItem("B", MaterialTheme.colorScheme.secondaryContainer, Modifier.fillMaxSize())
             }
-            AnimatedVisibility(visibility.last, Modifier.weight(1f), configuration.animationSpec, configuration.fade) {
+            AnimatedVisibility(
+                visible = visibility.last,
+                modifier = Modifier.weight(1f),
+                animationSpec = configuration.animationSpec,
+                fade = configuration.fade
+            ) {
                 DemoItem("C", MaterialTheme.colorScheme.tertiaryContainer, Modifier.fillMaxSize())
             }
         } else {
@@ -114,13 +129,28 @@ private fun AnimatedRowPreview(configuration: AnimatedSpacingConfiguration, visi
         verticalAlignment = Alignment.CenterVertically
     ) {
         if (configuration.weighted) {
-            AnimatedVisibility(visibility.first, Modifier.weight(1f), configuration.animationSpec, configuration.fade) {
+            AnimatedVisibility(
+                visible = visibility.first,
+                modifier = Modifier.weight(1f),
+                animationSpec = configuration.animationSpec,
+                fade = configuration.fade
+            ) {
                 DemoItem("A", MaterialTheme.colorScheme.primaryContainer, Modifier.fillMaxSize())
             }
-            AnimatedVisibility(visibility.middle, Modifier.weight(1f), configuration.animationSpec, configuration.fade) {
+            AnimatedVisibility(
+                visible = visibility.middle,
+                modifier = Modifier.weight(1f),
+                animationSpec = configuration.animationSpec,
+                fade = configuration.fade
+            ) {
                 DemoItem("B", MaterialTheme.colorScheme.secondaryContainer, Modifier.fillMaxSize())
             }
-            AnimatedVisibility(visibility.last, Modifier.weight(1f), configuration.animationSpec, configuration.fade) {
+            AnimatedVisibility(
+                visible = visibility.last,
+                modifier = Modifier.weight(1f),
+                animationSpec = configuration.animationSpec,
+                fade = configuration.fade
+            ) {
                 DemoItem("C", MaterialTheme.colorScheme.tertiaryContainer, Modifier.fillMaxSize())
             }
         } else {

@@ -85,6 +85,8 @@ interface AnimatedSpacingColumnScope : ColumnScope {
      * @param visible whether the content should occupy its full measured height.
      * @param modifier modifier applied to the visibility wrapper. Column scope modifiers such as `weight`, `align`, and
      * `alignBy` are supported.
+     * @param expandFrom edge from which content is structurally revealed while entering.
+     * @param shrinkTowards edge towards which content structurally collapses while exiting.
      * @param animationSpec animation used for the shared visibility-progress value.
      * @param fade whether to apply the visibility progress as alpha in addition to clipping the height. This is a
      * temporary, deliberately limited visual-effect option. It is expected to be replaced by a Compose-native
@@ -97,6 +99,8 @@ interface AnimatedSpacingColumnScope : ColumnScope {
     fun AnimatedVisibility(
         visible: Boolean,
         modifier: Modifier = Modifier,
+        expandFrom: Alignment.Vertical = Alignment.Top,
+        shrinkTowards: Alignment.Vertical = Alignment.Top,
         animationSpec: FiniteAnimationSpec<Float> = spring(),
         fade: Boolean = true,
         label: String = "AnimatedVisibility",
@@ -123,6 +127,8 @@ private object AnimatedSpacingColumnScopeInstance : AnimatedSpacingColumnScope {
     override fun AnimatedVisibility(
         visible: Boolean,
         modifier: Modifier,
+        expandFrom: Alignment.Vertical,
+        shrinkTowards: Alignment.Vertical,
         animationSpec: FiniteAnimationSpec<Float>,
         fade: Boolean,
         label: String,
@@ -131,6 +137,8 @@ private object AnimatedSpacingColumnScopeInstance : AnimatedSpacingColumnScope {
         AnimatedSpacingColumnVisibility(
             visible = visible,
             modifier = modifier,
+            expandFrom = expandFrom,
+            shrinkTowards = shrinkTowards,
             animationSpec = animationSpec,
             fade = fade,
             label = label,

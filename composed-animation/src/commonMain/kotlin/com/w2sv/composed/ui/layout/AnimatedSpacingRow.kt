@@ -86,6 +86,8 @@ interface AnimatedSpacingRowScope : RowScope {
      * @param visible whether the content should occupy its full measured width.
      * @param modifier modifier applied to the visibility wrapper. Row scope modifiers such as `weight`, `align`, and
      * `alignBy` are supported.
+     * @param expandFrom logical or absolute edge from which content is structurally revealed while entering.
+     * @param shrinkTowards logical or absolute edge towards which content structurally collapses while exiting.
      * @param animationSpec animation used for the shared visibility-progress value.
      * @param fade whether to apply the visibility progress as alpha in addition to clipping the width. This is a
      * temporary, deliberately limited visual-effect option. It is expected to be replaced by a Compose-native
@@ -98,6 +100,8 @@ interface AnimatedSpacingRowScope : RowScope {
     fun AnimatedVisibility(
         visible: Boolean,
         modifier: Modifier = Modifier,
+        expandFrom: Alignment.Horizontal = Alignment.Start,
+        shrinkTowards: Alignment.Horizontal = Alignment.Start,
         animationSpec: FiniteAnimationSpec<Float> = spring(),
         fade: Boolean = true,
         label: String = "AnimatedVisibility",
@@ -127,11 +131,22 @@ private object AnimatedSpacingRowScopeInstance : AnimatedSpacingRowScope {
     override fun AnimatedVisibility(
         visible: Boolean,
         modifier: Modifier,
+        expandFrom: Alignment.Horizontal,
+        shrinkTowards: Alignment.Horizontal,
         animationSpec: FiniteAnimationSpec<Float>,
         fade: Boolean,
         label: String,
         content: @Composable () -> Unit
     ) {
-        AnimatedSpacingRowVisibility(visible, modifier, animationSpec, fade, label, content)
+        AnimatedSpacingRowVisibility(
+            visible = visible,
+            modifier = modifier,
+            expandFrom = expandFrom,
+            shrinkTowards = shrinkTowards,
+            animationSpec = animationSpec,
+            fade = fade,
+            label = label,
+            content = content
+        )
     }
 }

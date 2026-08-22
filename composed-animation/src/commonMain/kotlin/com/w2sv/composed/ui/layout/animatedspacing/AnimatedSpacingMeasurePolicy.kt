@@ -236,7 +236,7 @@ private fun measureAnimatedWeightedChildren(
         val itemPresence = presence[index]
         val allocation = allocations[index]
         val measuredAllocation = if (data.visibilityControlled && itemPresence > 0f) {
-            (allocation / itemPresence).roundToInt().coerceIn(0, available)
+            (allocation / itemPresence).roundToInt().coerceAtLeast(0)
         } else {
             allocation
         }
@@ -290,9 +290,19 @@ private fun Constraints.weightedChildConstraints(
     orientation: AnimatedSpacingOrientation
 ) =
     if (orientation == AnimatedSpacingOrientation.Vertical) {
-        Constraints(maxWidth = maxWidth, minHeight = minimum, maxHeight = maximum)
+        Constraints.fitPrioritizingHeight(
+            minWidth = 0,
+            maxWidth = maxWidth,
+            minHeight = minimum,
+            maxHeight = maximum
+        )
     } else {
-        Constraints(minWidth = minimum, maxWidth = maximum, maxHeight = maxHeight)
+        Constraints.fitPrioritizingWidth(
+            minWidth = minimum,
+            maxWidth = maximum,
+            minHeight = 0,
+            maxHeight = maxHeight
+        )
     }
 
 private fun Constraints.constrainMain(value: Int, orientation: AnimatedSpacingOrientation) =
