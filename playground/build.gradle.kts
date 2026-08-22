@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
+
 plugins {
     id("w2sv.cmp")
     id("w2sv.kmp")
@@ -12,6 +14,17 @@ kotlin {
     }
 
     jvm()
+
+    @OptIn(ExperimentalWasmDsl::class)
+    wasmJs {
+        outputModuleName = "composed-playground"
+        browser {
+            commonWebpackConfig {
+                outputFileName = "composed-playground.js"
+            }
+        }
+        binaries.executable()
+    }
 
     sourceSets {
         commonMain.dependencies {

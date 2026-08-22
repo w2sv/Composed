@@ -311,18 +311,24 @@ dependencies {
 }
 ```
 
-## 🖥️ Desktop playground
+## 🖥️ Playground
 
-The [`playground`](playground) module contains a Compose Desktop app for interactively
-testing visual and behavioral APIs.
+The [`playground`](playground) module contains Compose Desktop and Wasm browser apps for
+interactively testing visual and behavioral APIs.
 
-Run it with:
+Run the desktop app with:
 
 ```bash
 ./gradlew :playground:run [--args=<sample-id>]
 ```
 
-Without the --args option provided, the playground opens a sample picker.
+Or run the Wasm app in a development server with:
+
+```bash
+./gradlew :playground:wasmJsBrowserDevelopmentRun
+```
+
+Without a desktop `--args` option, the playground opens a sample picker.
 To see the available sample IDs and detailed usage instructions, run
 
 ```bash
