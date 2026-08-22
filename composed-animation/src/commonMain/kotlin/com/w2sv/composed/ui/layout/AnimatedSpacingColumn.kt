@@ -14,6 +14,12 @@ import androidx.compose.ui.layout.Measured
 import androidx.compose.ui.layout.VerticalAlignmentLine
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.w2sv.composed.ui.layout.animatedspacing.AlignmentLineProvider
+import com.w2sv.composed.ui.layout.animatedspacing.AnimatedSpacingColumnMeasurePolicy
+import com.w2sv.composed.ui.layout.animatedspacing.AnimatedSpacingColumnVisibility
+import com.w2sv.composed.ui.layout.animatedspacing.animatedSpacingColumnAlign
+import com.w2sv.composed.ui.layout.animatedspacing.animatedSpacingColumnAlignBy
+import com.w2sv.composed.ui.layout.animatedspacing.animatedSpacingColumnWeight
 
 /**
  * A column whose spacing responds to the visibility progress of children added through

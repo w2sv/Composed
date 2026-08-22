@@ -1,4 +1,4 @@
-package com.w2sv.composed.ui.layout
+package com.w2sv.composed.ui.layout.animatedspacing
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment

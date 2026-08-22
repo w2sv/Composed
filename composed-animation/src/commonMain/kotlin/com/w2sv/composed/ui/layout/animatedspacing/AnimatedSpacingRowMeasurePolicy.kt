@@ -1,4 +1,4 @@
-package com.w2sv.composed.ui.layout
+package com.w2sv.composed.ui.layout.animatedspacing
 
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.layout.AlignmentLine
@@ -11,7 +11,7 @@ import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 
-internal class AnimatedSpacingColumnMeasurePolicy(private val spacing: Dp, private val horizontalAlignment: Alignment.Horizontal) :
+internal class AnimatedSpacingRowMeasurePolicy(private val spacing: Dp, private val verticalAlignment: Alignment.Vertical) :
     MeasurePolicy,
     CrossAxisPosition {
     override fun MeasureScope.measure(measurables: List<Measurable>, constraints: Constraints): MeasureResult =
@@ -19,8 +19,8 @@ internal class AnimatedSpacingColumnMeasurePolicy(private val spacing: Dp, priva
             measurables,
             constraints,
             spacing,
-            AnimatedSpacingOrientation.Vertical,
-            this@AnimatedSpacingColumnMeasurePolicy
+            AnimatedSpacingOrientation.Horizontal,
+            this@AnimatedSpacingRowMeasurePolicy
         )
 
     override fun position(
@@ -31,18 +31,13 @@ internal class AnimatedSpacingColumnMeasurePolicy(private val spacing: Dp, priva
         layoutDirection: LayoutDirection
     ): Int =
         when (val alignment = parentData?.crossAxisAlignment) {
-            is CrossAxisAlignment.Horizontal -> alignment.alignment.align(placeable.width, crossAxisSize, layoutDirection)
+            is CrossAxisAlignment.Vertical -> alignment.alignment.align(placeable.height, crossAxisSize)
 
             is CrossAxisAlignment.Relative -> {
                 val linePosition = alignment.provider.position(placeable)
-                if (linePosition == AlignmentLine.Unspecified) {
-                    0
-                } else {
-                    val offset = lineSpace.before - linePosition
-                    if (layoutDirection == LayoutDirection.Ltr) offset else crossAxisSize - placeable.width - offset
-                }
+                if (linePosition == AlignmentLine.Unspecified) 0 else lineSpace.before - linePosition
             }
 
-            else -> horizontalAlignment.align(placeable.width, crossAxisSize, layoutDirection)
+            else -> verticalAlignment.align(placeable.height, crossAxisSize)
         }
 }
