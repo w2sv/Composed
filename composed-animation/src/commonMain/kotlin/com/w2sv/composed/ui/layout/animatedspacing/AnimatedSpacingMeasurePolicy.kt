@@ -60,7 +60,7 @@ internal fun MeasureScope.measureAnimatedSpacing(
     val animatedSpacings = presence?.let { calculateSymmetricSpacings(it, spacingPx) }
     val totalSpacing = animatedSpacings?.sum() ?: (spacingPx * (measurables.size - 1))
     val placeables = arrayOfNulls<Placeable>(measurables.size)
-    val weights = measureFixedChildren(
+    val weights = measureFixedChildrenProgressively(
         measurables = measurables,
         parentData = parentData,
         placeables = placeables,
@@ -69,7 +69,17 @@ internal fun MeasureScope.measureAnimatedSpacing(
         animatedSpacings = animatedSpacings,
         orientation = orientation
     )
-    measureWeightedChildren(measurables, parentData, presence, placeables, constraints, totalSpacing, weights, orientation)
+    measureWeightedChildren(
+        measurables = measurables,
+        parentData = parentData,
+        presence = presence,
+        placeables = placeables,
+        constraints = constraints,
+        totalSpacing = totalSpacing,
+        ordinarySpacing = spacingPx,
+        summary = weights,
+        orientation = orientation
+    )
 
     val contentSize = placeables.contentSize(totalSpacing, orientation)
     val lineSpace = placeables.alignmentLineSpace(parentData, orientation)
@@ -101,14 +111,12 @@ private fun Array<AnimatedSpacingParentData?>.animatedPresenceOrNull(): FloatArr
 private fun IntArray?.spacingBefore(index: Int, ordinarySpacing: Int): Int =
     this?.get(index) ?: if (index == 0) 0 else ordinarySpacing
 
-private fun ordinarySpacingForWeights(
-    totalSpacing: Int,
-    childCount: Int,
-    weightedChildCount: Int
-): Int =
-    if (childCount <= 1) 0 else totalSpacing / (childCount - 1) * (weightedChildCount - 1)
+@FoundationLayoutParity("Spacing reserved between weighted children")
+private fun foundationSpacingForWeightedChildren(spacing: Int, weightedChildCount: Int): Int =
+    spacing * (weightedChildCount - 1)
 
-private fun measureFixedChildren(
+@FoundationLayoutParity("Progressive fixed-child measurement and fitted spacing")
+private fun measureFixedChildrenProgressively(
     measurables: List<Measurable>,
     parentData: Array<AnimatedSpacingParentData?>,
     placeables: Array<Placeable?>,
@@ -158,6 +166,7 @@ private fun measureWeightedChildren(
     placeables: Array<Placeable?>,
     constraints: Constraints,
     totalSpacing: Int,
+    ordinarySpacing: Int,
     summary: WeightSummary,
     orientation: AnimatedSpacingOrientation
 ) {
@@ -165,20 +174,66 @@ private fun measureWeightedChildren(
     if (maximum == Constraints.Infinity || summary.totalWeight <= 0f) return
 
     val weightedSpacing = if (presence == null) {
-        ordinarySpacingForWeights(totalSpacing, parentData.size, summary.weightedChildCount)
+        foundationSpacingForWeightedChildren(ordinarySpacing, summary.weightedChildCount)
     } else {
         (totalSpacing - summary.fixedSpacing).coerceAtLeast(0)
     }
     val available = (maximum - summary.fixedSpace - weightedSpacing).coerceAtLeast(0)
-    val allocations = if (summary.hasVisibilityControlledWeight) {
-        calculateAnimatedWeightedAllocations(available, parentData, checkNotNull(presence))
+    if (summary.hasVisibilityControlledWeight) {
+        measureAnimatedWeightedChildren(
+            measurables,
+            parentData,
+            checkNotNull(presence),
+            placeables,
+            constraints,
+            available,
+            orientation
+        )
     } else {
-        calculateOrdinaryWeightedAllocations(available, parentData, summary.totalWeight)
+        measureFoundationWeightedChildren(
+            measurables,
+            parentData,
+            placeables,
+            constraints,
+            available,
+            summary.totalWeight,
+            orientation
+        )
     }
+}
 
+@FoundationLayoutParity("Weighted-child allocation, fill, and measurement constraints")
+private fun measureFoundationWeightedChildren(
+    measurables: List<Measurable>,
+    parentData: Array<AnimatedSpacingParentData?>,
+    placeables: Array<Placeable?>,
+    constraints: Constraints,
+    available: Int,
+    totalWeight: Float,
+    orientation: AnimatedSpacingOrientation
+) {
+    val allocations = calculateFoundationWeightedAllocations(available, parentData, totalWeight)
     measurables.forEachIndexed { index, measurable ->
         val data = parentData[index]?.takeIf { it.weight != null } ?: return@forEachIndexed
-        val itemPresence = presence?.get(index) ?: 1f
+        val allocation = allocations[index]
+        val minimum = if (data.fill) allocation else 0
+        placeables[index] = measurable.measure(constraints.weightedChildConstraints(minimum, allocation, orientation))
+    }
+}
+
+private fun measureAnimatedWeightedChildren(
+    measurables: List<Measurable>,
+    parentData: Array<AnimatedSpacingParentData?>,
+    presence: FloatArray,
+    placeables: Array<Placeable?>,
+    constraints: Constraints,
+    available: Int,
+    orientation: AnimatedSpacingOrientation
+) {
+    val allocations = calculateAnimatedWeightedAllocations(available, parentData, presence)
+    measurables.forEachIndexed { index, measurable ->
+        val data = parentData[index]?.takeIf { it.weight != null } ?: return@forEachIndexed
+        val itemPresence = presence[index]
         val allocation = allocations[index]
         val measuredAllocation = if (data.visibilityControlled && itemPresence > 0f) {
             (allocation / itemPresence).roundToInt().coerceIn(0, available)

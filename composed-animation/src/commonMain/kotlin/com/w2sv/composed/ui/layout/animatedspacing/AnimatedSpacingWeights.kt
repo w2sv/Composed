@@ -4,8 +4,8 @@ import kotlin.math.floor
 import kotlin.math.roundToInt
 import kotlin.math.sign
 
-/** Matches Foundation's rounded weight-unit allocation and signed remainder distribution. */
-internal fun calculateOrdinaryWeightedAllocations(
+@FoundationLayoutParity("Rounded weight-unit allocation and signed remainder distribution")
+internal fun calculateFoundationWeightedAllocations(
     availableSpace: Int,
     parentData: Array<AnimatedSpacingParentData?>,
     totalWeight: Float = parentData.fold(0f) { total, data -> total + (data?.weight ?: 0f) }

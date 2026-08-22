@@ -60,7 +60,7 @@ class AnimatedSpacingWeightsTest {
 
             listOf(0, 1, 10, 99, 100).forEach { availableSpace ->
                 val expected = if (weights.any { it != null }) availableSpace else 0
-                assertEquals(expected, calculateOrdinaryWeightedAllocations(availableSpace, parentData).sum())
+                assertEquals(expected, calculateFoundationWeightedAllocations(availableSpace, parentData).sum())
             }
         }
     }
@@ -84,7 +84,7 @@ class AnimatedSpacingWeightsTest {
     ) {
         assertContentEquals(
             expected,
-            calculateOrdinaryWeightedAllocations(availableSpace, weights.toParentData())
+            calculateFoundationWeightedAllocations(availableSpace, weights.toParentData())
         )
     }
 
