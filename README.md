@@ -18,6 +18,10 @@
     <img src="https://img.shields.io/badge/docs-API_reference-blue" alt="API Reference">
 </a>
 
+<a href="https://w2sv.github.io/Composed/playground/">
+    <img src="https://img.shields.io/badge/playground-WebAssembly-654FF0?logo=webassembly&logoColor=white" alt="WebAssembly Playground">
+</a>
+
 <a href="https://github.com/w2sv/Composed/actions/workflows/build.yaml">
     <img src="https://github.com/w2sv/Composed/actions/workflows/build.yaml/badge.svg" alt="Build">
 </a>
@@ -315,6 +319,8 @@ dependencies {
 
 The [`playground`](playground) module contains Compose Desktop and Wasm browser apps for
 interactively testing visual and behavioral APIs.
+
+Try the [playground web app](https://w2sv.github.io/Composed/playground/) in your browser.
 
 Run the desktop app with:
 
