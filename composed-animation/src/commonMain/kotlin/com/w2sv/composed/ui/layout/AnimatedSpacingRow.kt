@@ -1,7 +1,10 @@
 package com.w2sv.composed.ui.layout
 
 import androidx.compose.animation.core.FiniteAnimationSpec
+import androidx.compose.animation.core.MutableTransitionState
+import androidx.compose.animation.core.rememberTransition
 import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.layout.LayoutScopeMarker
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.runtime.Composable
@@ -122,6 +125,27 @@ interface AnimatedSpacingRowScope : RowScope {
         label: String = "AnimatedVisibility",
         content: @Composable () -> Unit
     )
+
+    /**
+     * State-driven counterpart to [AnimatedVisibility] whose transition remains active until the content's structural
+     * presence animation has completed.
+     *
+     * @param visibleState observable current and target visibility state. Its `isIdle` becomes true only after size,
+     * spacing, and optional fade have reached the target.
+     * @param modifier modifier applied to the visibility wrapper. Row scope modifiers such as `weight`, `align`, and
+     * `alignBy` are supported.
+     * @param animation optional cohesive override. `null` inherits the containing row's animation configuration.
+     * @param label label used for Compose animation tooling.
+     * @param content content shown while the transition's current or target state is visible.
+     */
+    @Composable
+    fun AnimatedVisibility(
+        visibleState: MutableTransitionState<Boolean>,
+        modifier: Modifier = Modifier,
+        animation: AnimatedSpacingRowAnimation? = null,
+        label: String = "AnimatedVisibility",
+        content: @Composable () -> Unit
+    )
 }
 
 @OptIn(ExperimentalAnimatedSpacingApi::class)
@@ -150,9 +174,33 @@ private class AnimatedSpacingRowScopeInstance(private val inheritedAnimation: An
         label: String,
         content: @Composable () -> Unit
     ) {
+        val transition = updateTransition(targetState = visible, label = label)
+        AnimatedVisibility(transition, modifier, animation, label, content)
+    }
+
+    @Composable
+    override fun AnimatedVisibility(
+        visibleState: MutableTransitionState<Boolean>,
+        modifier: Modifier,
+        animation: AnimatedSpacingRowAnimation?,
+        label: String,
+        content: @Composable () -> Unit
+    ) {
+        val transition = rememberTransition(transitionState = visibleState, label = label)
+        AnimatedVisibility(transition, modifier, animation, label, content)
+    }
+
+    @Composable
+    private fun AnimatedVisibility(
+        transition: androidx.compose.animation.core.Transition<Boolean>,
+        modifier: Modifier,
+        animation: AnimatedSpacingRowAnimation?,
+        label: String,
+        content: @Composable () -> Unit
+    ) {
         val resolvedAnimation = animation ?: inheritedAnimation
         AnimatedSpacingRowVisibility(
-            visible = visible,
+            transition = transition,
             modifier = modifier,
             expandFrom = resolvedAnimation.expandFrom,
             shrinkTowards = resolvedAnimation.shrinkTowards,

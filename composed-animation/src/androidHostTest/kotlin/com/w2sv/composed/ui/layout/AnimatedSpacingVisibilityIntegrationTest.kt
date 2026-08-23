@@ -1,6 +1,7 @@
 package com.w2sv.composed.ui.layout
 
 import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
@@ -8,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -96,6 +98,140 @@ class AnimatedSpacingVisibilityIntegrationTest {
 
         assertContentCount(1)
         composeTestRule.onNodeWithTag("last").assertTopPositionInRootIsEqualTo(60.dp)
+    }
+
+    @Test
+    fun `state-driven visibility supports initial enter`() {
+        val visibleState = MutableTransitionState(false)
+        composeTestRule.setContent {
+            AnimatedSpacingColumn(spacing = 10.dp, animation = TestColumnAnimation) {
+                Item("first")
+                AnimatedVisibility(visibleState) { Item("content") }
+                Item("last")
+            }
+        }
+
+        startTransition { visibleState.targetState = true }
+        advanceHalfway()
+
+        assertContentCount(1)
+        composeTestRule.onNodeWithTag("last").assertTopPositionInRootIsEqualTo(44.dp)
+        composeTestRule.runOnIdle { assertEquals(false, visibleState.isIdle) }
+
+        completeTransition()
+        composeTestRule.runOnIdle { assertEquals(true, visibleState.isIdle) }
+    }
+
+    @Test
+    fun `state-driven exit becomes idle only after structural completion`() {
+        val visibleState = MutableTransitionState(true)
+        composeTestRule.setContent {
+            AnimatedSpacingRow(spacing = 10.dp, animation = TestRowAnimation) {
+                Item("first")
+                AnimatedVisibility(visibleState) { Item("content") }
+                Item("last")
+            }
+        }
+
+        startTransition { visibleState.targetState = false }
+        advanceHalfway()
+        assertContentCount(1)
+        composeTestRule.runOnIdle { assertEquals(false, visibleState.isIdle) }
+
+        completeTransition()
+        assertContentCount(0)
+        composeTestRule.runOnIdle { assertEquals(true, visibleState.isIdle) }
+    }
+
+    @Test
+    fun `state-driven target reversal remains continuous`() {
+        val visibleState = MutableTransitionState(true)
+        composeTestRule.setContent {
+            AnimatedSpacingColumn(spacing = 10.dp, animation = TestColumnAnimation) {
+                Item("first")
+                AnimatedVisibility(visibleState) { Item("content") }
+                Item("last")
+            }
+        }
+
+        startTransition { visibleState.targetState = false }
+        composeTestRule.mainClock.advanceTimeBy(300, ignoreFrameDuration = true)
+        startTransition { visibleState.targetState = true }
+        completeTransition()
+
+        assertContentCount(1)
+        composeTestRule.onNodeWithTag("last").assertTopPositionInRootIsEqualTo(60.dp)
+        composeTestRule.runOnIdle { assertEquals(true, visibleState.isIdle) }
+    }
+
+    @Test
+    fun `state-driven child inherits container animation`() {
+        val visibleState = MutableTransitionState(false)
+        val geometry = AxisGeometry()
+        composeTestRule.setContent {
+            AnimatedSpacingColumn(
+                spacing = 0.dp,
+                animation = TestColumnAnimation.copy(expandFrom = Alignment.Bottom)
+            ) {
+                AnimatedVisibility(
+                    visibleState = visibleState,
+                    modifier = Modifier.onGloballyPositioned { geometry.recordVerticalWrapper(it) }
+                ) {
+                    Box(Modifier.size(20.dp).onGloballyPositioned { geometry.recordVerticalContent(it) })
+                }
+            }
+        }
+
+        startTransition { visibleState.targetState = true }
+        advanceHalfway()
+        composeTestRule.runOnIdle { geometry.assertVerticalAlignment(Alignment.Bottom) }
+    }
+
+    @Test
+    fun `state-driven child animation overrides its container`() {
+        val visibleState = MutableTransitionState(false)
+        val geometry = AxisGeometry()
+        composeTestRule.setContent {
+            AnimatedSpacingColumn(
+                spacing = 0.dp,
+                animation = TestColumnAnimation.copy(expandFrom = Alignment.Bottom)
+            ) {
+                AnimatedVisibility(
+                    visibleState = visibleState,
+                    modifier = Modifier.onGloballyPositioned { geometry.recordVerticalWrapper(it) },
+                    animation = TestColumnAnimation.copy(expandFrom = Alignment.Top)
+                ) {
+                    Box(Modifier.size(20.dp).onGloballyPositioned { geometry.recordVerticalContent(it) })
+                }
+            }
+        }
+
+        startTransition { visibleState.targetState = true }
+        advanceHalfway()
+        composeTestRule.runOnIdle { geometry.assertVerticalAlignment(Alignment.Top) }
+    }
+
+    @Test
+    fun `state-driven content is disposed only after exit finishes`() {
+        val visibleState = MutableTransitionState(true)
+        var disposed = false
+        composeTestRule.setContent {
+            AnimatedSpacingColumn(spacing = 0.dp, animation = TestColumnAnimation) {
+                AnimatedVisibility(visibleState) {
+                    DisposableEffect(Unit) {
+                        onDispose { disposed = true }
+                    }
+                    Item("content")
+                }
+            }
+        }
+
+        startTransition { visibleState.targetState = false }
+        advanceHalfway()
+        composeTestRule.runOnIdle { assertEquals(false, disposed) }
+
+        completeTransition()
+        composeTestRule.runOnIdle { assertEquals(true, disposed) }
     }
 
     @Test

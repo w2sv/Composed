@@ -1,8 +1,8 @@
 package com.w2sv.composed.ui.layout.animatedspacing
 
 import androidx.compose.animation.core.FiniteAnimationSpec
+import androidx.compose.animation.core.Transition
 import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.updateTransition
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
@@ -27,7 +27,7 @@ import kotlin.math.roundToInt
 
 @Composable
 internal fun AnimatedSpacingColumnVisibility(
-    visible: Boolean,
+    transition: Transition<Boolean>,
     modifier: Modifier,
     expandFrom: Alignment.Vertical,
     shrinkTowards: Alignment.Vertical,
@@ -40,7 +40,7 @@ internal fun AnimatedSpacingColumnVisibility(
         StructuralAlignment.Vertical(expandFrom, shrinkTowards)
     }
     AnimatedSpacingVisibility(
-        visible = visible,
+        transition = transition,
         modifier = modifier,
         animationSpec = animationSpec,
         fade = fade,
@@ -52,7 +52,7 @@ internal fun AnimatedSpacingColumnVisibility(
 
 @Composable
 internal fun AnimatedSpacingRowVisibility(
-    visible: Boolean,
+    transition: Transition<Boolean>,
     modifier: Modifier,
     expandFrom: Alignment.Horizontal,
     shrinkTowards: Alignment.Horizontal,
@@ -65,7 +65,7 @@ internal fun AnimatedSpacingRowVisibility(
         StructuralAlignment.Horizontal(expandFrom, shrinkTowards)
     }
     AnimatedSpacingVisibility(
-        visible = visible,
+        transition = transition,
         modifier = modifier,
         animationSpec = animationSpec,
         fade = fade,
@@ -77,7 +77,7 @@ internal fun AnimatedSpacingRowVisibility(
 
 @Composable
 private fun AnimatedSpacingVisibility(
-    visible: Boolean,
+    transition: Transition<Boolean>,
     modifier: Modifier,
     animationSpec: FiniteAnimationSpec<Float>,
     fade: Boolean,
@@ -85,7 +85,6 @@ private fun AnimatedSpacingVisibility(
     structuralAlignment: StructuralAlignment,
     content: @Composable () -> Unit
 ) {
-    val transition = updateTransition(targetState = visible, label = label)
     val presence = transition.animateFloat(
         transitionSpec = { animationSpec },
         label = "$label:presence"
