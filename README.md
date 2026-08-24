@@ -39,22 +39,13 @@
 ---
 
 <p align="center">
-    <b>Small Compose helpers you keep pasting from project to project.</b>
+    <b>Reusable building blocks and utilities for Compose Multiplatform.</b>
 </p>
 
-Composed is a lightweight utility library
-for [Compose Multiplatform](https://github.com/jetbrains/compose-multiplatform) that fills in
-recurring gaps around Compose APIs.
-It provides focused helpers for **effects, snapshot state and savers, modifier composition, layout,
-gesture coordination, focus handling, animations, and Material 3 behavior** — without introducing a
-framework, design system, or collection of opinionated UI components.
+Composed extends [Compose Multiplatform](https://github.com/jetbrains/compose-multiplatform) with focused APIs for recurring UI problems — from small utilities for state, effects, and modifier composition to reusable animation controllers, layouts, gesture and focus coordination, and Material 3 extensions.
+The library aims to fill practical gaps in the Compose API without introducing a framework, design system, or opinionated component library.
 
-Platform-specific utilities stay explicitly scoped to their respective targets, while the common API
-remains usable across supported Compose Multiplatform platforms.
-
-See the [API reference](https://w2sv.github.io/Composed/) for the full documentation.
-
-> Web/Wasm support follows Compose Multiplatform's Beta status.
+See the [API reference](https://w2sv.github.io/Composed/) for the full documentation, or check out the interactive [Playground](https://w2sv.github.io/Composed/playground/) in the browser (currently not looking great on phone screens tho).
 
 ## ✨ API highlights
 
@@ -317,27 +308,29 @@ dependencies {
 
 ## 🖥️ Playground
 
-The [`playground`](playground) module contains Compose Desktop and Wasm browser apps for
-interactively testing visual and behavioral APIs.
+The [`playground module`](playground) provides Compose Desktop and Wasm browser apps for interactively exploring and testing visual and behavioral APIs.
 
-Try the [playground web app](https://w2sv.github.io/Composed/playground/) in your browser.
+### Web
 
-Run the desktop app with:
+Try the playground web app [directly in your browser](https://w2sv.github.io/Composed/playground/).
 
-```bash
-./gradlew :playground:run [--args=<sample-id>]
-```
+To run the Wasm app locally:
 
-Or run the Wasm app in a development server with:
-
-```bash
+```kotlin
 ./gradlew :playground:wasmJsBrowserDevelopmentRun
 ```
 
-Without a desktop `--args` option, the playground opens a sample picker.
-To see the available sample IDs and detailed usage instructions, run
+### Desktop
 
-```bash
+Run the desktop app with:
+
+```kotlin
+./gradlew :playground:run [--args=<sample-id>]
+```
+
+To see the available sample IDs and detailed usage instructions:
+
+```kotlin
 ./gradlew :playground:usage
 ```
 
