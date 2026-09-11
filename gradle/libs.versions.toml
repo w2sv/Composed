@@ -20,7 +20,7 @@ kotlinx-coroutines = "1.11.0"
 ktlint = "1.8.0"
 littlerobots-versionCatalogUpdate = "1.1.1"
 oikvpqya-compose-fastscroller = "0.3.2"
-robolectric = "4.16.1"
+robolectric = "4.17"
 vanniktech-maven-publish = "0.37.0"
 
 [libraries]
