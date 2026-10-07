@@ -1,26 +1,27 @@
 [versions]
-android-gradle-plugin = "9.3.1"
+android-gradle-plugin = "9.4.1"
 androidx-activity-compose = "1.13.0"
-androidx-annotation = "1.10.0"
-androidx-core-ktx = "1.19.0"
+androidx-annotation = "1.11.0"
+androidx-core-ktx = "1.19.1"
 jetbrains-androidx-lifecycle = "2.11.0"
-jetbrains-compose = "1.11.1"
+jetbrains-compose = "1.12.1"
 jetbrains-compose-material3 = "1.9.0"
 # @pin
 # contains expressive while being based on jetbrains-compose 1.11.1
 jetbrains-compose-material3-expressive = "1.11.0-alpha07"
 jetbrains-dokka = "2.2.0"
-jetbrains-kotlinx-kover = "0.9.9"
+jetbrains-kotlinx-kover = "0.9.11"
 jlleitschuh-gradle-ktlint = "14.2.0"
 junit = "4.13.2"
 # @pin
 kotlin = "2.3.21"
 kotlinx-coroutines = "1.11.0"
 # @pin
+# @keep
 ktlint = "1.8.0"
 littlerobots-versionCatalogUpdate = "1.1.1"
 oikvpqya-compose-fastscroller = "0.3.2"
-robolectric = "4.16.1"
+robolectric = "4.17"
 vanniktech-maven-publish = "0.37.0"
 
 [libraries]
@@ -39,10 +40,10 @@ jetbrains-compose-runtime = { module = "org.jetbrains.compose.runtime:runtime", 
 jetbrains-compose-ui = { module = "org.jetbrains.compose.ui:ui", version.ref = "jetbrains-compose" }
 jetbrains-compose-ui-test = { module = "org.jetbrains.compose.ui:ui-test", version.ref = "jetbrains-compose" }
 jetbrains-compose-ui-test-junit4 = { module = "org.jetbrains.compose.ui:ui-test-junit4", version.ref = "jetbrains-compose" }
-oikvpqya-compose-fastscroller-core = { module = "io.github.oikvpqya.compose.fastscroller:fastscroller-core", version.ref = "oikvpqya-compose-fastscroller" }
 jetbrains-kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
 jetbrains-kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinx-coroutines" }
 junit = { module = "junit:junit", version.ref = "junit" }
+oikvpqya-compose-fastscroller-core = { module = "io.github.oikvpqya.compose.fastscroller:fastscroller-core", version.ref = "oikvpqya-compose-fastscroller" }
 roboelectric = { module = "org.robolectric:robolectric", version.ref = "robolectric" }
 
 [plugins]
