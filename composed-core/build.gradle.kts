@@ -19,6 +19,7 @@ kotlin {
 
         androidMain.dependencies {
             api(libs.androidx.annotation)
+            implementation(libs.androidx.activity.compose)
             implementation(libs.androidx.core.ktx)
         }
 
