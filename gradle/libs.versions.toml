@@ -3,6 +3,8 @@ android-gradle-plugin = "9.4.1"
 androidx-activity-compose = "1.13.0"
 androidx-annotation = "1.11.0"
 androidx-core-ktx = "1.19.1"
+androidx-navigation3 = "1.2.0"
+androidx-savedstate = "1.5.0"
 jetbrains-androidx-lifecycle = "2.11.0"
 jetbrains-compose = "1.12.1"
 jetbrains-compose-material3 = "1.9.0"
@@ -28,6 +30,8 @@ vanniktech-maven-publish = "0.37.0"
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity-compose" }
 androidx-annotation = { module = "androidx.annotation:annotation", version.ref = "androidx-annotation" }
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "androidx-core-ktx" }
+androidx-navigation3-runtime = { module = "androidx.navigation3:navigation3-runtime", version.ref = "androidx-navigation3" }
+androidx-savedstate = { module = "androidx.savedstate:savedstate", version.ref = "androidx-savedstate" }
 jetbrains-androidx-lifecycle-runtime-compose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose", version.ref = "jetbrains-androidx-lifecycle" }
 jetbrains-compose-animation = { module = "org.jetbrains.compose.animation:animation", version.ref = "jetbrains-compose" }
 jetbrains-compose-foundation = { module = "org.jetbrains.compose.foundation:foundation", version.ref = "jetbrains-compose" }
@@ -37,6 +41,7 @@ jetbrains-compose-material3 = { module = "org.jetbrains.compose.material3:materi
 #noinspection SimilarGradleDependency
 jetbrains-compose-material3-expressive = { module = "org.jetbrains.compose.material3:material3", version.ref = "jetbrains-compose-material3-expressive" }
 jetbrains-compose-runtime = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "jetbrains-compose" }
+jetbrains-compose-runtime-saveable = { module = "org.jetbrains.compose.runtime:runtime-saveable", version.ref = "jetbrains-compose" }
 jetbrains-compose-ui = { module = "org.jetbrains.compose.ui:ui", version.ref = "jetbrains-compose" }
 jetbrains-compose-ui-test = { module = "org.jetbrains.compose.ui:ui-test", version.ref = "jetbrains-compose" }
 jetbrains-compose-ui-test-junit4 = { module = "org.jetbrains.compose.ui:ui-test-junit4", version.ref = "jetbrains-compose" }

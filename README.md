@@ -263,14 +263,12 @@ to hidden.
 
 ## 📦 Modules
 
-| Module               | Description                                                                        |
-|----------------------|------------------------------------------------------------------------------------|
-| `composed-core`      | General-purpose Compose utilities. Contains also Android-only utilities.           |
-| `composed-animation` | Reusable animation controllers, animated spacing layouts, and lazy-grid entrances. |
-| `composed-material3` | Utilities and extensions for Compose Material 3 layouts, drawers, and snackbars.   |
-
-Android permission-state utilities are available separately
-at [AugmentedPermissions](https://github.com/w2sv/AugmentedPermissions).
+| Module                 | Description                                                                        |
+|------------------------|------------------------------------------------------------------------------------|
+| `composed-animation`   | Reusable animation controllers, animated spacing layouts, and lazy-grid entrances. |
+| `composed-core`        | General-purpose Compose utilities. Contains also Android-only utilities.           |
+| `composed-material3`   | Utilities and extensions for Compose Material 3 layouts, drawers, and snackbars.   |
+| `composed-navigation3` | Type-safe back stacks and guarded navigation utilities for Navigation 3.           |
 
 ## 🚀 Installation
 
@@ -281,6 +279,7 @@ dependencies {
     implementation("io.github.w2sv:composed-animation:<version>")
     implementation("io.github.w2sv:composed-core:<version>")
     implementation("io.github.w2sv:composed-material3:<version>")
+    implementation("io.github.w2sv:composed-navigation3:<version>")
 }
 ```
 
@@ -294,6 +293,7 @@ w2sv-composed = "<version>"
 w2sv-composed-animation = { module = "io.github.w2sv:composed-animation", version.ref = "w2sv-composed" }
 w2sv-composed-core = { module = "io.github.w2sv:composed-core", version.ref = "w2sv-composed" }
 w2sv-composed-material3 = { module = "io.github.w2sv:composed-material3", version.ref = "w2sv-composed" }
+w2sv-composed-navigation3 = { module = "io.github.w2sv:composed-navigation3", version.ref = "w2sv-composed" }
 ```
 
 **build.gradle.kts:**
@@ -302,6 +302,7 @@ w2sv-composed-material3 = { module = "io.github.w2sv:composed-material3", versio
 dependencies {
     implementation(libs.w2sv.composed.animation)
     implementation(libs.w2sv.composed.core)
+    implementation(libs.w2sv.composed.navigation3)
     implementation(libs.w2sv.composed.material3)
 }
 ```
