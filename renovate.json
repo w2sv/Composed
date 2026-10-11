@@ -9,6 +9,13 @@
                 "github-actions"
             ],
             "groupName": "GitHub Actions"
+        },
+        {
+            "description": "Keep JDK 21 as specified in gradle-daemon-jvm.properties",
+            "matchManagers": ["github-actions"],
+            "matchPackageNames": ["java-jdk"],
+            "matchFileNames": [".github/workflows/build.yaml"],
+            "enabled": false
         }
     ]
 }
