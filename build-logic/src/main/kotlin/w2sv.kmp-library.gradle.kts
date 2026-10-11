@@ -36,8 +36,20 @@ kotlin {
                 }
             }
         }
+        binaries.executable()
     }
 
     iosArm64()
     iosSimulatorArm64()
 }
+
+// Grant Robolectric access to jdk.internal.access to fix
+// java.lang.RuntimeException at AndroidInterceptors.java:88
+//        Caused by: java.lang.IllegalAccessException at Reflection.java:394
+tasks.withType<Test>()
+    .matching { it.name == "testAndroidHostTest" }
+    .configureEach {
+        jvmArgs(
+            "--add-opens=java.base/jdk.internal.access=ALL-UNNAMED"
+        )
+    }
