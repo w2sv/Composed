@@ -6,7 +6,7 @@ androidx-core-ktx = "1.19.1"
 androidx-navigation3 = "1.2.0"
 androidx-savedstate = "1.5.0"
 jetbrains-androidx-lifecycle = "2.11.0"
-jetbrains-compose = "1.12.1"
+jetbrains-compose = "1.12.2"
 jetbrains-compose-material3 = "1.9.0"
 # @pin
 # contains expressive while being based on jetbrains-compose 1.11.1
