@@ -21,7 +21,7 @@ kotlinx-coroutines = "1.11.0"
 # @pin
 # @keep
 ktlint = "1.8.0"
-littlerobots-versionCatalogUpdate = "1.1.1"
+littlerobots-versionCatalogUpdate = "1.1.2"
 oikvpqya-compose-fastscroller = "0.3.2"
 robolectric = "4.17"
 vanniktech-maven-publish = "0.37.0"
